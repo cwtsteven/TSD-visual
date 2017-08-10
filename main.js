@@ -1,5 +1,5 @@
 requirejs.config({
-	urlArgs: "bust=" + (new Date()).getTime(),
+	//urlArgs: "bust=" + (new Date()).getTime(),
 	//By default load any module IDs from js/lib
 	baseUrl: 'js',
 	//except, if the module ID starts with "app",
