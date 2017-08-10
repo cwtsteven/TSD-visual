@@ -1,0 +1,96 @@
+<html>
+<head>
+	<meta charset="utf-8">
+  	<title>GoI Visualiser</title>
+  	<link rel="stylesheet" type="text/css" href="./css/jquery-ui.css">
+  	<link rel="stylesheet" type="text/css" href="./css/main.css">
+  	<script src="./jquery-ui/jquery.js"></script>
+  	<script src="./jquery-ui/jquery-ui.js"></script>
+  	<script src="./js/examples.js"></script>
+  	<script>
+  		$(function() {
+  			$("#btn-make-graph").button();
+  			$("#btn-refresh").button();
+  			$("#btn-play").button();
+  			$("#btn-pause").button();
+  			$("#btn-next").button();
+  			$("#btn-save").button();
+  			$("#btn-info").button();
+        $("#cb-draw").checkboxradio();
+  			
+  			$("#sm-example").selectmenu({
+  				select: function(event, ui) {
+  					var prog;
+  					switch($("#sm-example option:selected").val()) {
+  						case "fact": prog = fact_prog; break;
+  					}
+  					$("#ta-program").val(prog);
+  					$("#btn-make-graph").click();
+  				}
+  			})
+			
+  			$("#ta-program").val(fact_prog);
+  		});
+  	</script>
+</head>
+
+<body>
+	<div id="page">
+		<div id="main-content" class="divcontent" style="height: 80%">
+			<div class="left-content">
+		    	<div style="width: 100%; height: 10%;">
+    				<select id="sm-example">
+    					<option value="fact" selected>Factorial</option>
+    				</select>
+    				<!--<button id="btn-save">Save</button>-->
+    				<button id="btn-info">?</button>
+		    	</div>
+		    	<div style="width: 100%; height: 90%;">
+					<textarea id="ta-program" rows="40" spellcheck=false style="width: 100%; height: 50%; resize: none; font-size: 12px;">
+					</textarea>
+					<textarea id="ta-graph" rows="40" style="width: 100%; height: 50%; resize: none; background-color: lightgrey" readonly>
+					</textarea>
+		    	</div>
+	    	</div>
+	    	<div class="right-content">
+		    	<div align="center" id="graph" style="width: 100%; height: 92%;"></div>
+
+	    		<div align="center" style="height: 8%">
+		            <label for="cb-draw">Draw</label>
+		            <input type="checkbox" id="cb-draw" checked>
+  					<button id="btn-refresh">↻</button>
+  					<button id="btn-play">►</button>
+  					<button id="btn-pause">❚❚</button>
+  					<button id="btn-next">►|</button>
+	    		</div>
+	    	</div>
+	    </div>
+		
+		<div id="bottom-content" class="divcontent" style="height: 10%">
+			<div class="left-content">
+		    	<button id="btn-make-graph" style="width:100%;height:100%">>></button>
+	    	</div>
+	    	<div class="right-content">
+		    	<div align="center">
+		    		<div style="height: 100%">
+              <textarea id="flag" rows="4" wrap="off" class="stack-trace"></textarea>
+				    	<textarea id="dataStack" rows="4" wrap="off" class="stack-trace"></textarea>
+						  <textarea id="boxStack" rows="4" wrap="off" class="stack-trace"></textarea>
+		    		</div>
+				</div>
+	    	</div>
+		</div>
+
+		<div id="foot-content" class="left-content divcontent" style="height: 5%; width: 100%; margin-left: 0px">
+			</br>
+			This is a simulation tool of a GoI-style abstract machine implementing call-by-value. Related literature: </br>
+			Implemented by <a href=http://www.cs.bham.ac.uk/~wtc488/ target="_blank">Steven Cheung</a>, using <a href=https://github.com/mstefaniuk/graph-viz-d3-js target="_blank">graph-viz-d3-js</a>.
+		</div>
+
+		<div id="clearingdiv"></div>
+		<a id="download" href="" download="diagram.png"></a>
+	</div>
+
+	<script src="./bower_components/requirejs/require.js" data-main="main.js"></script>
+</body>
+</html>

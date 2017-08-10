@@ -1,0 +1,30 @@
+#clearingdiv {
+    clear: both;
+}
+.divcontent {
+    margin-left: 400px;
+}
+.right-content {
+    float: right;
+    width: 100%;
+}
+.left-content{
+    float: left;
+    width: 400px;
+    margin-left: -400px;
+}
+
+.stack-trace {
+	width: 33%;
+    height: 100%;
+	resize: none;
+}
+
+.menu-button {
+    height: 100%;
+}
+
+.overflow { 
+    width: 100%;
+    height: 100%; 
+}

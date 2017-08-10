@@ -1,0 +1,52 @@
+class Recur extends Expo {
+
+	constructor() {
+		super(null, "μ", null);
+		this.box = null;
+	}
+
+	transition(token, link) {
+		if (link.to == this.key) {
+			token.rewriteFlag = RewriteFlag.F_RECUR;
+			return this.findLinksOutOf("e")[0];
+		}
+	}
+
+	rewrite(token, nextLink) {
+		if (nextLink.from == this.key) {
+			if (token.rewriteFlag == RewriteFlag.F_RECUR) {
+				token.rewriteFlag = RewriteFlag.EMPTY;
+
+				var wrapper = BoxWrapper.create().addToGroup(this.group.group);
+				var newBox = this.group.copy(this.graph).addToGroup(wrapper.box);
+				wrapper.auxs = wrapper.createPaxsOnTopOf(newBox.auxs);
+				
+				new Link(wrapper.prin.key, newBox.prin.key, newBox.prin.name, "n", "s").addToGroup(wrapper);
+				
+				var oldGroup = this.group;
+				var oldBox = this.group.box;
+				this.group.moveOut();
+				var leftLink = this.findLinksInto("w")[0];
+				leftLink.changeTo(wrapper.prin.key, "s");
+				leftLink.fromPort = "n";
+				leftLink.reverse = false;
+				var inLink = this.findLinksInto("s")[0];
+				var outLink = this.findLinksOutOf("e")[0];
+				outLink.changeFrom(inLink.from, inLink.fromPort);
+
+				Term.joinAuxs(wrapper.auxs, oldBox.auxs, wrapper.group);
+				
+				oldGroup.delete();
+
+				token.at = nextLink.from;
+				token.rewrite = true;
+
+				return nextLink;
+			}
+		}
+	}
+
+	copy() {
+		return new Recur();
+	}
+}
