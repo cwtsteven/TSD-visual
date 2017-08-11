@@ -3,6 +3,6 @@ var fact_prog =
 + '  if (x <= 1)\n'
 + '  then 1\n'
 + '  else (x * (f (x - 1)))\n'
-+ '  in\n'
++ 'in\n'
 + '\n'
 + 'fact 4';

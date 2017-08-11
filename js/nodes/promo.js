@@ -44,9 +44,8 @@ class Promo extends Expo {
 				else if (prev instanceof Contract && token.boxStack.length >= 1) {
 					var link = token.boxStack.pop();
 					var inLinks = prev.findLinksInto(null);
-					if (inLinks.length == 1) {
-						link.changeTo(this.key, "s");
-						prev.delete();
+					if (inLinks.length == 1) { 
+						// this will not happen as the C-node should have taken care of it
 					}
 					else {
 						var newBoxWrapper = this.group.copy().addToGroup(this.group.group);
