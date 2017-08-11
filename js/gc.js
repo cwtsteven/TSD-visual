@@ -16,8 +16,10 @@ class GC {
 		for (let node of Array.from(group.nodes)) {
 			if ((node instanceof Weak) || (node instanceof Contract && node.findLinksInto(null).length == 0)) {
 				var nextNode = this.graph.findNodeByKey(node.findLinksOutOf(null)[0].to);
-				this.noMore = false;
-				this.collectFromBottom(node);
+				if (!nextNode instanceof Abs) { 
+					this.noMore = false;
+					this.collectFromBottom(node);
+				}
 			}
 			else if (node instanceof Group) {
 				this.collectInGroup(node);
