@@ -41,7 +41,6 @@ class MachineToken {
 var CompData = {
 	PROMPT: '*',
 	LAMBDA: 'λ',
-	L: 'L',
 	R: '@',
 }
 
@@ -49,17 +48,12 @@ var RewriteFlag = {
 	EMPTY: '□',
 	F_LAMBDA: '<λ>',
 	F_OP: '<$>',
-	F_TRI: '<△>',
 	F_IF: '<if>',
-	F_NN: '<n>',
 	F_C: '<C>',
 	F_PROMO: '<!>',
 	F_RECUR: '<μ>',
 }
 
 var BoxData = {
-	UNIT: '*',
-	L: 'L',
-	R: 'R',
 }
 

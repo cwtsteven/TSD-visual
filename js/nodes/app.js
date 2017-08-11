@@ -8,8 +8,6 @@ class App extends Node {
 		if (link.to == this.key) {
 			token.dataStack.push(CompData.PROMPT);
 			return this.findLinksOutOf("e")[0];
-			//token.dataStack.push(CompData.R);
-			//return this.findLinksOutOf("w")[0];
 		}
 		else if (link.from == this.key && link.fromPort == "e") {
 			token.dataStack.pop();
