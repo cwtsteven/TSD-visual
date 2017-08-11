@@ -48,10 +48,10 @@ class Contract extends Expo {
 					return nextLink;
 				}
 			}
-			token.rewriteFlag = RewriteFlag.EMPTY;
-			token.rewrite = false;
-			return nextLink;
 		}
+		token.rewriteFlag = RewriteFlag.EMPTY;
+		token.rewrite = false;
+		return nextLink;
 	}
 
 	copy() {

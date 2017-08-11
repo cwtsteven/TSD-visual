@@ -40,10 +40,13 @@ class Recur extends Expo {
 
 				token.at = nextLink.from;
 				token.rewrite = true;
-
 				return nextLink;
 			}
 		}
+
+		token.rewriteFlag = RewriteFlag.EMPTY;
+		token.rewrite = false;
+		return nextLink;
 	}
 
 	copy() {
