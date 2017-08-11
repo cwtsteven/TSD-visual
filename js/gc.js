@@ -7,19 +7,17 @@ class GC {
 	
 	collect() {
 		do {
+			this.noMore = true;
 			this.collectInGroup(this.graph.child);
 		} while (!this.noMore)
 	}
 
 	collectInGroup(group) {
-		this.noMore = true;
 		for (let node of Array.from(group.nodes)) {
 			if ((node instanceof Weak) || (node instanceof Contract && node.findLinksInto(null).length == 0)) {
 				var nextNode = this.graph.findNodeByKey(node.findLinksOutOf(null)[0].to);
-				if (!(nextNode instanceof Abs)) {
-					this.collectFromBottom(node);
-					this.noMore = false;
-				}
+				this.noMore = false;
+				this.collectFromBottom(node);
 			}
 			else if (node instanceof Group) {
 				this.collectInGroup(node);
