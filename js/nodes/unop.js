@@ -15,7 +15,7 @@ class UnOp extends Node {
 				var v1 = token.dataStack.pop();
 						 token.dataStack.pop();
 				token.dataStack.push(this.unOpApply(this.subType, v1));
-				token.dataStack.push(CompData.F_OP);
+				token.rewriteFlag = RewriteFlag.F_OP;
 				return this.findLinksInto(null)[0];
 			}
 		}
@@ -23,9 +23,9 @@ class UnOp extends Node {
 
 	rewrite(token, nextLink) {
 		if (nextLink.to == this.key) {
-			var data = token.dataStack.last();
-			if (data == CompData.F_OP) {
-				data = token.dataStack.pop();
+
+			if (token.rewriteFlag = RewriteFlag.F_OP) {
+				token.rewriteFlag = RewriteFlag.EMPTY;
 				var newConst = new Const(token.dataStack.last()).addToGroup(this.group);
 				nextLink.changeTo(newConst.key, nextLink.toPort);
 				this.graph.findNodeByKey(this.findLinksOutOf(null)[0].to).delete();
