@@ -17,6 +17,7 @@ class GoIMachine {
 		// init
 		this.graph.clear();
 		this.token.reset();
+		this.count = 0;
 		// create graph
 		var start = new Start().addToGroup(this.graph.child);
 		var term = this.toGraph(ast, this.graph.child);
