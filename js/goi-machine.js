@@ -37,19 +37,14 @@ class GoIMachine {
 		else if (ast instanceof Abstraction) {
 			var param = ast.param;
 			var abs = new Abs().addToGroup(group);
-			var wrapper = BoxWrapper.create().addToGroup(group);
-			var term = this.toGraph(ast.body, wrapper.box);
-			wrapper.auxs = wrapper.createPaxsOnTopOf(term.auxs);
+			var term = this.toGraph(ast.body, group);
 
-			var der = new Der().addToGroup(group);
-			new Link(wrapper.prin.key, term.prin.key, term.prin.name, "n", "s").addToGroup(wrapper);
-			new Link(der.key, wrapper.prin.key, wrapper.prin.name, "n", "s").addToGroup(group);
-			new Link(abs.key, der.key, term.prin.name, "e", "s").addToGroup(group);
+			new Link(abs.key, term.prin.key, term.prin.name, "e", "s").addToGroup(group);
 
-			var auxs = Array.from(wrapper.auxs);
+			var auxs = Array.from(term.auxs);
 			var paramUsed = false;
 			var auxNode;
-			for (let aux of wrapper.auxs) {
+			for (let aux of term.auxs) {
 				if (aux.name == param) {
 					paramUsed = true;
 					auxNode = aux;
