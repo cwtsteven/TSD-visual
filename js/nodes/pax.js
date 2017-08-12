@@ -1,8 +1,4 @@
-class Aux extends Expo {
-	
-}
-
-class Pax extends Aux {
+class Pax extends Expo {
 
 	constructor(name) {
 		super(null, "?", name);

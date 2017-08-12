@@ -30,7 +30,7 @@ class Promo extends Expo {
 					token.rewrite = true;
 					return newNextLink;
 				}
-				else if (prev instanceof Aux) {
+				else if (prev instanceof Pax) {
 					this.group.changeToGroup(prev.group.box);
 					prev.group.auxs = prev.group.auxs.concat(prev.group.createPaxsOnTopOf(this.group.auxs));
 					var inLink = prev.findLinksInto(null)[0];
