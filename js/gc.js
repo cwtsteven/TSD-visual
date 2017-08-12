@@ -15,8 +15,9 @@ class GC {
 	collectInGroup(group) {
 		for (let node of Array.from(group.nodes)) {
 			if ((node instanceof Weak) || (node instanceof Contract && node.findLinksInto(null).length == 0)) {
-				var nextNode = this.graph.findNodeByKey(node.findLinksOutOf(null)[0].to);
-				if (!(nextNode instanceof Abs)) { 
+				var link = node.findLinksOutOf(null)[0];
+				var nextNode = this.graph.findNodeByKey(link.to);
+				if (!(nextNode instanceof Abs && link.toPort == "w")) { 
 					this.noMore = false;
 					this.collectFromBottom(node);
 				}
@@ -28,7 +29,7 @@ class GC {
 	}
 
 	collectFromBottom(node) {
-		if ((node instanceof Contract && node.findLinksInto(null).length != 0) || node instanceof Pax) {
+		if ((node instanceof Contract && node.findLinksInto(null).length != 0)) {
 
 		}
 		else if (node instanceof Promo || node instanceof Recur) {
