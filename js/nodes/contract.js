@@ -29,23 +29,21 @@ class Contract extends Expo {
 					return nextLink;
 				}
 				else if (token.boxStack.length >= 2) {
-					var j = token.boxStack.last();
-					var prev2 = this.graph.findNodeByKey(j.from);
-					if (prev2 instanceof Contract) {
+					var i = token.boxStack.last();
+					var prev = this.graph.findNodeByKey(i.from);
+					if (prev instanceof Contract) {
 						token.boxStack.pop();
-						var i = token.boxStack.last();
-						for (let link of prev2.findLinksInto(null)) {
-							link.changeTo(prev.key, "s");
+						for (let link of prev.findLinksInto(null)) {
+							link.changeTo(this.key, "s");
 						}
-						prev2.delete();
+						prev.delete();
 						token.at = nextLink.from;
 						token.rewrite = true;
 						return nextLink;
 					}
 				}
 				else if (token.boxStack.length == 1) {
-					token.rewriteFlag = RewriteFlag.EMPTY;
-					return nextLink;
+					
 				}
 			}
 		}
