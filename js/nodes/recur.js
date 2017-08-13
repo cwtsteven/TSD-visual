@@ -18,7 +18,7 @@ class Recur extends Expo {
 				token.rewriteFlag = RewriteFlag.EMPTY;
 
 				var wrapper = BoxWrapper.create().addToGroup(this.group.group);
-				var newBox = this.group.copy(this.graph).addToGroup(wrapper.box);
+				var newBox = this.group.copy().addToGroup(wrapper.box);
 				wrapper.auxs = wrapper.createPaxsOnTopOf(newBox.auxs);
 				
 				new Link(wrapper.prin.key, newBox.prin.key, newBox.prin.name, "n", "s").addToGroup(wrapper);
