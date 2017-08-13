@@ -32,12 +32,11 @@ class If extends Node {
 					var downLink = this.findLinksInto(null)[0];
 					var otherLink = this.findLinksOutOf(nextLink.fromPort == "n"?"e":"n")[0];
 					nextLink.changeFrom(downLink.from, downLink.fromPort);
-					var weak = new Weak(otherLink.text).addToGroup(this.group);
+					var weak = new Weak(this.graph.findNodeByKey(otherLink.to).name).addToGroup(this.group);
 					otherLink.changeFrom(weak.key, "n");
 					this.delete();
 					left.delete();
 
-					token.rewriteFlag = RewriteFlag.EMPTY;
 					token.at = nextLink.from;
 					token.rewrite = true;
 					return nextLink;
