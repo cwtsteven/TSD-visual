@@ -1,7 +1,7 @@
 class App extends Node {
 
 	constructor() {
-		super(null, "@", null);
+		super(null, "@");
 	}
 	
 	transition(token, link) {

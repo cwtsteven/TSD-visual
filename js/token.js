@@ -17,7 +17,7 @@ class MachineToken {
 				this.forward = false;
 				this.next = link.from;
 			}
-			this.link.focus(this.label, "red");
+			this.link.focus("red");
 		}
 	}
 
@@ -33,8 +33,6 @@ class MachineToken {
 		this.rewriteFlag = RewriteFlag.EMPTY;
 		this.dataStack = [CompData.PROMPT];
 		this.boxStack = [];
-
-		this.label = "●";
 	}
 }
 

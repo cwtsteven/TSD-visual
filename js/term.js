@@ -18,10 +18,10 @@ class Term extends Group {
 			var newPax = new Pax(pax.name).addToGroup(this);
 			
 			if (pax.findLinksOutOf(null).length == 0)
-				new Link(pax.key, newPax.key, pax.name, "n", "s").addToGroup(this);
+				new Link(pax.key, newPax.key, "n", "s").addToGroup(this);
 			else {
 				var outLink = pax.findLinksOutOf(null)[0];
-				new Link(newPax.key, outLink.to, pax.name, "n", outLink.toPort).addToGroup(this.group);
+				new Link(newPax.key, outLink.to, "n", outLink.toPort).addToGroup(this.group);
 				outLink.changeTo(newPax.key, "s");
 				outLink.changeToGroup(this);
 			}
@@ -44,8 +44,8 @@ class Term extends Group {
 						outLink.changeToGroup(group);
 					}
 
-					new Link(leftAux.key, con.key, leftAux.name, "n", "s").addToGroup(group);
-					new Link(rightAux.key, con.key, leftAux.name, "n", "s").addToGroup(group);
+					new Link(leftAux.key, con.key, "n", "s").addToGroup(group);
+					new Link(rightAux.key, con.key, "n", "s").addToGroup(group);
 					newAuxs.splice(newAuxs.indexOf(leftAux), 1);
 					newAuxs.splice(newAuxs.indexOf(rightAux), 1);
 					newAuxs.push(con);
@@ -130,11 +130,11 @@ class BoxWrapper extends Term {
 		}
 
 		for (let link of this.box.links) {
-			var newLink = new Link(map.get(link.from), map.get(link.to), link.text, link.fromPort, link.toPort).addToGroup(newBox);
+			var newLink = new Link(map.get(link.from), map.get(link.to), link.fromPort, link.toPort).addToGroup(newBox);
 			newLink.reverse = link.reverse;
 		}
 		for (let link of this.links) {
-			var newLink = new Link(map.get(link.from), map.get(link.to), link.text, link.fromPort, link.toPort).addToGroup(newBoxWrapper);
+			var newLink = new Link(map.get(link.from), map.get(link.to), link.fromPort, link.toPort).addToGroup(newBoxWrapper);
 			newLink.reverse = link.reverse;
 		}
 

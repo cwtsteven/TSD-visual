@@ -1,7 +1,7 @@
 class Abs extends Node {
 
 	constructor() {
-		super(null, "λ", null);
+		super(null, "λ");
 	}
 	
 	transition(token, link) {

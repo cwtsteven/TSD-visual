@@ -6,7 +6,7 @@ class Node {
 		this.key = null;
 		this.shape = shape;
 		this.text = text;
-		this.name = name; // identifier name if any
+		this.name = name; // identifier name or constant name if any
 		this.graph = null;
 		this.group = null;
 		this.width = null;

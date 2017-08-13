@@ -1,17 +1,13 @@
 class Link {
-	constructor(from, to, text, fromPort, toPort, reverse) {
+	constructor(from, to, fromPort, toPort, reverse) {
 		this.from = from;
 		this.to = to;
-		this.text = text;
 		this.fromPort = fromPort;
 		this.toPort = toPort;
 		this.reverse = reverse;
 
 		this.colour = null;
 		this.penWidth = null;
-		this.label = null;
-		this.labelFontColour = null;
-		this.labelFontSize = null;
 		this.addToGraph(graph); // cheating
 		this.addToNode(); // cheating
 	}
@@ -62,20 +58,14 @@ class Link {
 		toNode.links.push(this);
 	}
 
-	focus(label, colour) {
+	focus(colour) {
 		this.colour = colour;
 		this.penWidth = "20";
-		this.label = label;
-		this.labelFontColour = colour;
-		this.labelFontSize = "30";
 	}
 
 	clearFocus() {
 		this.colour = null;
 		this.penWidth = null;
-		this.label = null;
-		this.labelFontColour = null;
-		this.labelFontSize = null;
 	}
 
 	delete() {
@@ -113,14 +103,6 @@ class Link {
 			str += ',color=' + this.colour;
 		if (this.penWidth != null)
 			str += ',penwidth=' + this.penWidth;
-		/*
-		if (this.label != null)
-				str += 'xlabel=' + this.label + ';';
-		if (this.labelfontcolor != null)
-			str += 'labelfontcolor=' + this.labelFontColour + ';';
-		if (this.labelfontsize != null)
-			str += 'labelfontsize=' + this.labelFontSize + ';';
-		*/
 
 		str += '];';
 		return str;

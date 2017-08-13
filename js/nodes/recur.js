@@ -1,7 +1,7 @@
 class Recur extends Expo {
 
 	constructor() {
-		super(null, "μ", null);
+		super(null, "μ");
 		this.box = null;
 	}
 
@@ -21,7 +21,7 @@ class Recur extends Expo {
 				var newBox = this.group.copy().addToGroup(wrapper.box);
 				wrapper.auxs = wrapper.createPaxsOnTopOf(newBox.auxs);
 				
-				new Link(wrapper.prin.key, newBox.prin.key, newBox.prin.name, "n", "s").addToGroup(wrapper);
+				new Link(wrapper.prin.key, newBox.prin.key, "n", "s").addToGroup(wrapper);
 				
 				var oldGroup = this.group;
 				var oldBox = this.group.box;
