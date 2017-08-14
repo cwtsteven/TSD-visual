@@ -7,4 +7,9 @@ class Pax extends Expo {
 	copy() {
 		return new Pax(this.name);
 	}
+
+	delete() {
+		this.group.auxs.splice(this.group.auxs.indexOf(this), 1);
+		super.delete();
+	}
 }
