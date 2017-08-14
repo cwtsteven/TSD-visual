@@ -41,7 +41,6 @@ class Term extends Group {
 					var outLink = leftAux.findLinksOutOf(null)[0];
 					if (typeof outLink != 'undefined') {
 						outLink.changeFrom(con.key, outLink.fromPort);
-						outLink.changeToGroup(group);
 					}
 
 					new Link(leftAux.key, con.key, "n", "s").addToGroup(group);
