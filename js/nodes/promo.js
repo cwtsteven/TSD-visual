@@ -36,6 +36,7 @@ class Promo extends Expo {
 					var inLink = prev.findLinksInto(null)[0];
 					var promoInLink = this.findLinksInto(null)[0];
 					promoInLink.changeFrom(inLink.from, inLink.fromPort);
+					promoInLink.changeToGroup(this.group.group); // the box
 					prev.group.removeAux(prev); // preserve outLink
 					token.at = nextLink.from;
 					token.rewrite = true;
