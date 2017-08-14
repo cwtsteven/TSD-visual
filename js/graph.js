@@ -9,7 +9,7 @@ class Graph {
 		this.key = 0;
 		this.linkKey = 0;
 		this.allNodes = new Map(); // for efficiency searching
-		this.allLinks = new Map(); // for printing ONLY
+		this.allLinks = []; // for printing ONLY
 		this.child = new Group(); 
 	}
 
@@ -33,19 +33,17 @@ class Graph {
 	}
 
 	addLink(link) {
-		link.key = this.linkKey;
-		this.allLinks.set(link.key, link);
-		this.linkKey++;
+		this.allLinks.push(link);
 	}
 
 	removeLink(link) {
-		this.allLinks.delete(link.key);
+		this.allLinks.splice(this.allLinks.indexOf(link), 1);
 	}
 
 	draw(width, height) {
 		var str = this.child.draw('\n  ');
 		str += '\n';
-		for (let link of this.allLinks.values()) {
+		for (let link of this.allLinks) {
 			str += link.draw('\n  ');
 		}
 		return 'digraph G {'
