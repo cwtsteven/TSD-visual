@@ -42,6 +42,21 @@ class If extends Node {
 					token.rewrite = true;
 					return nextLink;
 				}
+				else {
+					var newIf;
+					if (nextLink.fromPort == "n") 
+						newIf = new If1().addToGroup(this.group);
+					else 
+						newIf = new If2().addToGroup(this.group);
+
+					for (let link of this.findLinksOutOf(null))
+						link.changeFrom(newIf.key, link.fromPort);
+					this.findLinksInto(null)[0].changeTo(newIf.key, "s");
+					this.delete();
+					
+					token.rewrite = true;
+					return nextLink;
+				}
 			}
 		}
 		token.rewriteFlag = RewriteFlag.EMPTY;

@@ -27,11 +27,21 @@ class Parser {
     else if (this.lexer.skip(Token.LET)) {
       const id = this.lexer.token(Token.LCID);
       
-      if (this.lexer.skip(Token.DEFINE)) {        
-        const N = this.term(ctx);
-        this.lexer.match(Token.IN);
-        const M = this.term([id].concat(ctx));
-        return new Application(new Abstraction(id, M), N);
+      if (this.lexer.skip(Token.DEFINE)) { 
+        var N;
+        if (this.lexer.skip(Token.CLPAREN)) {
+          N = this.term(ctx);
+          this.lexer.match(Token.CRPAREN);
+          this.lexer.match(Token.IN);
+          const M = this.term([id].concat(ctx));
+          return new ProvApplication(new Abstraction(id, M), N);
+        }  
+        else {
+          N = this.term(ctx);
+          this.lexer.match(Token.IN);
+          const M = this.term([id].concat(ctx));
+          return new Application(new Abstraction(id, M), N);
+        }
       }
     } 
     else if (this.lexer.skip(Token.IF)) {
@@ -52,6 +62,12 @@ class Parser {
       const term = this.term([id2].concat([id].concat(ctx)));
       return new Recursion(id, id2, term);
     }
+    else if (this.lexer.skip(Token.CHANGE)) {
+      const id = this.lexer.token(Token.LCID);
+      this.lexer.match(Token.TO);
+      const term = this.term(ctx);
+      return new Change(id, term);
+    }
     else {
       return this.application(ctx);
     }
@@ -61,7 +77,7 @@ class Parser {
     return token.type == Token.AND || token.type == Token.OR 
         || token.type == Token.PLUS || token.type == Token.SUB  
         || token.type == Token.MULT || token.type == Token.DIV 
-        || token.type == Token.LTE 
+        || token.type == Token.LTE || token.type == Token.SEQ
   }
 
   parseApplication(ctx, lhs, pred) {
@@ -96,6 +112,9 @@ class Parser {
       else if (op.type == Token.LTE) {
         lhs = new BinaryOp(BinOpType.Lte, "<=", lhs, rhs);
       }
+      else if (op.type == Token.SEQ) {
+        lhs = new Application(new Abstraction('_', rhs), lhs);
+      }
     }
     return lhs;
   }
@@ -107,12 +126,21 @@ class Parser {
       return this.parseApplication(ctx, lhs, 0);
 
     while (true) {
-      const rhs = this.atom(ctx);
-      
-      if (!rhs) {
-        return lhs;
-      } else {
-        lhs = new Application(lhs, rhs);
+      var rhs;
+
+      if (this.lexer.skip(Token.CLPAREN)) {
+        rhs = this.term(ctx);
+        this.lexer.match(Token.CRPAREN);
+        lhs = new ProvApplication(lhs, rhs);
+      }
+      else {
+        rhs = this.atom(ctx);
+        
+        if (!rhs) {
+          return lhs;
+        } else {
+            lhs = new Application(lhs, rhs);
+        }
       }
     }
 

@@ -19,6 +19,17 @@ class Application {
   }
 }
 
+class ProvApplication extends Application {
+
+}
+
+class Change {
+  constructor(param, body) {
+    this.param = param;
+    this.body = body;
+  }
+}
+
 class Identifier {
   /**
    * name is the string matched for this identifier.

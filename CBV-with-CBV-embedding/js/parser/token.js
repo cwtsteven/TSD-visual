@@ -16,6 +16,8 @@ class Token {
   'LAMBDA',
   'LPAREN',
   'RPAREN',
+  'CLPAREN',
+  'CRPAREN',
   'LCID',
   'DOT', 
   'COMMA',
@@ -46,4 +48,8 @@ class Token {
   'IF',
   'THEN',
   'ELSE',
+
+  'CHANGE',
+  'TO',
+  'SEQ',
 ].forEach(token => Token[token] = token);

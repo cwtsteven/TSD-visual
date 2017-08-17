@@ -66,6 +66,23 @@ class GoIMachine {
 			return new Term(wrapper.prin, wrapper.auxs);
 		} 
 
+		else if (ast instanceof ProvApplication) {
+			var app = new App().addToGroup(group);
+			//lhs
+			var left = this.toGraph(ast.lhs, group);
+			var der = new Der(left.prin.name).addToGroup(group);
+			new Link(der.key, left.prin.key, "n", "s").addToGroup(group);
+			// rhs
+			var right = this.toGraph(ast.rhs, group);		
+			var prov = new Prov().addToGroup(group);
+			new Link(prov.key, right.prin.key, "n", "s").addToGroup(group);
+			
+			new Link(app.key, der.key, "w", "s").addToGroup(group);
+			new Link(app.key, prov.key, "e", "s").addToGroup(group);
+
+			return new Term(app, Term.joinAuxs(left.auxs, right.auxs, group));
+		} 
+
 		else if (ast instanceof Application) {
 			var app = new App().addToGroup(group);
 			//lhs
@@ -165,6 +182,35 @@ class GoIMachine {
 
 			return new Term(wrapper.prin, wrapper.auxs);
 		}
+
+		else if (ast instanceof Change) {
+			var param = ast.param;
+			var delta = new Delta().addToGroup(group);
+			var term = this.toGraph(ast.body, group);
+			var der = new Der(param).addToGroup(group);
+			new Link(delta.key, der.key, "w", "s").addToGroup(group);
+			new Link(delta.key, term.prin.key, "e", "s").addToGroup(group);
+
+			var auxs = Array.from(term.auxs);
+			var p1Used = false;
+			var auxNode1;
+			for (var i=0; i<term.auxs.length; i++) {
+				var aux = auxs[i];
+				if (aux.name == param) {
+					p1Used = true;
+					auxs.splice(i, 1);
+					var con = new Contract(aux.name).addToGroup(group);
+					new Link(der.key, con.key, "n", "s").addToGroup(group);
+					new Link(aux.key, con.key, "n", "s").addToGroup(group);
+					auxs.push(con);
+					break;
+				}
+			}
+			if (!p1Used)
+				auxs.push(der);
+
+			return new Term(delta, auxs);
+		}
 	}
 
 	deleteVarNode(group) {
@@ -225,7 +271,8 @@ class GoIMachine {
 	}
 
 	printHistory(flag, dataStack, boxStack) {
-		flag.val(this.token.rewriteFlag + '\n' + flag.val());
+		var modStr = this.token.modStack.length == 0 ? '□' : Array.from(this.token.modStack).reverse().toString() + ',□';
+		flag.val(this.token.rewriteFlag + '\t' + modStr + '\n' + flag.val());
 		var dataStr = this.token.dataStack.length == 0 ? '□' : Array.from(this.token.dataStack).reverse().toString() + ',□';
 		dataStack.val(dataStr + '\n' + dataStack.val());
 		var boxStr = this.token.boxStack.length == 0 ? '□' : Array.from(this.token.boxStack).reverse().toString() + ',□';
@@ -236,8 +283,8 @@ class GoIMachine {
 
 define('goi-machine', ['gc', 'graph', 'node', 'group', 'link', 'term', 'token', 'op', 'parser/ast', 'parser/token', 'parser/lexer', 'parser/parser'
 					, 'nodes/expo', 'nodes/abs', 'nodes/app', 'nodes/binop', 'nodes/const', 'nodes/contract'
-					, 'nodes/der', 'nodes/if', 'nodes/pax', 'nodes/promo'
-					, 'nodes/recur', 'nodes/start', 'nodes/unop', 'nodes/weak'],
+					, 'nodes/der', 'nodes/if', 'nodes/if1', 'nodes/if2', 'nodes/pax', 'nodes/promo'
+					, 'nodes/recur', 'nodes/start', 'nodes/unop', 'nodes/weak', 'nodes/prov', 'nodes/mod', 'nodes/delta'],
 	function() {
 		return new GoIMachine();	
 	}

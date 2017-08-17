@@ -43,12 +43,24 @@ class Lexer {
         this._token = new Token(Token.COMMA);
         break;
 
+      case ';':
+        this._token = new Token(Token.SEQ, null, 1);
+        break;
+
       case '(':
         this._token = new Token(Token.LPAREN);
         break;
 
       case ')':
         this._token = new Token(Token.RPAREN);
+        break;
+
+      case '{':
+        this._token = new Token(Token.CLPAREN);
+        break;
+
+      case '}':
+        this._token = new Token(Token.CRPAREN);
         break;
 
       case '\0':
@@ -136,6 +148,10 @@ class Lexer {
             this._token = new Token(Token.THEN);
           else if (str == "else")
             this._token = new Token(Token.ELSE);
+          else if (str == "set")
+            this._token = new Token(Token.CHANGE);
+          else if (str == "to")
+            this._token = new Token(Token.TO);
           else
             this._token = new Token(Token.LCID, str);
         } 

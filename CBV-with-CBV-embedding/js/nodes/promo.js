@@ -52,11 +52,10 @@ class Promo extends Expo {
 				else {
 					var newBoxWrapper = this.group.copy().addToGroup(this.group.group);
 					Term.joinAuxs(this.group.auxs, newBoxWrapper.auxs, newBoxWrapper.group);
-					prev.findLinksOutOf(null)[0].changeTo(newBoxWrapper.prin.key, prev.findLinksOutOf(null)[0].toPort);
-					link.changeTo(this.key, "s");
+					link.changeTo(newBoxWrapper.prin.key, "s");
 				}
 				token.rewrite = true;
-				return nextLink;	
+				return newBoxWrapper.prin.findLinksOutOf(null)[0];	
 			}
 		}
 		

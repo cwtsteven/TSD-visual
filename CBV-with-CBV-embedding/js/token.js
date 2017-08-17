@@ -31,6 +31,7 @@ class MachineToken {
 		this.link = null;
 		
 		this.rewriteFlag = RewriteFlag.EMPTY;
+		this.modStack = [ModData.NOCOPY];
 		this.dataStack = [CompData.PROMPT];
 		this.boxStack = [];
 	}
@@ -40,6 +41,12 @@ var CompData = {
 	PROMPT: '*',
 	LAMBDA: 'λ',
 	R: '@',
+	M: 'M',
+	DELTA: 'Δ',
+}
+
+var ModData = {
+	NOCOPY: '©',
 }
 
 var RewriteFlag = {
@@ -50,6 +57,10 @@ var RewriteFlag = {
 	F_C: '<C>',
 	F_PROMO: '<!>',
 	F_RECUR: '<μ>',
+	F_MOD: '<M>',
+	F_MPROMO: '<!M>',
+	F_DELTA: '<∇>',
+	F_MODIFY: '<Δ>',
 }
 
 var BoxData = {

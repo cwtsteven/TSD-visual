@@ -37,7 +37,10 @@ class Abs extends Node {
 				
 				otherNextLink.changeTo(appOtherLink.to, appOtherLink.toPort);
 				otherNextLink.reverse = false;
-				otherNextLink.fromPort = "n";
+
+				var otherNode = this.graph.findNodeByKey(otherNextLink.from);
+				if (otherNode instanceof Expo) 
+					otherNextLink.fromPort = "n";
 				otherNextLink.changeToGroup(appOtherLink.group);
 				
 				this.delete();
