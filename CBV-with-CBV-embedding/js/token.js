@@ -41,7 +41,6 @@ var CompData = {
 	PROMPT: '*',
 	LAMBDA: 'λ',
 	R: '@',
-	M: 'M',
 	DELTA: 'Δ',
 }
 

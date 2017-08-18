@@ -53,6 +53,7 @@ class If extends Node {
 						link.changeFrom(newIf.key, link.fromPort);
 					this.findLinksInto(null)[0].changeTo(newIf.key, "s");
 					this.delete();
+					token.dataStack.push(CompData.PROMPT);
 					
 					token.rewrite = true;
 					return nextLink;

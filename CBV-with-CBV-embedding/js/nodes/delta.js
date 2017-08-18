@@ -13,7 +13,7 @@ class Delta extends Node {
 		else if (link.from == this.key) {
 			if (link.fromPort == "e") {
 				token.dataStack.pop();
-				token.dataStack.push(link.to);
+				token.dataStack.push(link);
 				token.dataStack.push(CompData.DELTA);
 				token.modStack.pop();
 				token.forward = true;

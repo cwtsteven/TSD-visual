@@ -23,8 +23,7 @@ class UnOp extends Node {
 
 	rewrite(token, nextLink) {
 		if (nextLink.to == this.key) {
-
-			if (token.rewriteFlag = RewriteFlag.F_OP) {
+			if (token.rewriteFlag == RewriteFlag.F_OP) {
 				token.rewriteFlag = RewriteFlag.EMPTY;
 				var wrapper = BoxWrapper.create().addToGroup(this.group);
 				var newConst = new Const(token.dataStack.last()).addToGroup(wrapper.box);

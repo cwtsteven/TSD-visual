@@ -47,8 +47,7 @@ class Mod extends Node {
 					return this.findLinksOutOf("w")[0];
 				}
 				token.dataStack.pop();
-				token.dataStack.push(this.findLinksOutOf("w")[0].to);
-				token.dataStack.push(CompData.M);
+				token.dataStack.push(CompData.LAMBDA);
 				token.forward = false;
 				return link;
 			}
@@ -82,70 +81,41 @@ class Mod extends Node {
 						token.rewrite = true;
 						return nextLink;
 					}
-					else if (prev instanceof Pax) {
-						/*
-						if (token.modStack.last() != ModData.NOCOPY) {
-							var righLink = this.findLinksOutOf("e")[0];
-							var weak = new Weak(this.graph.findNodeByKey(righLink.to).name).addToGroup(this.group.group);
-							righLink.changeFrom(weak.key, "n");
-
-							this.group.changeToGroup(prev.group.box);
-							prev.group.auxs = prev.group.auxs.concat(prev.group.createPaxsOnTopOf(this.group.auxs));
-							var inLink = prev.findLinksInto(null)[0];
-							var promoInLink = this.findLinksInto(null)[0];
-							promoInLink.changeFrom(inLink.from, inLink.fromPort);
-							promoInLink.changeToGroup(this.group.group); // the box
-							prev.group.removeAux(prev); // preserve outLink
-
-							var promo = new Promo().addToGroup(this.group);
-							this.group.prin = promo;
-							this.findLinksOutOf("w")[0].changeFrom(promo.key, "n");
-							promoInLink.changeTo(promo.key, "s");
-
-							this.delete();
-
-							token.at = nextLink.from;
-							token.rewrite = true;
-							return nextLink;
-						}
-						*/
-					}
 					else if (prev instanceof Contract && token.boxStack.length >= 1) {
-						var link = token.boxStack.pop();
+						var link = token.boxStack.last();
 						var inLinks = prev.findLinksInto(null);
 						if (inLinks.length == 1) { 
 							// this will not happen as the C-node should have taken care of it
 						}
 						else {
 							var leftNode = this.graph.findNodeByKey(nextLink.to);
-							var newBoxWrapper = leftNode.group.copy().addToGroup(this.group);
-							Term.joinAuxs(leftNode.group.auxs, newBoxWrapper.auxs, newBoxWrapper.group);
-							link.changeTo(newBoxWrapper.prin.key, "s");
+							var con = new Contract(leftNode.name).addToGroup(this.group);
+							nextLink.changeFrom(con.key, "n");
+							new Link(this.key, con.key, "w", "s").addToGroup(this.group);
+							link.changeTo(con.key, "s");
 						}
 						token.rewrite = true;
-						token.rewriteFlag = RewriteFlag.F_PROMO;
-						return newBoxWrapper.prin.findLinksOutOf(null)[0];	
+						token.rewriteFlag = RewriteFlag.F_C;
+						return nextLink;
 					}
 				}
 			}
 
 			else if (token.rewriteFlag == RewriteFlag.F_MODIFY) {
-				var key = token.dataStack.pop();
-				var node = this.graph.findNodeByKey(key);
+				token.rewriteFlag = RewriteFlag.EMPTY;
+
+				var link = token.dataStack.pop();
+				var toNode = this.graph.findNodeByKey(link.to);
+				var delta = this.graph.findNodeByKey(link.from);
 				var weak = new Weak().addToGroup(this.group);
 				new Link(weak.key, nextLink.to, "n", "s").addToGroup(this.group);
-				if (node instanceof Promo) {
-					var wrapper = node.group.copy().addToGroup(this.group);
-					Term.joinAuxs(node.group.auxs, wrapper.auxs, wrapper.group);
-					nextLink.changeTo(wrapper.prin.key, "s");
-				}
-				else {
-					nextLink.changeTo(node.key, "s");
-				}
+				var con = new Contract(toNode.name).addToGroup(this.group);
+				nextLink.changeTo(con.key, "s");
+				new Link(delta.key, con.key, link.fromPort, "s").addToGroup(this.group);
+				link.changeFrom(con.key, "n");
 
 				this.changeType(ModType.R);
 
-				token.rewriteFlag = RewriteFlag.EMPTY;
 				token.forward = false;
 				token.rewrite = true;
 				return nextLink;

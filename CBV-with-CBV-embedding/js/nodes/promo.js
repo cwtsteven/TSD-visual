@@ -29,33 +29,21 @@ class Promo extends Expo {
 				token.rewrite = true;
 				return newNextLink;
 			}
-			/*
-			else if (prev instanceof Pax) {
-				this.group.changeToGroup(prev.group.box);
-				prev.group.auxs = prev.group.auxs.concat(prev.group.createPaxsOnTopOf(this.group.auxs));
-				var inLink = prev.findLinksInto(null)[0];
-				var promoInLink = this.findLinksInto(null)[0];
-				promoInLink.changeFrom(inLink.from, inLink.fromPort);
-				promoInLink.changeToGroup(this.group.group); // the box
-				prev.group.removeAux(prev); // preserve outLink
-				token.at = nextLink.from;
-				token.rewrite = true;
-				return nextLink;
-			}
-			*/
 			else if (prev instanceof Contract && token.boxStack.length >= 1) {
-				var link = token.boxStack.pop();
-				var inLinks = prev.findLinksInto(null);
-				if (inLinks.length == 1) { 
-					// this will not happen as the C-node should have taken care of it
+				if (nextLink.from == this.key) {
+					var link = token.boxStack.pop();
+					var inLinks = prev.findLinksInto(null);
+					if (inLinks.length == 1) { 
+						// this will not happen as the C-node should have taken care of it
+					}
+					else {
+						var newBoxWrapper = this.group.copy().addToGroup(this.group.group);
+						Term.joinAuxs(this.group.auxs, newBoxWrapper.auxs, newBoxWrapper.group);
+						link.changeTo(newBoxWrapper.prin.key, "s");
+					}
+					token.rewrite = true;
+					return newBoxWrapper.prin.findLinksOutOf(null)[0];	
 				}
-				else {
-					var newBoxWrapper = this.group.copy().addToGroup(this.group.group);
-					Term.joinAuxs(this.group.auxs, newBoxWrapper.auxs, newBoxWrapper.group);
-					link.changeTo(newBoxWrapper.prin.key, "s");
-				}
-				token.rewrite = true;
-				return newBoxWrapper.prin.findLinksOutOf(null)[0];	
 			}
 		}
 		

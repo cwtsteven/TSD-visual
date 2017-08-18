@@ -29,17 +29,45 @@ class App extends Node {
 				var data = token.dataStack.last();
 				var rightLink = this.findLinksOutOf("e")[0];
 				var prev = this.graph.findNodeByKey(rightLink.to);
-				if (prev instanceof Mod || prev instanceof Contract) {
+				if (prev instanceof Promo || prev instanceof Mod || prev instanceof Contract) {
 
 				}
-				else if (prev instanceof Prov) {
-					var prev2 = this.graph.findNodeByKey(prev.findLinksOutOf(null)[0].to);
-					var newLink = this.createMod(data, prev2);
-					prev.deleteAndPreserveInLink();
+				else if ((Number.isInteger(data) || typeof(data) === "boolean")) {
+					var right;
+					if (prev instanceof Prov) {
+						right = this.graph.findNodeByKey(prev.findLinksOutOf(null)[0].to);
+						prev.deleteAndPreserveInLink();
+					}
+					else
+						right = prev;
+
+					var mod = new Mod().addToGroup(this.group);
+					var wrapper = BoxWrapper.create().addToGroup(mod.group);
+					var con = new Const(data).addToGroup(wrapper.box);
+					new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper);
+					new Link(mod.key, wrapper.prin.key, "w", "s").addToGroup(this.group);
+					var inLink = right.findLinksInto(null)[0];
+					new Link(inLink.from, mod.key, inLink.fromPort, "s").addToGroup(mod.group);
+					inLink.changeFrom(mod.key, "e");
 					token.rewrite = true;
 				}
-				else if (!(prev instanceof Promo)) {
-					var newLink = this.createMod(data, prev);
+				else if (data == CompData.LAMBDA) {
+					var right;
+					if (prev instanceof Prov) {
+						right = this.graph.findNodeByKey(prev.findLinksOutOf(null)[0].to);
+						prev.deleteAndPreserveInLink();
+					}
+					else
+						right = prev;
+					
+					var inLink = right.findLinksInto(null)[0];
+					var mod = new Mod().addToGroup(this.group);
+					var con = new Contract(right.name).addToGroup(this.group);
+					new Link(inLink.from, mod.key, inLink.fromPort, "s").addToGroup(mod.group);
+					inLink.changeFrom(con.key, "n");
+					new Link(mod.key, con.key, "e", "s").addToGroup(this.group);
+					new Link(mod.key, con.key, "w", "s").addToGroup(this.group);
+
 					token.rewrite = true;
 				}
 
@@ -49,9 +77,8 @@ class App extends Node {
 			}
 
 			else if (nextLink.to == this.key) {
-				if (token.dataStack.last() == CompData.M) {
+				if (token.dataStack.last() == CompData.LAMBDA) {
 					token.dataStack.pop();
-					var key = token.dataStack.pop();
 
 					var mod = new Mod().addToGroup(this.group);
 					this.findLinksInto(null)[0].changeTo(mod.key, "s");
@@ -62,26 +89,21 @@ class App extends Node {
 					var newDer = new Der().addToGroup(this.group);
 					new Link(newApp.key, newDer.key, "w", "s").addToGroup(this.group);
 
-					var rightNode = this.graph.findNodeByKey(this.findLinksOutOf("e")[0].to);
-					var wrapper;
-					if (rightNode instanceof Promo) {
-						wrapper = rightNode.group.copy().addToGroup(this.group);
-						Term.joinAuxs(rightNode.group.auxs, wrapper.auxs, this.group);
-					}
-					else if (rightNode instanceof Mod) {
-						var promo = this.graph.findNodeByKey(rightNode.findLinksOutOf("w")[0].to);
-						wrapper = promo.group.copy().addToGroup(this.group);
-						Term.joinAuxs(promo.group.auxs, wrapper.auxs, this.group);
-					}
-					new Link(newApp.key, wrapper.prin.key, "e", "s").addToGroup(this.group);
+					
+					var rightLink = this.findLinksOutOf("e")[0];
+					var rightNode = this.graph.findNodeByKey(rightLink.to);
+
+					var con = new Contract(rightNode.name).addToGroup(this.group);
+					new Link(newApp.key, con.key, "e", "s").addToGroup(this.group);
+					rightLink.changeFrom(con.key, "n");
+					new Link(this.key, con.key, "e", "s").addToGroup(this.group);
 
 					var leftDer = this.graph.findNodeByKey(this.findLinksOutOf("w")[0].to);
-					var leftMod = this.graph.findNodeByKey(leftDer.findLinksOutOf(null)[0].to);
-					var leftPromo = this.graph.findNodeByKey(key);
 
-					var fun = leftPromo.group.copy().addToGroup(this.group);
-					Term.joinAuxs(leftPromo.group.auxs, fun.auxs, this.group);
-					new Link(newDer.key, fun.prin.key, "n", "s").addToGroup(this.group);
+					var con2 = new Contract(leftDer.name).addToGroup(this.group);
+					leftDer.findLinksOutOf(null)[0].changeFrom(con2.key, "n");
+					new Link(leftDer.key, con2.key, "n", "s").addToGroup(this.group);
+					new Link(newDer.key, con2.key, "n", "s").addToGroup(this.group);
 
 					token.modStack.push(mod.key);
 					token.forward = true;
@@ -93,29 +115,6 @@ class App extends Node {
 
 		token.rewrite = false;
 		return nextLink;
-	}
-
-	createMod(data, prev) {
-		if (data == CompData.LAMBDA) {
-			var wrapper = prev.group.copy().addToGroup(prev.group.group);
-			var mod = new Mod().addToGroup(this.group);
-			new Link(mod.key, wrapper.prin.key, "w", "s").addToGroup(mod.group);
-
-			var inLink = prev.findLinksInto(null)[0];
-			new Link(inLink.from, mod.key, inLink.fromPort, "s").addToGroup(wrapper.group);
-			inLink.changeFrom(mod.key, "e");
-			Term.joinAuxs(prev.group.auxs, wrapper.auxs, wrapper.group);
-		}
-		else if ((Number.isInteger(data) || typeof(data) === "boolean")) {
-			var mod = new Mod().addToGroup(this.group);
-			var wrapper = BoxWrapper.create().addToGroup(mod.group);
-			var con = new Const(data).addToGroup(wrapper.box);
-			new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper);
-			new Link(mod.key, wrapper.prin.key, "w", "s").addToGroup(this.group);
-			var inLink = prev.findLinksInto(null)[0];
-			new Link(inLink.from, mod.key, inLink.fromPort, "s").addToGroup(mod.group);
-			inLink.changeFrom(mod.key, "e");
-		}
 	}
 
 	copy() {
