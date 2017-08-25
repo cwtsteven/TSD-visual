@@ -15,10 +15,12 @@ class If1 extends Node {
 	}
 
 	rewrite(token, nextLink) {
-		if (nextLink.to == this.key) {
-			if (token.rewriteFlag == RewriteFlag.F_MOD) {
-				token.rewriteFlag = RewriteFlag.EMPTY;
+		if (token.rewriteFlag == RewriteFlag.F_MOD && nextLink.to == this.key) {
+			token.rewriteFlag = RewriteFlag.EMPTY;
 
+			var nextNode = this.graph.findNodeByKey(nextLink.from);
+			var newLink = nextLink;
+			if (!(nextNode instanceof Mod)) {
 				var data = token.dataStack.pop();
 				if (data == CompData.LAMBDA) {
 					var outLink = this.findLinksOutOf("n")[0];
@@ -28,22 +30,67 @@ class If1 extends Node {
 					outLink.changeFrom(con.key, "n");
 					new Link(mod.key, con.key, "w", "s").addToGroup(this.group);
 					new Link(this.key, con.key, "n", "s").addToGroup(this.group);
-					var newLink = new Link(nextLink.from, mod.key, nextLink.fromPort, "s").addToGroup(this.group);
+					newLink = new Link(nextLink.from, mod.key, nextLink.fromPort, "s").addToGroup(this.group);
 					nextLink.changeFrom(mod.key, "e");
-					token.rewrite = true;
 				}
-				else
-					token.rewrite = false;
+			}
 
-				token.dataStack.pop();
+			var op = token.dataStack.pop();
+			if (op == CompData.PROMPT)
 				token.dataStack.push(data);
-				return newLink;
+			else if (op == CompData.R)
+				token.dataStack.push(CompData.M);
+			
+			token.rewrite = true;
+			return newLink;
+		}
+
+		else if (token.rewriteFlag == RewriteFlag.EMPTY) {
+			token.rewrite = false;
+			return nextLink;
+		}
+	}
+
+	analyse(token) {
+		if (token.link.fromPort == "w") {
+			if (this.otherPort && this.propPorts.indexOf("e") == -1) {
+				this.propPorts.push("e");
+				this.otherPort = false;
+			}
+			return super.analyse(token);
+		}
+		else if (token.link.fromPort == 'n')
+			return super.analyse(token);
+		else {
+			if (this.propPorts.indexOf("w") == -1) {
+				this.otherPort = true;
+				token.machine.analysisToken.splice(token.machine.analysisToken.indexOf(token), 1);
+				return null;
+			}
+			else {
+				var link = super.analyse(token);
+				if (this.propPorts.length == 0)
+					this.otherPort = false;
+				return link;
 			}
 		}
-		token.rewriteFlag = RewriteFlag.EMPTY;
-		token.rewrite = false;
-		return nextLink;
 	}
+
+	propagate(token) {
+		if (token.link.fromPort == "w") {
+			var newIf = new If().addToGroup(this.group);
+			newIf.propPorts = Array.from(this.propPorts);
+			for (let link of this.findLinksOutOf(null)) {
+				link.changeFrom(newIf.key, link.fromPort);
+			}
+			this.findLinksInto(null)[0].changeTo(newIf.key, "s");
+			this.delete();
+			return token.link;
+		}
+		else 
+			return super.propagate(token);
+	}
+
 
 	copy() {
 		return new If1();

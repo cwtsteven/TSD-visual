@@ -12,6 +12,7 @@ class Node {
 		this.width = null;
 		this.height = null;
 		this.links = [];
+		this.propPorts = [];
 		this.addToGraph(graph); // cheating!
 	}
 
@@ -90,5 +91,26 @@ class Node {
 	rewrite(token, nextLink) {
 		token.rewrite = false;
 		return nextLink;
+	}
+
+	analyse(token) {
+		if (this.propPorts.indexOf(token.link.fromPort) == -1)
+			this.propPorts.push(token.link.fromPort);
+		return this.findLinksInto("s")[0];
+	}
+
+	propagate(token) {
+		if (this.propPorts.indexOf(token.link.fromPort) != -1) {
+			this.propPorts.splice(this.propPorts.indexOf(token.link.fromPort), 1);
+			if (this.propPorts.length == 0)
+				return this.findLinksInto("s")[0];
+			else {
+				token.machine.propTokens.splice(token.machine.propTokens.indexOf(token), 1);
+				return null;
+			}
+		}
+		
+		token.machine.propTokens.splice(token.machine.propTokens.indexOf(token), 1);
+		return null;
 	}
 }

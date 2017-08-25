@@ -152,6 +152,8 @@ class Lexer {
             this._token = new Token(Token.CHANGE);
           else if (str == "to")
             this._token = new Token(Token.TO);
+          else if (str == "prop")
+            this._token = new Token(Token.PROP);
           else
             this._token = new Token(Token.LCID, str);
         } 

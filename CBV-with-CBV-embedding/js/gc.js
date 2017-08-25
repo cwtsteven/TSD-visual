@@ -6,10 +6,12 @@ class GC {
 	}
 	
 	collect() {
+		/*
 		do {
 			this.noMore = true;
 			this.collectInGroup(this.graph.child);
 		} while (!this.noMore)
+		*/
 	}
 
 	collectInGroup(group) {

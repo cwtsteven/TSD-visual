@@ -16,38 +16,65 @@ class Contract extends Expo {
 	}
 
 	rewrite(token, nextLink) {
-		if (nextLink.from == this.key) {
-			if (token.rewriteFlag == RewriteFlag.F_C) {
-				if (this.findLinksInto(null).length == 1) {
-					token.boxStack.pop();
-					var inLink = this.findLinksInto(null)[0];
-					nextLink.changeFrom(inLink.from, inLink.fromPort);
-					this.delete();
-					token.rewriteFlag = RewriteFlag.EMPTY;
-					token.rewrite = true;
-					return nextLink;
-				}
-				else if (token.boxStack.length >= 2) {
-					var i = token.boxStack.last();
-					var prev = this.graph.findNodeByKey(i.from);
-					if (prev instanceof Contract) {
-						token.boxStack.pop();
-						for (let link of prev.findLinksInto(null)) {
-							link.changeTo(this.key, "s");
-						}
-						prev.delete();
-						token.rewrite = true;
-						return nextLink;
+		if (token.rewriteFlag == RewriteFlag.F_C && nextLink.from == this.key) {
+			token.rewriteFlag = RewriteFlag.EMPTY;
+
+			if (this.findLinksInto(null).length == 1) {
+				for (let _token of nextLink.tokens)
+					_token.boxStack.pop();
+				var inLink = this.findLinksInto(null)[0];
+				for (let _token of inLink.tokens)
+					_token.setLink(nextLink);
+				nextLink.changeFrom(inLink.from, inLink.fromPort);
+				this.delete();
+			}
+			else {
+				var i = token.boxStack.last();
+				var prev = this.graph.findNodeByKey(i.from);
+				if (prev instanceof Contract) {
+					for (let _token of nextLink.tokens) {
+						if (_token.boxStack.last() == i)
+							_token.boxStack.pop();
 					}
-				}
-				else if (token.boxStack.length == 1) {
-					
+					for (let _token of i.tokens) {
+						_token.setLink(nextLink);
+						_token.rewriteFlag = RewriteFlag.F_C;
+					}
+					for (let link of prev.findLinksInto(null)) {
+						link.changeTo(this.key, "s");
+					}
+					prev.delete();
+					token.rewriteFlag = RewriteFlag.F_C;
 				}
 			}
+			
+			token.rewrite = true;
+			return nextLink;
 		}
-		token.rewriteFlag = RewriteFlag.EMPTY;
-		token.rewrite = false;
-		return nextLink;
+		
+		else if (token.rewriteFlag == RewriteFlag.EMPTY) {
+			token.rewrite = false;
+			return nextLink;
+		}
+	}
+
+	analyse(token) {
+		for (let link of this.findLinksInto(null)) {
+			var newToken = new AnalysisToken(token.machine, token.node, link);
+			token.machine.analysisToken.push(newToken);
+		}
+		token.machine.analysisToken.splice(token.machine.analysisToken.indexOf(token), 1);
+		return null;
+	}
+
+	propagate(token) {
+		for (let link of this.findLinksInto(null)) {
+			var newToken = new PropToken(token.machine, link);
+			token.machine.propTokens.push(newToken);
+			newToken.mNodes = Array.from(token.mNodes);
+		}
+		token.machine.propTokens.splice(token.machine.propTokens.indexOf(token), 1);
+		return null;
 	}
 
 	copy() {

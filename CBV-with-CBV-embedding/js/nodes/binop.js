@@ -30,31 +30,34 @@ class BinOp extends Node {
 	}
 
 	rewrite(token, nextLink) {
-		if (nextLink.to == this.key) {
-			if (token.rewriteFlag == RewriteFlag.F_OP) {
-				token.rewriteFlag = RewriteFlag.EMPTY;
+		if (token.rewriteFlag == RewriteFlag.F_OP && nextLink.to == this.key) {
+			token.rewriteFlag = RewriteFlag.EMPTY;
 
-				var left = this.graph.findNodeByKey(this.findLinksOutOf("w")[0].to);
-				var right = this.graph.findNodeByKey(this.findLinksOutOf("e")[0].to);
+			var left = this.graph.findNodeByKey(this.findLinksOutOf("w")[0].to);
+			var right = this.graph.findNodeByKey(this.findLinksOutOf("e")[0].to);
 
-				if (left instanceof Const && right instanceof Const) {
-					var wrapper = BoxWrapper.create().addToGroup(this.group);
-					var newConst = new Const(token.dataStack.last()).addToGroup(wrapper.box);
-					var newLink = new Link(wrapper.prin.key, newConst.key, "n", "s").addToGroup(wrapper);
-					nextLink.changeTo(wrapper.prin.key, "s");
-					
-					left.delete();
-					right.delete();
-					this.delete();
+			if (left instanceof Const && right instanceof Const) {
+				var wrapper = BoxWrapper.create().addToGroup(this.group);
+				var newConst = new Const(token.dataStack.last()).addToGroup(wrapper.box);
+				var newLink = new Link(wrapper.prin.key, newConst.key, "n", "s").addToGroup(wrapper);
+				nextLink.changeTo(wrapper.prin.key, "s");
+				
+				left.delete();
+				right.delete();
+				this.delete();
 
-					token.rewriteFlag = RewriteFlag.F_PROMO;
-					token.rewrite = true;
-					return newLink;
-				}
+				token.rewriteFlag = RewriteFlag.F_PROMO;
+				token.rewrite = true;
+				return newLink;
 			}
+			
+			token.rewrite = true;
+			return nextLink;
 		}
-		token.rewrite = false;
-		return nextLink;
+		else if (token.rewriteFlag == RewriteFlag.EMPTY) {
+			token.rewrite = false;
+			return nextLink;
+		}
 	}
 
 	binOpApply(type, v1, v2) {

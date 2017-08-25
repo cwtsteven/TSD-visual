@@ -30,6 +30,11 @@ class Change {
   }
 }
 
+class Propagation {
+  constructor() {
+  }
+}
+
 class Identifier {
   /**
    * name is the string matched for this identifier.

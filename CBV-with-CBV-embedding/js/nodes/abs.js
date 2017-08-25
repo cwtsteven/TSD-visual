@@ -45,13 +45,16 @@ class Abs extends Node {
 				
 				this.delete();
 				app.delete();
-				
-				token.rewrite = true;
-				return nextLink;
 			}
+				
+			token.rewrite = true;
+			return nextLink;
 		}
-		token.rewrite = false;
-		return nextLink;
+		
+		else if (token.rewriteFlag == RewriteFlag.EMPTY) {
+			token.rewrite = false;
+			return nextLink;
+		}
 	}
 
 	copy() {

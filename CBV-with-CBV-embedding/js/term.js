@@ -34,7 +34,7 @@ class Term extends Group {
 		var newAuxs = leftAuxs.concat(rightAuxs);
 		outter:
 		for (let leftAux of leftAuxs) {
-			for(let rightAux of rightAuxs) {
+			for (let rightAux of rightAuxs) {
 				if (leftAux.name == rightAux.name) {
 					var con = new Contract(leftAux.name).addToGroup(group);
 
@@ -43,8 +43,8 @@ class Term extends Group {
 						outLink.changeFrom(con.key, outLink.fromPort);
 					}
 
-					new Link(leftAux.key, con.key, "n", "s").addToGroup(group);
 					new Link(rightAux.key, con.key, "n", "s").addToGroup(group);
+					new Link(leftAux.key, con.key, "n", "s").addToGroup(group);
 					newAuxs.splice(newAuxs.indexOf(leftAux), 1);
 					newAuxs.splice(newAuxs.indexOf(rightAux), 1);
 					newAuxs.push(con);

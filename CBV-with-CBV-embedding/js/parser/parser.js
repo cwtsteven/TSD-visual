@@ -178,6 +178,9 @@ class Parser {
       const term = this.term(ctx);
       return new UnaryOp(UnOpType.Not, "~", term);
     }
+    else if (this.lexer.skip(Token.PROP)) {
+      return new Propagation();
+    }
     else {
       return undefined;
     }

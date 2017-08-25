@@ -29,25 +29,33 @@ class Delta extends Node {
 	}
 
 	rewrite(token, nextLink) {
-		if (nextLink.to == this.key && token.rewriteFlag == RewriteFlag.F_DELTA) {
+		if (token.rewriteFlag == RewriteFlag.F_DELTA && nextLink.to == this.key) {
 			token.rewriteFlag = RewriteFlag.EMPTY;
 			var data = token.dataStack.last();
 			var weak1 = new Weak().addToGroup(this.group);
 			var weak2 = new Weak().addToGroup(this.group);
 			this.findLinksOutOf("w")[0].changeFrom(weak1.key, "n");
 			this.findLinksOutOf("e")[0].changeFrom(weak2.key, "n");
-			var con = new Const(data).addToGroup(this.group);
-			this.findLinksInto(null)[0].changeTo(con.key, "s");
+			var wrapper = BoxWrapper.create().addToGroup(this.group);
+			var con = new Const(data).addToGroup(wrapper.box);
+			var newLink = new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper);
+			this.findLinksInto(null)[0].changeTo(wrapper.prin.key, "s");
 			this.delete();
 
+			token.rewriteFlag = RewriteFlag.F_PROMO;
 			token.rewrite = true;
-			token.at = nextLink.to;
-			return nextLink;
+			return newLink;
 		}
 
-		token.rewriteFlag = RewriteFlag.EMPTY;
-		token.rewrite = false;
-		return nextLink;
+		else if (token.rewriteFlag == RewriteFlag.EMPTY) {
+			token.rewrite = false;
+			return nextLink;
+		}
+	}
+
+	analyse(token) {
+		token.machine.analysisToken.splice(token.machine.analysisToken.indexOf(token), 1);
+		return null;
 	}
 
 	copy() {

@@ -1,35 +1,41 @@
 class MachineToken {
 
-	constructor() {
+	constructor(machine) {
+		this.machine = machine;
 		this.reset();
 	}
 
 	setLink(link) {
-		if (this.link != null)
+		if (this.link != null) {
+			this.link.tokens.splice(this.link.tokens.indexOf(this), 1);
 			this.link.clearFocus();
+		}
 		this.link = link;
 		if (this.link != null) {
-			if (this.forward) {
-				this.from = link.from;
-				this.to = link.to;
-			}
-			else {
-				this.from = link.to;
-				this.to = link.from;
-			}
-			this.link.focus("red");
+			this.link.tokens.push(this);
+			this.link.focus(this.colour);
 		}
 	}
 
 	reset() {
 		this.forward = true;
-		this.rewrite = false;
 		this.transited = false;
 		
-		this.from = null; // logical from
-		this.to = null; // logical to
 		this.link = null;
-		
+	}
+}
+
+class EvaluationToken extends MachineToken {
+
+	constructor(machine) {
+		super(machine);
+		this.colour = 'red';
+	}
+
+	reset() {
+		super.reset();
+
+		this.rewrite = false;
 		this.rewriteFlag = RewriteFlag.EMPTY;
 		this.modStack = [ModData.NOCOPY];
 		this.dataStack = [CompData.PROMPT];
@@ -41,6 +47,7 @@ var CompData = {
 	PROMPT: '*',
 	LAMBDA: 'λ',
 	R: '@',
+	M: 'M',
 	DELTA: 'Δ',
 }
 
@@ -60,8 +67,10 @@ var RewriteFlag = {
 	F_MPROMO: '<!M>',
 	F_DELTA: '<∇>',
 	F_MODIFY: '<Δ>',
+	F_PROP: '<P>',
 }
 
 var BoxData = {
+
 }
 

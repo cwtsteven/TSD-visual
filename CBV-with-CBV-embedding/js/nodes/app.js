@@ -23,7 +23,6 @@ class App extends Node {
 	rewrite(token, nextLink) {
 		if (token.rewriteFlag == RewriteFlag.F_MOD) {
 			token.rewriteFlag = RewriteFlag.EMPTY;
-			token.rewrite = false;
 
 			if (nextLink.from == this.key && nextLink.fromPort == "w") {
 				var data = token.dataStack.last();
@@ -66,9 +65,14 @@ class App extends Node {
 					new Link(inLink.from, mod.key, inLink.fromPort, "s").addToGroup(mod.group);
 					inLink.changeFrom(con.key, "n");
 					new Link(mod.key, con.key, "e", "s").addToGroup(this.group);
-					new Link(mod.key, con.key, "w", "s").addToGroup(this.group);
+					var newLink = new Link(mod.key, con.key, "w", "s").addToGroup(this.group);
 
+					/*
+					token.dataStack.pop();
+					token.dataStack.push(CompData.PROMPT);
 					token.rewrite = true;
+					return newLink;
+					*/
 				}
 
 				token.dataStack.pop();
@@ -77,44 +81,51 @@ class App extends Node {
 			}
 
 			else if (nextLink.to == this.key) {
-				if (token.dataStack.last() == CompData.LAMBDA) {
-					token.dataStack.pop();
+				if (token.dataStack.last() == CompData.M) {
 
-					var mod = new Mod().addToGroup(this.group);
-					this.findLinksInto(null)[0].changeTo(mod.key, "s");
-					new Link(mod.key, this.key, "e", "s").addToGroup(this.group);
+					var nextNode = this.graph.findNodeByKey(nextLink.from);
+					if (!(nextNode instanceof Mod)) {
+						token.dataStack.pop();
+						var mod = new Mod().addToGroup(this.group);
+						this.findLinksInto(null)[0].changeTo(mod.key, "s");
+						new Link(mod.key, this.key, "e", "s").addToGroup(this.group);
 
-					var newApp = this.copy().addToGroup(this.group);
-					var newLink = new Link(mod.key, newApp.key, "w", "s").addToGroup(this.group);
-					var newDer = new Der().addToGroup(this.group);
-					new Link(newApp.key, newDer.key, "w", "s").addToGroup(this.group);
+						var newApp = this.copy().addToGroup(this.group);
+						var newLink = new Link(mod.key, newApp.key, "w", "s").addToGroup(this.group);
+						var newDer = new Der().addToGroup(this.group);
+						new Link(newApp.key, newDer.key, "w", "s").addToGroup(this.group);
 
-					
-					var rightLink = this.findLinksOutOf("e")[0];
-					var rightNode = this.graph.findNodeByKey(rightLink.to);
+						
+						var rightLink = this.findLinksOutOf("e")[0];
+						var rightNode = this.graph.findNodeByKey(rightLink.to);
 
-					var con = new Contract(rightNode.name).addToGroup(this.group);
-					new Link(newApp.key, con.key, "e", "s").addToGroup(this.group);
-					rightLink.changeFrom(con.key, "n");
-					new Link(this.key, con.key, "e", "s").addToGroup(this.group);
+						var con = new Contract(rightNode.name).addToGroup(this.group);
+						new Link(newApp.key, con.key, "e", "s").addToGroup(this.group);
+						rightLink.changeFrom(con.key, "n");
+						new Link(this.key, con.key, "e", "s").addToGroup(this.group);
 
-					var leftDer = this.graph.findNodeByKey(this.findLinksOutOf("w")[0].to);
+						var leftDer = this.graph.findNodeByKey(this.findLinksOutOf("w")[0].to);
 
-					var con2 = new Contract(leftDer.name).addToGroup(this.group);
-					leftDer.findLinksOutOf(null)[0].changeFrom(con2.key, "n");
-					new Link(leftDer.key, con2.key, "n", "s").addToGroup(this.group);
-					new Link(newDer.key, con2.key, "n", "s").addToGroup(this.group);
+						var con2 = new Contract(leftDer.name).addToGroup(this.group);
+						leftDer.findLinksOutOf(null)[0].changeFrom(con2.key, "n");
+						new Link(leftDer.key, con2.key, "n", "s").addToGroup(this.group);
+						new Link(newDer.key, con2.key, "n", "s").addToGroup(this.group);
 
-					token.modStack.push(mod.key);
-					token.forward = true;
-					token.rewrite = true;
-					return newLink;
+						token.modStack.push(mod.key);
+						token.forward = true;
+						token.rewrite = true;
+						return newLink;
+					}
 				}
 			}
+			token.rewrite = true;
+			return nextLink;
 		}
 
-		token.rewrite = false;
-		return nextLink;
+		else if (token.rewriteFlag == RewriteFlag.EMPTY) {
+			token.rewrite = false;
+			return nextLink;
+		}
 	}
 
 	copy() {

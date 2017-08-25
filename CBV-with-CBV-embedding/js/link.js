@@ -8,6 +8,8 @@ class Link {
 
 		this.colour = null;
 		this.penWidth = null;
+
+		this.tokens = [];
 		this.addToGraph(graph); // cheating
 		this.addToNode(); // cheating
 	}
