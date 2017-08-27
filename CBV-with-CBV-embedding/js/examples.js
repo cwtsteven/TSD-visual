@@ -19,6 +19,14 @@ var prop_within_fun =
 + 'let f = {λy. ((set x to y);prop;x + y)} in\n'
 + 'f 3'
 
+var effect_order = 
+  'let x = {1} in\n'
++ 'let f = {λy. ((set x to y);x + y)} in\n'
++ 'let m = (f 2) + (f 3) in\n'
++ '(set x to 4);\n'
++ 'prop;\n'
++ 'm'
+
 var concurrent_prop = 
   'let x = {1} in\n'
 + 'let f = {λy.x+y} in\n'
@@ -45,13 +53,6 @@ var batch_update =
 + '(set y to 6);\n'
 + 'prop;\n'
 + 'z'
-
-var effect_order = 
-  'let x = {1} in\n'
-+ 'let f = {λy. ((set x to y);x + y)} in\n'
-+ 'let m = (f 2) + (f 3) in\n'
-+ 'prop;\n'
-+ 'm'
 
 var fact_inc = 
   'let fact = rec(f,x).\n'
