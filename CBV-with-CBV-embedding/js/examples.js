@@ -14,15 +14,6 @@ var prov =
 + 'prop;\n'
 + 'y'
 
-var change_withn_fun =
-  'let x = {1} in\n'
-+ 'let y = {2} in\n'
-+ 'let f = {λz. x + ((set x to y); z) + y} in\n'
-+ 'let m = (f 3) + (f 4) in\n'
-+ 'prop;\n'
-+ 'prop;\n'
-+ 'm'
-
 var prop_within_fun = 
   'let x = {1} in\n'
 + 'let f = {λy. ((set x to y);prop;x + y)} in\n'
@@ -58,7 +49,7 @@ var batch_update =
 var effect_order = 
   'let x = {1} in\n'
 + 'let f = {λy. ((set x to y);x + y)} in\n'
-+ 'let m = (f 3) + (f 4) in\n'
++ 'let m = (f 2) + (f 3) in\n'
 + 'prop;\n'
 + 'm'
 
