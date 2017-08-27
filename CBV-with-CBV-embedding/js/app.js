@@ -36,6 +36,7 @@ require(["jquery", "renderer", "goi-machine"],
 				$("#dataStack").val("");
 				$("#flag").val("");
 				$("#boxStack").val("");
+				$("#modStack").val("");
 				var source = $("#ta-program").val();
 				machine.compile(source);
 				draw();
