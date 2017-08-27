@@ -22,21 +22,24 @@
   				select: function(event, ui) {
   					var prog;
   					switch($("#sm-example option:selected").val()) {
-  						case "fact": prog = fact_prog; break;
-  						case "prov": prog = prov_prog; break;
-  						case "change_withn_fun": prog = change_withn_fun_prog; break;
-  						case "prop_within_fun": prog = prop_within_fun_prog; break;
-  						case "concurrent_prop": prog = concurrent_prop_prog; break;
-  						case "circular": prog = circular_prog; break;
-  						case "batch_update": prog = batch_update_prog; break;
-  						case "effect_order": prog = effect_order_prog; break; 
+  						case "fact": prog = fact; break;
+  						case "prov": prog = prov; break;
+  						case "change_withn_fun": prog = change_withn_fun; break;
+  						case "prop_within_fun": prog = prop_within_fun; break;
+  						case "prop_within_prop": prog = prop_within_prop; break;
+  						case "concurrent_prop": prog = concurrent_prop; break;
+  						case "circular": prog = circular; break;
+  						case "batch_update": prog = batch_update; break;
+  						case "effect_order": prog = effect_order; break; 
+  						case "if_inc": prog = if_inc; break;
+  						case "fact_inc": prog = fact_inc; break;
   					}
   					$("#ta-program").val(prog);
   					$("#btn-make-graph").click();
   				}
   			});
 			
-  			$("#ta-program").val(fact_prog);
+  			$("#ta-program").val(fact);
   		});
   	</script>
 </head>
@@ -48,10 +51,12 @@
 			<option value="prov">Provisonal argument</option>
 			<option value="change_withn_fun">Change within function</option>
 			<option value="prop_within_fun">Propagation within function</option>
+			<option value="effect_order">Order of effects</option>
 			<option value="concurrent_prop">Concurrent propagation</option>
 			<option value="circular">Circular dependence</option>
 			<option value="batch_update">Batch update</option>
-			<option value="effect_order">Order of effects</option>
+			<option value="if_inc">If then else</option>
+			<option value="fact_inc">Factorial (incremental)</option>
 		</select>
 		<button id="btn-info">?</button>
 		<textarea id="ta-program" rows="40" spellcheck=false style="width: 100%; height: 37%; resize: none; font-size: 12px;">

@@ -32,11 +32,11 @@ class Contract extends Expo {
 				var i = token.boxStack.last();
 				var prev = this.graph.findNodeByKey(i.from);
 				if (prev instanceof Contract) {
-					for (let _token of nextLink.tokens) {
+					for (let _token of Array.from(nextLink.tokens)) {
 						if (_token.boxStack.last() == i)
 							_token.boxStack.pop();
 					}
-					for (let _token of i.tokens) {
+					for (let _token of Array.from(i.tokens)) {
 						_token.setLink(nextLink);
 						_token.rewriteFlag = RewriteFlag.F_C;
 					}

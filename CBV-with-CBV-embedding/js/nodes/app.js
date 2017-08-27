@@ -66,13 +66,6 @@ class App extends Node {
 					inLink.changeFrom(con.key, "n");
 					new Link(mod.key, con.key, "e", "s").addToGroup(this.group);
 					var newLink = new Link(mod.key, con.key, "w", "s").addToGroup(this.group);
-
-					/*
-					token.dataStack.pop();
-					token.dataStack.push(CompData.PROMPT);
-					token.rewrite = true;
-					return newLink;
-					*/
 				}
 
 				token.dataStack.pop();
@@ -86,6 +79,9 @@ class App extends Node {
 					var nextNode = this.graph.findNodeByKey(nextLink.from);
 					if (!(nextNode instanceof Mod)) {
 						token.dataStack.pop();
+						var key = token.dataStack.pop();
+						var promo = this.graph.findNodeByKey(key);
+
 						var mod = new Mod().addToGroup(this.group);
 						this.findLinksInto(null)[0].changeTo(mod.key, "s");
 						new Link(mod.key, this.key, "e", "s").addToGroup(this.group);
@@ -104,11 +100,10 @@ class App extends Node {
 						rightLink.changeFrom(con.key, "n");
 						new Link(this.key, con.key, "e", "s").addToGroup(this.group);
 
-						var leftDer = this.graph.findNodeByKey(this.findLinksOutOf("w")[0].to);
-
-						var con2 = new Contract(leftDer.name).addToGroup(this.group);
-						leftDer.findLinksOutOf(null)[0].changeFrom(con2.key, "n");
-						new Link(leftDer.key, con2.key, "n", "s").addToGroup(this.group);
+						var con2 = new Contract(promo.name).addToGroup(this.group);
+						var promoInLink = promo.findLinksInto(null)[0];
+						promoInLink.changeTo(con2.key, "s");
+						new Link(con2.key, key, "n", "s").addToGroup(this.group);
 						new Link(newDer.key, con2.key, "n", "s").addToGroup(this.group);
 
 						token.modStack.push(mod.key);

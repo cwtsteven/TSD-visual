@@ -197,8 +197,8 @@ class GoIMachine {
 			var param = ast.param;
 			var delta = new Delta().addToGroup(group);
 			var term = this.toGraph(ast.body, group);
-			var der = new Der(param).addToGroup(group);
-			new Link(delta.key, der.key, "w", "s").addToGroup(group);
+			var v = new Var(param).addToGroup(group);
+			new Link(delta.key, v.key, "w", "s").addToGroup(group);
 			new Link(delta.key, term.prin.key, "e", "s").addToGroup(group);
 
 			var auxs = Array.from(term.auxs);
@@ -211,13 +211,13 @@ class GoIMachine {
 					auxs.splice(i, 1);
 					var con = new Contract(aux.name).addToGroup(group);
 					new Link(aux.key, con.key, "n", "s").addToGroup(group);
-					new Link(der.key, con.key, "n", "s").addToGroup(group);
+					new Link(v.key, con.key, "n", "s").addToGroup(group);
 					auxs.push(con);
 					break;
 				}
 			}
 			if (!p1Used)
-				auxs.push(der);
+				auxs.push(v);
 
 			return new Term(delta, auxs);
 		}
@@ -248,8 +248,10 @@ class GoIMachine {
 
 	startPropagation() {
 		for (let rNode of this.rNodes) {
-			var pToken = new PropToken(this, this.graph.findNodeByKey(rNode).findLinksOutOf("e")[0]);
+			var node = this.graph.findNodeByKey(rNode);
+			var pToken = new PropToken(this, node.findLinksOutOf("e")[0]);
 			this.propTokens.push(pToken);
+			node.changeType(ModType.M);
 		}
 	}
 
@@ -318,9 +320,10 @@ class GoIMachine {
 			if (nextLink != null) {
 				token.setLink(nextLink);
 				if (token.isMain) 
-					this.printHistory(flag, dataStack, boxStack); 
+					this.printHistory(token, flag, dataStack, boxStack); 
 				else if (token instanceof EvaluationToken && !token.isMain)
-					//console.log(token)
+					//console.log(token);
+					//this.printHistory(token, flag, dataStack, boxStack);
 					;
 			}
 			else {
@@ -349,30 +352,32 @@ class GoIMachine {
 					else {
 						token.setLink(nextLink);
 						if (token.isMain)
-							this.printHistory(flag, dataStack, boxStack);
+							this.printHistory(token, flag, dataStack, boxStack);
 						else
-							//console.log(token)
+							//console.log(token);
+							//this.printHistory(token, flag, dataStack, boxStack);
 							;
 					}
 				}
 				else {
 					token.setLink(nextLink);
 					if (token.isMain)
-						this.printHistory(flag, dataStack, boxStack);
+						this.printHistory(token, flag, dataStack, boxStack);
 					else
-						//console.log(token)
+						//console.log(token);
+						//this.printHistory(token, flag, dataStack, boxStack);
 						;
 				}
 			}
 		}
 	}
 
-	printHistory(flag, dataStack, boxStack) {
-		var modStr = this.token.modStack.length == 0 ? '□' : Array.from(this.token.modStack).reverse().toString() + ',□';
-		flag.val(this.token.rewriteFlag + '\t' + modStr + '\n' + flag.val());
-		var dataStr = this.token.dataStack.length == 0 ? '□' : Array.from(this.token.dataStack).reverse().toString() + ',□';
+	printHistory(token, flag, dataStack, boxStack) {
+		var modStr = token.modStack.length == 0 ? '□' : Array.from(token.modStack).reverse().toString() + ',□';
+		flag.val(token.rewriteFlag + '\t' + modStr + '\n' + flag.val());
+		var dataStr = token.dataStack.length == 0 ? '□' : Array.from(token.dataStack).reverse().toString() + ',□';
 		dataStack.val(dataStr + '\n' + dataStack.val());
-		var boxStr = this.token.boxStack.length == 0 ? '□' : Array.from(this.token.boxStack).reverse().toString() + ',□';
+		var boxStr = token.boxStack.length == 0 ? '□' : Array.from(token.boxStack).reverse().toString() + ',□';
 		boxStack.val(boxStr + '\n' + boxStack.val());
 	}
 

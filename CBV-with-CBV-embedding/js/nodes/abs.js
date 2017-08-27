@@ -25,11 +25,11 @@ class Abs extends Node {
 		if (token.rewriteFlag == RewriteFlag.F_LAMBDA && nextLink.from == this.key) {
 			token.rewriteFlag = RewriteFlag.EMPTY;
 
-			var app = this.graph.findNodeByKey(this.findLinksInto("s")[0].from);
-			if (app instanceof App) {
+			var prev = this.graph.findNodeByKey(this.findLinksInto("s")[0].from);
+			if (prev instanceof App) {
 				// M rule
-				var appLink = app.findLinksInto(null)[0];
-				var appOtherLink = app.findLinksOutOf("e")[0];
+				var appLink = prev.findLinksInto(null)[0];
+				var appOtherLink = prev.findLinksOutOf("e")[0];
 				var otherNextLink = this.findLinksInto("w")[0];
 
 				nextLink.changeFrom(appLink.from, appLink.fromPort);
@@ -44,7 +44,16 @@ class Abs extends Node {
 				otherNextLink.changeToGroup(appOtherLink.group);
 				
 				this.delete();
-				app.delete();
+				prev.delete();
+			}
+
+			else if (prev instanceof Promo) {
+				var inLink = this.findLinksInto("s")[0];
+				token.dataStack.push(inLink.from);
+				token.dataStack.push(CompData.M);
+				token.forward = false;
+				token.rewrite = true;
+				return inLink;
 			}
 				
 			token.rewrite = true;
