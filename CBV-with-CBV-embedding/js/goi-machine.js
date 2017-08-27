@@ -256,7 +256,7 @@ class GoIMachine {
 	}
 
 	// machine step
-	pass(flag, dataStack, boxStack) {	
+	pass(flag, dataStack, boxStack, modStack) {	
 		if (!finished) {
 			this.count++;
 			if (this.count == 200) {
@@ -267,7 +267,7 @@ class GoIMachine {
 			if (this.propagating) {
 				if (this.analysing) {
 					for (let token of Array.from(this.analysisToken)) {
-						this.tokenPass(token, flag, dataStack, boxStack);
+						this.tokenPass(token, flag, dataStack, boxStack, modStack);
 					}
 					if (this.analysisToken.length == 0) {
 						this.analysing = false;
@@ -279,7 +279,7 @@ class GoIMachine {
 						if (token.evaluating) 
 							this.tokenPass(token.evalToken, flag, dataStack, boxStack);
 						
-						this.tokenPass(token, flag, dataStack, boxStack);
+						this.tokenPass(token, flag, dataStack, boxStack, modStack);
 					}
 					if (this.propTokens.length == 0) {
 						this.propagating = false;
@@ -287,11 +287,11 @@ class GoIMachine {
 				}
 			}
 			else
-				this.tokenPass(this.token, flag, dataStack, boxStack);
+				this.tokenPass(this.token, flag, dataStack, boxStack, modStack);
 		}
 	}
 
-	tokenPass(token, flag, dataStack, boxStack) {
+	tokenPass(token, flag, dataStack, boxStack, modStack) {
 		var node;
 		if (!token.transited) {
 			if (token.link != null) {
@@ -320,10 +320,10 @@ class GoIMachine {
 			if (nextLink != null) {
 				token.setLink(nextLink);
 				if (token.isMain) 
-					this.printHistory(token, flag, dataStack, boxStack); 
+					this.printHistory(token, flag, dataStack, boxStack, modStack); 
 				else if (token instanceof EvaluationToken && !token.isMain)
 					//console.log(token);
-					//this.printHistory(token, flag, dataStack, boxStack);
+					//this.printHistory(token, flag, dataStack, boxStack, modStack);
 					;
 			}
 			else {
@@ -347,38 +347,39 @@ class GoIMachine {
 					nextLink = nextNode.rewrite(token, nextLink);
 					if (!token.rewrite) {
 						token.transited = false;
-						this.tokenPass(token, flag, dataStack, boxStack);
+						this.tokenPass(token, flag, dataStack, boxStack, modStack);
 					}
 					else {
 						token.setLink(nextLink);
 						if (token.isMain)
-							this.printHistory(token, flag, dataStack, boxStack);
+							this.printHistory(token, flag, dataStack, boxStack, modStack);
 						else
 							//console.log(token);
-							//this.printHistory(token, flag, dataStack, boxStack);
+							//this.printHistory(token, flag, dataStack, boxStack, modStack);
 							;
 					}
 				}
 				else {
 					token.setLink(nextLink);
 					if (token.isMain)
-						this.printHistory(token, flag, dataStack, boxStack);
+						this.printHistory(token, flag, dataStack, boxStack, modStack);
 					else
 						//console.log(token);
-						//this.printHistory(token, flag, dataStack, boxStack);
+						//this.printHistory(token, flag, dataStack, boxStack, modStack);
 						;
 				}
 			}
 		}
 	}
 
-	printHistory(token, flag, dataStack, boxStack) {
-		var modStr = token.modStack.length == 0 ? '□' : Array.from(token.modStack).reverse().toString() + ',□';
-		flag.val(token.rewriteFlag + '\t' + modStr + '\n' + flag.val());
+	printHistory(token, flag, dataStack, boxStack, modStack) {
+		flag.val(token.rewriteFlag + '\n' + flag.val());
 		var dataStr = token.dataStack.length == 0 ? '□' : Array.from(token.dataStack).reverse().toString() + ',□';
 		dataStack.val(dataStr + '\n' + dataStack.val());
 		var boxStr = token.boxStack.length == 0 ? '□' : Array.from(token.boxStack).reverse().toString() + ',□';
 		boxStack.val(boxStr + '\n' + boxStack.val());
+		var modStr = token.modStack.length == 0 ? '□' : Array.from(token.modStack).reverse().toString() + ',□';
+		modStack.val(modStr + '\n' + modStack.val());
 	}
 
 }
