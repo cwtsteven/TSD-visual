@@ -35,17 +35,16 @@ class Prov extends Node {
 				token.rewrite = true;
 			}
 			else if (data == CompData.LAMBDA) {
-				var outNode = this.graph.findNodeByKey(this.findLinksOutOf(null)[0].to);
-				var promo = this.searchForPromo(outNode);
-				var promoCopy = promo.group.deepCopy(this.group);
-
 				var mod = new Mod().addToGroup(this.group);
-				new Link(mod.key, promoCopy.prin.key, "w", "s").addToGroup(this.group);
 				var outLink = this.findLinksOutOf(null)[0];
 				outLink.changeFrom(mod.key, "e");
 				var inLink = this.findLinksInto(null)[0];
 				inLink.changeTo(mod.key, "s");
 				this.delete();
+
+				var newLeft = mod.graph.findNodeByKey(mod.findLinksOutOf("e")[0].to).deepUnfolding(mod);
+				new Link(mod.key, newLeft.prin.key, "w", "s").addToGroup(this.group);
+
 				token.rewrite = true;
 			}
 

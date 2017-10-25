@@ -56,6 +56,64 @@ class Node {
 		return links;
 	}
 
+	searchForPromo() {
+		if (this instanceof Promo)
+			return this;
+		else if (this instanceof Mod || this instanceof Inter)
+			return this.graph.findNodeByKey(this.findLinksOutOf("w")[0].to).searchForPromo();
+		else if (this instanceof If1)
+			return this.graph.findNodeByKey(this.findLinksOutOf("n")[0].to).searchForPromo();
+		else if (this instanceof If2)
+			return this.graph.findNodeByKey(this.findLinksOutOf("e")[0].to).searchForPromo();
+		else if (this instanceof Contract)
+			return this.graph.findNodeByKey(this.findLinksOutOf(null)[0].to).searchForPromo();
+	}
+
+	searchForPromoFromMod(mod) {
+		if (this instanceof Promo)
+			return null;
+		else if (this instanceof Mod || this instanceof Inter) {
+			console.log(this.parents);
+			if (this.parents.indexOf(mod.key) != -1)
+				return this.graph.findNodeByKey(this.findLinksOutOf("w")[0].to);
+			else
+				return null;
+		}
+		else if (this instanceof If1)
+			return this.graph.findNodeByKey(this.findLinksOutOf("n")[0].to).searchForPromoFromMod(mod);
+		else if (this instanceof If2)
+			return this.graph.findNodeByKey(this.findLinksOutOf("e")[0].to).searchForPromoFromMod(mod);
+		else if (this instanceof Contract)
+			return this.graph.findNodeByKey(this.findLinksOutOf(null)[0].to).searchForPromoFromMod(mod);
+		else if (this instanceof Pax)
+			return this.graph.findNodeByKey(this.findLinksOutOf(null)[0].to).searchForPromoFromMod(mod);
+	}
+
+	unFolding(map, mod, boxWrapper) {
+		var newBoxWrapper = boxWrapper.copyBox(map).addToGroup(mod.group);
+		for (let aux of boxWrapper.auxs) {
+			var promo = aux.searchForPromoFromMod(mod);
+			if (promo != null) {
+				var newBox2 = aux.unFolding(map, mod, promo.group, mod.group);
+				new Link(map.get(aux.key), newBox2.prin.key, "n", "s").addToGroup(mod.group);
+			}
+			else {
+				var con = new Contract(aux.name).addToGroup(mod.group);
+				var auxLink = aux.findLinksOutOf(null)[0];
+				auxLink.changeFrom(con.key, "n");
+				new Link(aux.key, con.key, "n", "s").addToGroup(mod.group);
+				new Link(map.get(aux.key), con.key, "n", "s").addToGroup(mod.group);
+			}
+		}
+		return newBoxWrapper;
+	}
+
+	deepUnfolding(mod) {
+		var firstPromo = this.searchForPromo();
+		var map = new Map();
+		return this.unFolding(map, mod, firstPromo.group);
+	}
+
 	copy(graph) {
 		var newNode = new Node(this.shape, this.text, this.name).addToGraph(graph);
 		newNode.width = this.width;
@@ -80,19 +138,6 @@ class Node {
 		if (this.height != null)
 			str += ',height=' + this.height;
 		return str += '];'
-	}
-
-	searchForPromo(node) {
-		if (node instanceof Promo)
-			return node;
-		else if (node instanceof Mod || node instanceof Inter)
-			return this.searchForPromo(this.graph.findNodeByKey(node.findLinksOutOf("w")[0].to));
-		else if (node instanceof If1)
-			return this.searchForPromo(this.graph.findNodeByKey(node.findLinksOutOf("n")[0].to));
-		else if (node instanceof If2)
-			return this.searchForPromo(this.graph.findNodeByKey(node.findLinksOutOf("e")[0].to));
-		else if (node instanceof Contract)
-			return this.searchForPromo(this.graph.findNodeByKey(node.findLinksOutOf(null)[0].to));
 	}
 
 	// machine instructions

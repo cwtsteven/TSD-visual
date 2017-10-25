@@ -19,6 +19,27 @@ class Promo extends Expo {
 			token.rewriteFlag = RewriteFlag.EMPTY;
 			var prev = this.graph.findNodeByKey(this.findLinksInto(null)[0].from);
 
+			if (prev instanceof Mod && prev.type != ModType.U && token.copyStack.last() == CopyData.U) {
+				/*
+				var con = new Contract(this.name).addToGroup(this.group.group);
+				this.findLinksInto(null)[0].changeTo(con.key, "s");
+				new Link(con.key, this.key, "n", "s").addToGroup(this.group.group);
+				var link = token.boxStack.last();
+				link.changeTo(con.key, "s");
+
+				token.rewriteFlag = RewriteFlag.F_PROMO;
+				token.rewrite = true;
+				return nextLink;
+				*/
+				var newBoxWrapper = this.group.copy().addToGroup(this.group.group);
+				Term.joinAuxs(this.group.auxs, newBoxWrapper.auxs, newBoxWrapper.group);
+				var link = token.boxStack.pop();
+				link.changeTo(newBoxWrapper.prin.key, "s");
+				token.rewriteFlag = RewriteFlag.F_PROMO;
+				token.rewrite = true;
+				return newBoxWrapper.prin.findLinksOutOf(null)[0];
+			}
+
 			if (prev instanceof Der) {
 				var oldGroup = this.group;
 				oldGroup.moveOut(); // this.group is a box-wrapper

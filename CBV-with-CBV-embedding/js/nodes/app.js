@@ -53,6 +53,7 @@ class App extends Node {
 					new Link(mod.key, this.key, "e", "s").addToGroup(this.group);
 
 					this.appDeepCopy(mod);
+					token.copyStack.push(CopyData.U);
 
 					token.forward = true;
 					token.rewrite = true;
@@ -77,8 +78,7 @@ class App extends Node {
 			if (next instanceof App) {
 				var newApp = this.copy().addToGroup(this.group);
 				new Link(prev.key, newApp.key, prevPort, "s").addToGroup(this.group);
-				var rightPromo = this.searchForPromo(this.graph.findNodeByKey(next.findLinksOutOf("e")[0].to));
-				var newRight = rightPromo.group.deepCopy(this.group);
+				var newRight = this.graph.findNodeByKey(next.findLinksOutOf("e")[0].to).deepUnfolding(mod);
 				new Link(newApp.key, newRight.prin.key, "e", "s").addToGroup(this.group);
 				next = this.graph.findNodeByKey(next.findLinksOutOf("w")[0].to);
 				prev = newApp;
@@ -92,8 +92,7 @@ class App extends Node {
 				prevPort = "n";
 			}
 		}
-		var leftPromo = this.searchForPromo(this.graph.findNodeByKey(next.findLinksOutOf(null)[0].to));
-		var newLeft = leftPromo.group.deepCopy(this.group);
+		var newLeft = this.graph.findNodeByKey(next.findLinksOutOf(null)[0].to).deepUnfolding(mod);
 		new Link(prev.key, newLeft.prin.key, prevPort, "s").addToGroup(this.group);
 	}
 

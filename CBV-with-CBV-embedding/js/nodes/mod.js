@@ -11,6 +11,7 @@ class Mod extends Node {
 		super(null, "M");
 		this.type = ModType.M;
 		this.numParents = 0;
+		this.parents = [];
 	}
 
 	transition(token, link) {
@@ -53,6 +54,8 @@ class Mod extends Node {
 			if (token.machine.rNodes.indexOf(this.key) == -1)
 				token.machine.rNodes.push(this.key);
 
+			this.parents = [];
+
 			token.forward = false;
 			token.rewrite = true;
 			return nextLink;
@@ -66,6 +69,8 @@ class Mod extends Node {
 
 	analyse(token) {
 		if (token.link.fromPort == "e") {
+			this.parents = union_arrays(this.parents, token.mNodes);
+			console.log(this.parents);
 			if (token.mNodes.indexOf(this.key) == -1) {
 				if (this.numParents == 0) {
 					this.numParents++;
@@ -128,8 +133,6 @@ class Mod extends Node {
 			var data = evalToken.dataStack.last();
 
 			var leftLink = this.findLinksOutOf("w")[0];
-			var weak = new Weak(this.graph.findNodeByKey(leftLink.to).name).addToGroup(this.group);
-			leftLink.changeFrom(weak.key, "n");
 
 			if ((Number.isInteger(data) || typeof(data) === "boolean")) {
 				var wrapper = BoxWrapper.create().addToGroup(this.group);
@@ -140,12 +143,15 @@ class Mod extends Node {
 			}
 			else if (data == CompData.LAMBDA) {
 				var outNode = this.graph.findNodeByKey(this.findLinksOutOf("e")[0].to);
-				var promo = this.searchForPromo(outNode);
-				var promoCopy = promo.group.deepCopy(this.group)
+				var newRight = outNode.deepUnfolding(this);
 				
-				new Link(this.key, promoCopy.prin.key, "w", "s").addToGroup(this.group);
+				new Link(this.key, newRight.prin.key, "w", "s").addToGroup(this.group);
 				token.rewrite = true;
 			}
+
+			var weak = new Weak(this.graph.findNodeByKey(leftLink.to).name).addToGroup(this.group);
+			leftLink.changeFrom(weak.key, "n");
+
 			evalToken.reset();
 			return this.findLinksInto(null)[0];
 		}
@@ -180,8 +186,8 @@ class Inter extends Mod {
 		}
 		else if (link.from == this.key && link.fromPort == "w") {
 			if (this.type == ModType.U) {
+				token.copyStack.pop();
 				this.changeType(ModType.I);
-				//token.copyStack.pop();
 				token.rewriteFlag = RewriteFlag.F_U;
 			}
 			return this.findLinksInto(null)[0];
@@ -220,11 +226,12 @@ class Inter extends Mod {
 			&& evalToken.dataStack.last() == CompData.I && evalToken.rewriteFlag == RewriteFlag.EMPTY) {
 
 			var leftLink = this.findLinksOutOf('w')[0];
-			var weak = new Weak().addToGroup(this.group);
-			leftLink.changeFrom(weak.key, "n");
 
 			var app = this.graph.findNodeByKey(this.findLinksOutOf('e')[0].to);
 			app.appDeepCopy(this);
+
+			var weak = new Weak().addToGroup(this.group);
+			leftLink.changeFrom(weak.key, "n");
 
 			evalToken.reset();
 			evalToken.setLink(this.findLinksOutOf("w")[0]);
