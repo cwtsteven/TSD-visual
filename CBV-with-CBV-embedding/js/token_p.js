@@ -7,7 +7,6 @@ class PropToken extends MachineToken {
 		this.setLink(link);
 		this.evalToken = new EvaluationToken(machine);
 		this.evalToken.isMain = false;
-		this.mNodes = [];
 		this.evaluating = false;
 	}
 

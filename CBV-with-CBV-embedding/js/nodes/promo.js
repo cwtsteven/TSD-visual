@@ -19,13 +19,22 @@ class Promo extends Expo {
 			token.rewriteFlag = RewriteFlag.EMPTY;
 			var prev = this.graph.findNodeByKey(this.findLinksInto(null)[0].from);
 
-			if (prev instanceof Mod && token.modStack.last() != ModData.NOCOPY) {
-				prev = this.graph.findNodeByKey(prev.findLinksInto(null)[0].from);
-				if (!(prev instanceof Contract)) {
+			/*
+			if ((prev instanceof Mod && prev.type != ModType.U) || (prev instanceof If1) || (prev instanceof If2)) {
+				var prev2 = this.graph.findNodeByKey(prev.findLinksInto(null)[0].from);
+				if (prev2 instanceof Contract && token.copyStack.last() == CopyData.U) {
+					var con = new Contract(this.name).addToGroup(this.group.group);
+					this.findLinksInto(null)[0].changeTo(con.key, "s");
+					var link = token.boxStack.last();
+					link.changeTo(con.key, "s");
+					new Link(con.key, this.key, "n", "s").addToGroup(this.group.group);
+
 					token.rewrite = true;
-					return nextLink;
+					token.rewriteFlag = RewriteFlag.F_PROMO;
+					return this.findLinksOutOf(null)[0];
 				}
 			}
+			*/
 
 			if (prev instanceof Der) {
 				var oldGroup = this.group;
@@ -67,6 +76,12 @@ class Promo extends Expo {
 		}
 		
 		else if (token.rewriteFlag == RewriteFlag.EMPTY) {
+			if (token.dataStack.last() == CompData.R) {
+				token.dataStack.pop();
+				token.dataStack.push(CompData.I);
+				nextLink = this.findLinksInto(null)[0];
+				token.forward = false;
+			}
 			token.rewrite = false;
 			return nextLink;
 		}

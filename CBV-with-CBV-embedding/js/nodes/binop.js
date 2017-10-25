@@ -36,19 +36,17 @@ class BinOp extends Node {
 			var left = this.graph.findNodeByKey(this.findLinksOutOf("w")[0].to);
 			var right = this.graph.findNodeByKey(this.findLinksOutOf("e")[0].to);
 
-			if (left instanceof Const && right instanceof Const) {
+			if (left instanceof Promo && right instanceof Promo) {
 				var wrapper = BoxWrapper.create().addToGroup(this.group);
 				var newConst = new Const(token.dataStack.last()).addToGroup(wrapper.box);
-				var newLink = new Link(wrapper.prin.key, newConst.key, "n", "s").addToGroup(wrapper);
+				new Link(wrapper.prin.key, newConst.key, "n", "s").addToGroup(wrapper);
 				nextLink.changeTo(wrapper.prin.key, "s");
 				
-				left.delete();
-				right.delete();
+				left.group.delete();
+				right.group.delete();
 				this.delete();
 
 				token.rewriteFlag = RewriteFlag.F_PROMO;
-				token.rewrite = true;
-				return newLink;
 			}
 			
 			token.rewrite = true;

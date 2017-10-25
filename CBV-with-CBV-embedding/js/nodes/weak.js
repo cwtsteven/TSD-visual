@@ -5,7 +5,7 @@ class Weak extends Expo {
 	}
 
 	analyse(token) {
-		token.machine.analysisToken.splice(token.machine.analysisToken.indexOf(token), 1);
+		token.machine.aTokens.splice(token.machine.aTokens.indexOf(token), 1);	
 		return null;
 	}
 

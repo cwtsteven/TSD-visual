@@ -13,6 +13,11 @@ class Der extends Expo {
 
 class Var extends Der {
 
+	constructor(name) {
+		super(name);
+		this.text = "V";
+	}
+
 	deleteAndPreserveOutLink() { 
 		var inLink = this.findLinksInto(null)[0];
 		var outLink = this.findLinksOutOf(null)[0];
@@ -23,7 +28,7 @@ class Var extends Der {
 			else
 				outLink.changeFrom(inLink.from, inLink.fromPort);
 		}
-		super.delete();
+		this.delete();
 	}
 
 }

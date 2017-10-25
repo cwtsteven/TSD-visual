@@ -7,7 +7,7 @@ class GoIMachine {
 		graph = this.graph; // cheating!
 		this.token = new EvaluationToken(this);
 		this.token.isMain = true;
-		this.analysisToken = [];
+		this.aTokens = [];
 		this.propTokens = [];
 		this.rNodes = [];
 		this.analysing = false;
@@ -23,7 +23,7 @@ class GoIMachine {
 		// init
 		this.graph.clear();
 		this.token.reset();
-		this.analysisToken = [];
+		this.aTokens = [];
 		this.propTokens = [];
 		this.rNodes = [];
 		this.analysing = false;
@@ -80,12 +80,22 @@ class GoIMachine {
 			var app = new App().addToGroup(group);
 			//lhs
 			var left = this.toGraph(ast.lhs, group);
+
 			var der = new Der(left.prin.name).addToGroup(group);
 			new Link(der.key, left.prin.key, "n", "s").addToGroup(group);
 			// rhs
-			var right = this.toGraph(ast.rhs, group);		
+			var right = this.toGraph(ast.rhs, group);	
 			var prov = new Prov().addToGroup(group);
 			new Link(prov.key, right.prin.key, "n", "s").addToGroup(group);
+			/*	
+			var mod = new Mod().addToGroup(group);
+			//var contract = new Contract(right.name).addToGroup(group);
+			new Link(mod.key, right.prin.key, "e", "s").addToGroup(group);
+			new Link(mod.key, rightCopy.prin.key, "w", "s").addToGroup(group);
+			//new Link(contract.key, right.prin.key, "n", "s").addToGroup(group);
+			var auxs = Term.joinAuxs(rightCopy.auxs, right.auxs, group);
+			*/
+			
 			
 			new Link(app.key, der.key, "w", "s").addToGroup(group);
 			new Link(app.key, prov.key, "e", "s").addToGroup(group);
@@ -120,14 +130,10 @@ class GoIMachine {
 
 			binop.subType = ast.type;
 			var left = this.toGraph(ast.v1, group);
-			var derL = new Der(left.prin.name).addToGroup(group);
-			new Link(derL.key, left.prin.key, "n", "s").addToGroup(group);
 			var right = this.toGraph(ast.v2, group);
-			var derR = new Der(right.prin.name).addToGroup(group);
-			new Link(derR.key, right.prin.key, "n", "s").addToGroup(group);
 
-			new Link(binop.key, derL.key, "w", "s").addToGroup(group);
-			new Link(binop.key, derR.key, "e", "s").addToGroup(group);
+			new Link(binop.key, left.prin.key, "w", "s").addToGroup(group);
+			new Link(binop.key, right.prin.key, "e", "s").addToGroup(group);
 
 			return new Term(binop, Term.joinAuxs(left.auxs, right.auxs, group));
 		}
@@ -136,10 +142,8 @@ class GoIMachine {
 			var unop = new UnOp(ast.name).addToGroup(group);
 			unop.subType = ast.type;
 			var box = this.toGraph(ast.v1, group);
-			var der = new Der(box.prin.name).addToGroup(group);
-			new Link(der.key, box.prin.key, "n", "s").addToGroup(group);
 
-			new Link(unop.key, der.key, "n", "s").addToGroup(group);
+			new Link(unop.key, box.prin.key, "n", "s").addToGroup(group);
 
 			return new Term(unop, box.auxs);
 		}
@@ -147,12 +151,10 @@ class GoIMachine {
 		else if (ast instanceof IfThenElse) {
 			var ifnode = new If().addToGroup(group);
 			var cond = this.toGraph(ast.cond, group);
-			var der = new Der(cond.prin.name).addToGroup(group);
-			new Link(der.key, cond.prin.key, "n", "s").addToGroup(group);
 			var t1 = this.toGraph(ast.t1, group);
 			var t2 = this.toGraph(ast.t2, group);
 
-			new Link(ifnode.key, der.key, "w", "s").addToGroup(group);
+			new Link(ifnode.key, cond.prin.key, "w", "s").addToGroup(group);
 			new Link(ifnode.key, t1.prin.key, "n", "s").addToGroup(group);
 			new Link(ifnode.key, t2.prin.key, "e", "s").addToGroup(group);
 
@@ -229,7 +231,7 @@ class GoIMachine {
 	}
 
 	deleteVarNode(group) {
-		for (let node of group.nodes) {
+		for (let node of Array.from(group.nodes)) {
 			if (node instanceof Group)
 				this.deleteVarNode(node);
 			else if (node instanceof Var) 
@@ -241,8 +243,9 @@ class GoIMachine {
 		this.propagating = true;
 		this.analysing = true;
 		for (let rNode of this.rNodes) {
-			var aToken = new AnalysisToken(this, rNode, this.graph.findNodeByKey(rNode).findLinksInto(null)[0]);
-			this.analysisToken.push(aToken);
+			var aToken = new AnalysisToken(this, this.graph.findNodeByKey(rNode).findLinksInto(null)[0]);
+			aToken.mNodes.push(rNode);
+			this.aTokens.push(aToken);
 		}
 	}
 
@@ -252,7 +255,18 @@ class GoIMachine {
 			var pToken = new PropToken(this, node.findLinksOutOf("e")[0]);
 			this.propTokens.push(pToken);
 			node.changeType(ModType.M);
+			node.numParents = 1;
 		}
+	}
+
+	shuffle(a) {
+	    var j, x, i;
+	    for (i = a.length - 1; i > 0; i--) {
+	        j = Math.floor(Math.random() * (i + 1));
+	        x = a[i];
+	        a[i] = a[j];
+	        a[j] = x;
+	    }
 	}
 
 	// machine step
@@ -266,21 +280,43 @@ class GoIMachine {
 
 			if (this.propagating) {
 				if (this.analysing) {
-					for (let token of Array.from(this.analysisToken)) {
-						this.tokenPass(token, flag, dataStack, boxStack, modStack);
+					var arr = Array.from(new Array(this.aTokens.length),(val,index)=>index+1);
+					this.shuffle(arr);
+					var arr_2 = Array.from(this.aTokens);
+					var num = Math.ceil((Math.random() * arr.length));
+					for (var i=0; i<arr_2.length; i++) {
+						var index = arr[i]-1;
+						this.tokenPass(arr_2[i], flag, dataStack, boxStack, modStack);
 					}
-					if (this.analysisToken.length == 0) {
+
+					var finished = true;
+					for (let aToken of this.aTokens) {
+						if (!aToken.halt) {
+							finished = false;
+							break;
+						}
+					}
+
+					if (finished) {
 						this.analysing = false;
+						this.aTokens = [];
 						this.startPropagation();
 					}
 				}
 				else {
-					for (let token of Array.from(this.propTokens)) {
+					var arr = Array.from(new Array(this.propTokens.length),(val,index)=>index+1);
+					this.shuffle(arr);
+					var arr_2 = Array.from(this.propTokens);
+					var num = Math.ceil((Math.random() * arr.length));
+					for (var i=0; i<arr_2.length; i++) {
+						var index = arr[i]-1;
+						var token = arr_2[i];
 						if (token.evaluating) 
-							this.tokenPass(token.evalToken, flag, dataStack, boxStack);
+							this.tokenPass(token.evalToken, flag, dataStack, boxStack, modStack);
 						
 						this.tokenPass(token, flag, dataStack, boxStack, modStack);
 					}
+
 					if (this.propTokens.length == 0) {
 						this.propagating = false;
 					}
@@ -323,7 +359,7 @@ class GoIMachine {
 					this.printHistory(token, flag, dataStack, boxStack, modStack); 
 				else if (token instanceof EvaluationToken && !token.isMain)
 					//console.log(token);
-					//this.printHistory(token, flag, dataStack, boxStack, modStack);
+					//this.printHistory(token, flag, dataStack, boxStack);
 					;
 			}
 			else {
@@ -343,21 +379,8 @@ class GoIMachine {
 				node = this.graph.findNodeByKey(target);
 				var nextLink = node.rewrite(token, token.link);
 				if (!token.rewrite) {
-					var nextNode = this.graph.findNodeByKey(token.forward ? token.link.to : token.link.from);
-					nextLink = nextNode.rewrite(token, nextLink);
-					if (!token.rewrite) {
-						token.transited = false;
-						this.tokenPass(token, flag, dataStack, boxStack, modStack);
-					}
-					else {
-						token.setLink(nextLink);
-						if (token.isMain)
-							this.printHistory(token, flag, dataStack, boxStack, modStack);
-						else
-							//console.log(token);
-							//this.printHistory(token, flag, dataStack, boxStack, modStack);
-							;
-					}
+					token.transited = false;
+					this.tokenPass(token, flag, dataStack, boxStack, modStack);
 				}
 				else {
 					token.setLink(nextLink);
@@ -378,7 +401,7 @@ class GoIMachine {
 		dataStack.val(dataStr + '\n' + dataStack.val());
 		var boxStr = token.boxStack.length == 0 ? '□' : Array.from(token.boxStack).reverse().toString() + ',□';
 		boxStack.val(boxStr + '\n' + boxStack.val());
-		var modStr = token.modStack.length == 0 ? '□' : Array.from(token.modStack).reverse().toString() + ',□';
+		var modStr = token.copyStack.length == 0 ? '□' : Array.from(token.copyStack).reverse().toString() + ',□';
 		modStack.val(modStr + '\n' + modStack.val());
 	}
 

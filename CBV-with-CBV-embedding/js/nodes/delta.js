@@ -7,21 +7,20 @@ class Delta extends Node {
 	transition(token, link) {
 		if (link.to == this.key) {
 			token.dataStack.push(CompData.PROMPT);
-			token.modStack.push(ModData.NOCOPY);
+			token.copyStack.push(CopyData.C);
 			return this.findLinksOutOf("e")[0];
 		}
 		else if (link.from == this.key) {
 			if (link.fromPort == "e") {
 				token.dataStack.pop();
-				token.dataStack.push(this.key);
-				token.dataStack.push(CompData.DELTA);
-				token.modStack.pop();
+				token.dataStack.push(CompData.DELTA + '(' + this.key + ')');
 				token.forward = true;
 				return this.findLinksOutOf("w")[0];
 			}
 			else if (link.fromPort == "w") {
 				token.dataStack.pop();
 				token.dataStack.push("()");
+				token.copyStack.pop();
 				token.rewriteFlag = RewriteFlag.F_DELTA;
 				return this.findLinksInto(null)[0];
 			}
@@ -38,13 +37,13 @@ class Delta extends Node {
 			this.findLinksOutOf("e")[0].changeFrom(weak2.key, "n");
 			var wrapper = BoxWrapper.create().addToGroup(this.group);
 			var con = new Const(data).addToGroup(wrapper.box);
-			var newLink = new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper);
+			new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper);
 			this.findLinksInto(null)[0].changeTo(wrapper.prin.key, "s");
 			this.delete();
 
 			token.rewriteFlag = RewriteFlag.F_PROMO;
 			token.rewrite = true;
-			return newLink;
+			return nextLink;
 		}
 
 		else if (token.rewriteFlag == RewriteFlag.EMPTY) {
@@ -54,7 +53,12 @@ class Delta extends Node {
 	}
 
 	analyse(token) {
-		token.machine.analysisToken.splice(token.machine.analysisToken.indexOf(token), 1);
+		token.machine.aTokens.splice(token.machine.aTokens.indexOf(token), 1);		
+		return null;
+	}
+
+	propagate(token) {
+		token.machine.propTokens.splice(token.machine.propTokens.indexOf(token), 1);
 		return null;
 	}
 

@@ -22,13 +22,13 @@ class Prop extends Node {
 			token.rewriteFlag = RewriteFlag.EMPTY;
 			var wrapper = BoxWrapper.create().addToGroup(this.group);
 			var con = new Const(token.dataStack.last()).addToGroup(wrapper.box);
-			var newLink = new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper);
+			new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper);
 			nextLink.changeTo(wrapper.prin.key, "s");
 			this.delete();
 
 			token.rewriteFlag = RewriteFlag.F_PROMO;
 			token.rewrite = true;
-			return newLink;
+			return nextLink;
 		}
 
 		else if (token.rewriteFlag == RewriteFlag.EMPTY) {

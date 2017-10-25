@@ -46,15 +46,6 @@ class Abs extends Node {
 				this.delete();
 				prev.delete();
 			}
-
-			else if (prev instanceof Promo) {
-				var inLink = this.findLinksInto("s")[0];
-				token.dataStack.push(inLink.from);
-				token.dataStack.push(CompData.M);
-				token.forward = false;
-				token.rewrite = true;
-				return inLink;
-			}
 				
 			token.rewrite = true;
 			return nextLink;

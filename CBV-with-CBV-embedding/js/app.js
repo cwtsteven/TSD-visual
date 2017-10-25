@@ -116,7 +116,7 @@ require(["jquery", "renderer", "goi-machine"],
 		    specialChar(this);
 		}).trigger('input');
 
-		var $stacks = $('#flag, #dataStack, #boxStack, #modStack');
+		var $stacks = $('#flag, #dataStack, #boxStack', '#modStack');
 		var sync = function(e){
 		    var $other = $stacks.not(this);
 		    $other.get(0).scrollTop = this.scrollTop;
@@ -139,11 +139,3 @@ function specialChar(textarea) {
 		textarea.setSelectionRange(selection-6, selection-6);
 	}
 }
-
-/*
-var info =
-      "Instructions:" +
-+ "\n  1. Choose an example from the drop down menu or create your own program"
-+ "\n  2. Click '>>' button to display the graph"
-+ "\n  3. Click ";
-*/

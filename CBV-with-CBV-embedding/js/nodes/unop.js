@@ -24,16 +24,20 @@ class UnOp extends Node {
 	rewrite(token, nextLink) {
 		if (token.rewriteFlag == RewriteFlag.F_OP && nextLink.to == this.key) {
 			token.rewriteFlag = RewriteFlag.EMPTY;
-			var wrapper = BoxWrapper.create().addToGroup(this.group);
-			var newConst = new Const(token.dataStack.last()).addToGroup(wrapper.box);
-			var newLink = new Link(wrapper.prin.key, newConst.key, "n", "s").addToGroup(wrapper);
-			nextLink.changeTo(wrapper.prin.key, "s");
-			this.graph.findNodeByKey(this.findLinksOutOf(null)[0].to).delete();
-			this.delete();
+			var prev = this.graph.findNodeByKey(this.findLinksOutOf(null)[0].to);
+			if (prev instanceof Promo) {
+				var wrapper = BoxWrapper.create().addToGroup(this.group);
+				var newConst = new Const(token.dataStack.last()).addToGroup(wrapper.box);
+				new Link(wrapper.prin.key, newConst.key, "n", "s").addToGroup(wrapper);
+				nextLink.changeTo(wrapper.prin.key, "s");
+				prev.group.delete();
+				this.delete();
 
-			token.rewriteFlag = RewriteFlag.F_PROMO;
+				token.rewriteFlag = RewriteFlag.F_PROMO;
+			}
+
 			token.rewrite = true;
-			return newLink;
+			return nextLink;
 		}
 		
 		else if (token.rewriteFlag == RewriteFlag.EMPTY) {

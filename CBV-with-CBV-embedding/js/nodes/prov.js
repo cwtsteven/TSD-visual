@@ -1,7 +1,9 @@
-class Prov extends Expo {
-
+class Prov extends Node {
+	
 	constructor() {
-		super("diamond", "");
+		super('diamond', '');
+		this.width = ".3";
+		this.height = ".3";
 	}
 
 	transition(token, link) {
@@ -11,7 +13,15 @@ class Prov extends Expo {
 		else if (link.from == this.key) {
 			return this.findLinksInto(null)[0];
 		}
+	}
 
+	deleteAndPreserveInLink() { 
+		var inLink = this.findLinksInto(null)[0];
+		var outLink = this.findLinksOutOf(null)[0];
+		if (outLink != null && inLink != null) {
+			inLink.changeTo(outLink.to, outLink.toPort);
+		}
+		super.delete();
 	}
 
 	copy() {

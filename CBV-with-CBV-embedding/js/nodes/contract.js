@@ -60,10 +60,11 @@ class Contract extends Expo {
 
 	analyse(token) {
 		for (let link of this.findLinksInto(null)) {
-			var newToken = new AnalysisToken(token.machine, token.node, link);
-			token.machine.analysisToken.push(newToken);
+			var newToken = new AnalysisToken(token.machine, link);
+			newToken.mNodes = Array.from(token.mNodes);
+			token.machine.aTokens.push(newToken);
 		}
-		token.machine.analysisToken.splice(token.machine.analysisToken.indexOf(token), 1);
+		token.machine.aTokens.splice(token.machine.aTokens.indexOf(token), 1);
 		return null;
 	}
 

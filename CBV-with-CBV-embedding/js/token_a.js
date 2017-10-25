@@ -1,11 +1,12 @@
 class AnalysisToken extends MachineToken {
 
-	constructor(machine, node, link) {
+	constructor(machine, link) {
 		super(machine);
 		this.colour = 'green';
-		this.node = node;
+		this.mNodes = [];
 		this.forward = false;
 		this.setLink(link);
+		this.halt = false;
 	}
 
 	reset() {

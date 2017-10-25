@@ -20,8 +20,7 @@ class MachineToken {
 	reset() {
 		this.forward = true;
 		this.transited = false;
-		
-		this.link = null;
+		this.setLink(null);
 	}
 }
 
@@ -37,9 +36,9 @@ class EvaluationToken extends MachineToken {
 
 		this.rewrite = false;
 		this.rewriteFlag = RewriteFlag.EMPTY;
-		this.modStack = [ModData.NOCOPY];
 		this.dataStack = [CompData.PROMPT];
 		this.boxStack = [];
+		this.copyStack = [CopyData.C];
 	}
 }
 
@@ -47,12 +46,8 @@ var CompData = {
 	PROMPT: '*',
 	LAMBDA: 'λ',
 	R: '@',
-	M: 'M',
+	I: 'I',
 	DELTA: 'Δ',
-}
-
-var ModData = {
-	NOCOPY: '©',
 }
 
 var RewriteFlag = {
@@ -63,8 +58,8 @@ var RewriteFlag = {
 	F_C: '<C>',
 	F_PROMO: '<!>',
 	F_RECUR: '<μ>',
-	F_MOD: '<M>',
-	F_MPROMO: '<!M>',
+	F_MOD: '<I>',
+	F_U: '<U>',
 	F_DELTA: '<∇>',
 	F_MODIFY: '<Δ>',
 	F_PROP: '<P>',
@@ -72,5 +67,10 @@ var RewriteFlag = {
 
 var BoxData = {
 
+}
+
+var CopyData = {
+	C: '©',
+	U: 'U',
 }
 
