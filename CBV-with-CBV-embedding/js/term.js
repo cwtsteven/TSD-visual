@@ -145,18 +145,20 @@ class BoxWrapper extends Term {
 		return this.copyBox(map);
 	}
 
-	deepCopy() {
+	deepCopyBox(map, group) {
+		var newBoxWrapper = this.copyBox(map).addToGroup(group);
 		for (let aux of this.auxs) {
 			var auxLink = aux.findLinksOutOf(null)[0];
 			var promo = this.searchForPromo(this.graph.findNodeByKey(auxLink.to));
-			promo.group.deepCopy();
-			var con = new Contract(promo.name).addToGroup(this.group);
-			promo.findLinksInto(null)[0].changeTo(con.key, "s");
-			var weak = new Weak(auxLink.text).addToGroup(this.group);
-			new Link(auxLink.from, con.key, auxLink.fromPort, "s").addToGroup(this.group);
-			auxLink.changeFrom(weak.key, "n");
-			new Link(con.key, promo.key, "n", "s").addToGroup(this.group);
+			var newPromoGroup = promo.group.deepCopyBox(map, group);
+			new Link(map.get(aux.key), newPromoGroup.prin.key, "n", "s").addToGroup(group);
 		}
+		return newBoxWrapper;
+	}
+
+	deepCopy(group) {
+		var map = new Map();
+		return this.deepCopyBox(map, group);
 	}
 
 	delete() {

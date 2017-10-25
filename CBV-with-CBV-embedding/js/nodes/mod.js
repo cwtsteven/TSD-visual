@@ -125,37 +125,29 @@ class Mod extends Node {
 
 		else if (token.link.fromPort == "e" && evalToken.link == token.link && evalToken.forward == token.forward && evalToken.rewriteFlag == RewriteFlag.EMPTY) {
 			token.evaluating = false;
+			var data = evalToken.dataStack.last();
 
-			if (evalToken.dataStack.last() == CompData.LAMBDA) {
-				var rightNode = this.graph.findNodeByKey(token.link.to);
-				var promo = this.searchForPromo(rightNode);
-				var promoCopy = promo.group.copy().addToGroup(this.group);
-				Term.joinAuxs(promo.group.auxs, promoCopy.auxs, this.group);
-				promoCopy.deepCopy();
+			var leftLink = this.findLinksOutOf("w")[0];
+			var weak = new Weak(this.graph.findNodeByKey(leftLink.to).name).addToGroup(this.group);
+			leftLink.changeFrom(weak.key, "n");
 
-				var leftLink = this.findLinksOutOf("w")[0];
-				var weak = new Weak(this.graph.findNodeByKey(leftLink.to).name).addToGroup(this.group);
-				leftLink.changeFrom(weak.key, "n");
-
-				//var contract = new Contract(promo.name).addToGroup(this.group);
-				new Link(this.key, promoCopy.prin.key, "w", "s").addToGroup(this.group);
-				//promo.findLinksInto(null)[0].changeTo(contract.key, "s");
-				//new Link(contract.key, promo.key, "n", "s").addToGroup(this.group);
-				evalToken.reset();
-				return this.findLinksInto(null)[0];
-			}
-			else {		
-				var leftLink = this.findLinksOutOf("w")[0];
-				var weak = new Weak(this.graph.findNodeByKey(leftLink.to).name).addToGroup(this.group);
-				leftLink.changeFrom(weak.key, "n");
-				var data = evalToken.dataStack.last();
+			if ((Number.isInteger(data) || typeof(data) === "boolean")) {
 				var wrapper = BoxWrapper.create().addToGroup(this.group);
-				var cons = new Const(data).addToGroup(wrapper.box);
-				new Link(wrapper.prin.key, cons.key, "n", "s").addToGroup(wrapper);
+				var con = new Const(data).addToGroup(wrapper.box);
+				new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper);
 				new Link(this.key, wrapper.prin.key, "w", "s").addToGroup(this.group);
-				evalToken.reset();
-				return this.findLinksInto(null)[0];
+				token.rewrite = true;
 			}
+			else if (data == CompData.LAMBDA) {
+				var outNode = this.graph.findNodeByKey(this.findLinksOutOf("e")[0].to);
+				var promo = this.searchForPromo(outNode);
+				var promoCopy = promo.group.deepCopy(this.group)
+				
+				new Link(this.key, promoCopy.prin.key, "w", "s").addToGroup(this.group);
+				token.rewrite = true;
+			}
+			evalToken.reset();
+			return this.findLinksInto(null)[0];
 		}
 		else {
 			token.setLink(this.findLinksOutOf(token.link.fromPort)[0]);
@@ -232,33 +224,10 @@ class Inter extends Mod {
 			leftLink.changeFrom(weak.key, "n");
 
 			var app = this.graph.findNodeByKey(this.findLinksOutOf('e')[0].to);
-
-			var leftDer = this.graph.findNodeByKey(app.findLinksOutOf("w")[0].to);
-			var leftPromo = this.searchForPromo(this.graph.findNodeByKey(leftDer.findLinksOutOf(null)[0].to));
-			leftPromo.group.deepCopy();
-			var rightPromo = this.searchForPromo(this.graph.findNodeByKey(app.findLinksOutOf("e")[0].to));
-			rightPromo.group.deepCopy();
-
-			var newApp = app.copy().addToGroup(this.group);
-			var newLink = new Link(this.key, newApp.key, "w", "s").addToGroup(this.group);
-			var newDer = new Der().addToGroup(this.group);
-			new Link(newApp.key, newDer.key, "w", "s").addToGroup(this.group);
-
-			var con = new Contract(rightPromo.name).addToGroup(this.group);
-			var r_Link = rightPromo.findLinksInto(null)[0];
-			r_Link.changeTo(con.key, "s");
-			new Link(con.key, rightPromo.key, "n", "s").addToGroup(this.group);
-			new Link(newApp.key, con.key, "e", "s").addToGroup(this.group);
-
-			var con2 = new Contract(leftPromo.name).addToGroup(this.group);
-			var l_Link = leftPromo.findLinksInto(null)[0];
-			l_Link.changeTo(con2.key, "s");
-			new Link(con2.key, leftPromo.key, "n", "s").addToGroup(this.group);
-			new Link(newDer.key, con2.key, "n", "s").addToGroup(this.group);
+			app.appDeepCopy(this);
 
 			evalToken.reset();
-			evalToken.setLink(newLink);
-			//evalToken.copyStack.push(CopyData.U);
+			evalToken.setLink(this.findLinksOutOf("w")[0]);
 			this.changeType(ModType.U);
 			return token.link;
 		}
