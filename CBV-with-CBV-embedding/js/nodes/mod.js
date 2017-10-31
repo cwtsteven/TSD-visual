@@ -70,7 +70,6 @@ class Mod extends Node {
 	analyse(token) {
 		if (token.link.fromPort == "e") {
 			this.parents = union_arrays(this.parents, token.mNodes);
-			console.log(this.parents);
 			if (token.mNodes.indexOf(this.key) == -1) {
 				if (this.numParents == 0) {
 					this.numParents++;
@@ -234,6 +233,7 @@ class Inter extends Mod {
 			leftLink.changeFrom(weak.key, "n");
 
 			evalToken.reset();
+			evalToken.copyStack.push(CopyData.U);
 			evalToken.setLink(this.findLinksOutOf("w")[0]);
 			this.changeType(ModType.U);
 			return token.link;
@@ -241,6 +241,7 @@ class Inter extends Mod {
 
 		else if (token.link.fromPort == 'e' && evalToken.link == this.findLinksOutOf('w')[0] && evalToken.forward == token.forward 
 			&& evalToken.rewriteFlag == RewriteFlag.EMPTY) {
+			evalToken.copyStack.pop();
 			evalToken.reset();
 			token.evaluating = false;
 			this.changeType(ModType.I);

@@ -9,3 +9,13 @@ let f = {λy.x} in
 (set f to f);
 prop;
 (f 0)
+
+let x = {1} in
+let f = {λx.set x to 2} in
+f x
+
+let x = {1} in
+let f = {λy. (set x to 2);y} in
+(set x to (f x));
+prop;
+x

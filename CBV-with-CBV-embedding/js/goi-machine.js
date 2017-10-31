@@ -298,10 +298,16 @@ class GoIMachine {
 					this.shuffle(arr);
 					var arr_2 = Array.from(this.aTokens);
 					var num = Math.ceil((Math.random() * arr.length));
+					// random
+					for (var i=0; i<arr.length; i++) {
+						this.tokenPass(arr_2[arr[i]-1], flag, dataStack, boxStack, modStack);
+					}
+					/*
+					// all progress 1 step
 					for (var i=0; i<arr_2.length; i++) {
-						var index = arr[i]-1;
 						this.tokenPass(arr_2[i], flag, dataStack, boxStack, modStack);
 					}
+					*/
 
 					var finished = true;
 					for (let aToken of this.aTokens) {
@@ -322,14 +328,24 @@ class GoIMachine {
 					this.shuffle(arr);
 					var arr_2 = Array.from(this.propTokens);
 					var num = Math.ceil((Math.random() * arr.length));
+					// random
+					for (var i=0; i<arr.length; i++) {
+						var token = arr_2[arr[i]-1];
+						if (token.evaluating) 
+							this.tokenPass(token.evalToken, flag, dataStack, boxStack, modStack);
+						
+						this.tokenPass(token, flag, dataStack, boxStack, modStack);
+					}
+					/*
+					// all progress 1 step
 					for (var i=0; i<arr_2.length; i++) {
-						var index = arr[i]-1;
 						var token = arr_2[i];
 						if (token.evaluating) 
 							this.tokenPass(token.evalToken, flag, dataStack, boxStack, modStack);
 						
 						this.tokenPass(token, flag, dataStack, boxStack, modStack);
 					}
+					*/
 
 					if (this.propTokens.length == 0) {
 						this.propagating = false;

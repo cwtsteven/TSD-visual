@@ -7,11 +7,13 @@ class App extends Node {
 	transition(token, link) {
 		if (link.to == this.key) {
 			token.dataStack.push(CompData.PROMPT);
+			token.copyStack.push(CopyData.C);
 			return this.findLinksOutOf("e")[0];
 		}
 		else if (link.from == this.key && link.fromPort == "e") {
 			token.dataStack.pop();
 			token.dataStack.push(CompData.R);
+			token.copyStack.pop();
 			token.forward = true;
 			return this.findLinksOutOf("w")[0];
 		}
@@ -78,8 +80,12 @@ class App extends Node {
 			if (next instanceof App) {
 				var newApp = this.copy().addToGroup(this.group);
 				new Link(prev.key, newApp.key, prevPort, "s").addToGroup(this.group);
-				var newRight = this.graph.findNodeByKey(next.findLinksOutOf("e")[0].to).deepUnfolding(mod);
-				new Link(newApp.key, newRight.prin.key, "e", "s").addToGroup(this.group);
+				//var newRight = this.graph.findNodeByKey(next.findLinksOutOf("e")[0].to).deepUnfolding(mod);
+				//new Link(newApp.key, newRight.prin.key, "e", "s").addToGroup(this.group);
+				var link = next.findLinksOutOf("e")[0];
+				var con = this.graph.findNodeByKey(link.to).shallowUnfolding(this.group);
+				link.changeTo(con.key, "s");
+				new Link(newApp.key, con.key, "e", "s").addToGroup(this.group);
 				next = this.graph.findNodeByKey(next.findLinksOutOf("w")[0].to);
 				prev = newApp;
 				prevPort = "w";
@@ -92,8 +98,12 @@ class App extends Node {
 				prevPort = "n";
 			}
 		}
-		var newLeft = this.graph.findNodeByKey(next.findLinksOutOf(null)[0].to).deepUnfolding(mod);
-		new Link(prev.key, newLeft.prin.key, prevPort, "s").addToGroup(this.group);
+		//var newLeft = this.graph.findNodeByKey(next.findLinksOutOf(null)[0].to).deepUnfolding(mod);
+		//new Link(prev.key, newLeft.prin.key, prevPort, "s").addToGroup(this.group);
+		var link = next.findLinksInto(null)[0];
+		var con = this.graph.findNodeByKey(link.to).shallowUnfolding(this.group);
+		link.changeTo(con.key, "s");
+		new Link(prev.key, con.key, "n", "s").addToGroup(this.group);
 	}
 
 	copy() {

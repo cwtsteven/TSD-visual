@@ -73,7 +73,6 @@ class Node {
 		if (this instanceof Promo)
 			return null;
 		else if (this instanceof Mod || this instanceof Inter) {
-			console.log(this.parents);
 			if (this.parents.indexOf(mod.key) != -1)
 				return this.graph.findNodeByKey(this.findLinksOutOf("w")[0].to);
 			else
@@ -112,6 +111,12 @@ class Node {
 		var firstPromo = this.searchForPromo();
 		var map = new Map();
 		return this.unFolding(map, mod, firstPromo.group);
+	}
+
+	shallowUnfolding(group) {
+		var con = new Contract(this.name).addToGroup(group);
+		new Link(con.key, this.key, "n", "s").addToGroup(group);
+		return con;
 	}
 
 	copy(graph) {
