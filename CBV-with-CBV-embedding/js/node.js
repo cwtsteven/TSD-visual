@@ -69,48 +69,38 @@ class Node {
 			return this.graph.findNodeByKey(this.findLinksOutOf(null)[0].to).searchForPromo();
 	}
 
-	searchForPromoFromMod(mod) {
+	searchForPromoOrMod() {
 		if (this instanceof Promo)
-			return null;
-		else if (this instanceof Mod || this instanceof Inter) {
-			if (this.parents.indexOf(mod.key) != -1)
-				return this.graph.findNodeByKey(this.findLinksOutOf("w")[0].to);
-			else
-				return null;
-		}
+			return this;
+		else if (this instanceof Mod || this instanceof Inter)
+			return this;
 		else if (this instanceof If1)
-			return this.graph.findNodeByKey(this.findLinksOutOf("n")[0].to).searchForPromoFromMod(mod);
+			return this.graph.findNodeByKey(this.findLinksOutOf("n")[0].to).searchForPromoOrMod();
 		else if (this instanceof If2)
-			return this.graph.findNodeByKey(this.findLinksOutOf("e")[0].to).searchForPromoFromMod(mod);
-		else if (this instanceof Contract)
-			return this.graph.findNodeByKey(this.findLinksOutOf(null)[0].to).searchForPromoFromMod(mod);
-		else if (this instanceof Pax)
-			return this.graph.findNodeByKey(this.findLinksOutOf(null)[0].to).searchForPromoFromMod(mod);
+			return this.graph.findNodeByKey(this.findLinksOutOf("e")[0].to).searchForPromoOrMod();
+		else if (this instanceof Contract || this instanceof Pax)
+			return this.graph.findNodeByKey(this.findLinksOutOf(null)[0].to).searchForPromoOrMod();
 	}
 
-	unFolding(map, mod, boxWrapper) {
-		var newBoxWrapper = boxWrapper.copyBox(map).addToGroup(mod.group);
-		for (let aux of boxWrapper.auxs) {
-			var promo = aux.searchForPromoFromMod(mod);
-			if (promo != null) {
-				var newBox2 = aux.unFolding(map, mod, promo.group, mod.group);
-				new Link(map.get(aux.key), newBox2.prin.key, "n", "s").addToGroup(mod.group);
+	unFolding(map, mod) {
+		var next = this.searchForPromoOrMod();
+		if (next instanceof Promo || next.parents.indexOf(mod.key) != -1) {
+			var promo = next.searchForPromo();
+			var newBoxWrapper = promo.group.copyBox(map).addToGroup(mod.group);
+			for (let aux of promo.group.auxs) {
+				var newBoxPrin = aux.unFolding(map, mod);
+				new Link(map.get(aux.key), newBoxPrin.key, "n", "s").addToGroup(mod.group);
 			}
-			else {
-				var con = new Contract(aux.name).addToGroup(mod.group);
-				var auxLink = aux.findLinksOutOf(null)[0];
-				auxLink.changeFrom(con.key, "n");
-				new Link(aux.key, con.key, "n", "s").addToGroup(mod.group);
-				new Link(map.get(aux.key), con.key, "n", "s").addToGroup(mod.group);
-			}
+			return newBoxWrapper.prin;
 		}
-		return newBoxWrapper;
+		else {
+			return next.shallowUnfolding(mod.group);
+		}
 	}
 
 	deepUnfolding(mod) {
-		var firstPromo = this.searchForPromo();
 		var map = new Map();
-		return this.unFolding(map, mod, firstPromo.group);
+		return this.unFolding(map, mod);
 	}
 
 	shallowUnfolding(group) {

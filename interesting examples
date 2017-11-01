@@ -1,21 +1,40 @@
+// infinite loop on left arm - solved
 let f = {λx.x} in
 (set f to (λx.f x));
 prop;
 (f 0)
 
-
+// infinite loop on left arm - solved
 let x = {1} in
 let f = {λy.x} in
 (set f to f);
 prop;
 (f 0)
 
+// set within changeable function - solved
 let x = {1} in
 let f = {λx.set x to 2} in
 f x
 
+// set within changeable function during propagation - solved
+let y = {1} in
+let f = {λx.(set y to 1);x + y} in
+(set y to (f 1));
+prop;
+y
+
+// no propagation can be done
 let x = {1} in
-let f = {λy. (set x to 2);y} in
-(set x to (f x));
+let y = {2} in
+(set x to y+1);
+(set y to x+1);
 prop;
 x
+
+// infinite loop on left arm - solved
+let f = {λx.x} in
+let g = λx.f x in
+let h = {λx.g x} in
+(set f to λx. h x);
+prop;
+(f 1)

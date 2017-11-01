@@ -6,9 +6,16 @@ class Delta extends Node {
 	
 	transition(token, link) {
 		if (link.to == this.key) {
-			token.dataStack.push(CompData.PROMPT);
-			token.copyStack.push(CopyData.C);
-			return this.findLinksOutOf("e")[0];
+			if (token.isMain) {
+				token.dataStack.push(CompData.PROMPT);
+				token.copyStack.push(CopyData.C);
+				return this.findLinksOutOf("e")[0];
+			}
+			else {
+				token.rewriteFlag = RewriteFlag.F_DELTA;
+				token.forward = false;
+				return link;
+			}
 		}
 		else if (link.from == this.key) {
 			if (link.fromPort == "e") {

@@ -144,7 +144,7 @@ class Mod extends Node {
 				var outNode = this.graph.findNodeByKey(this.findLinksOutOf("e")[0].to);
 				var newRight = outNode.deepUnfolding(this);
 				
-				new Link(this.key, newRight.prin.key, "w", "s").addToGroup(this.group);
+				new Link(this.key, newRight.key, "w", "s").addToGroup(this.group);
 				token.rewrite = true;
 			}
 

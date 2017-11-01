@@ -43,7 +43,7 @@ class Prov extends Node {
 				this.delete();
 
 				var newLeft = mod.graph.findNodeByKey(mod.findLinksOutOf("e")[0].to).deepUnfolding(mod);
-				new Link(mod.key, newLeft.prin.key, "w", "s").addToGroup(this.group);
+				new Link(mod.key, newLeft.key, "w", "s").addToGroup(this.group);
 
 				token.rewrite = true;
 			}

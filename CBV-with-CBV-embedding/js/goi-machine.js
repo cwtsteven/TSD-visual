@@ -266,10 +266,12 @@ class GoIMachine {
 	startPropagation() {
 		for (let rNode of this.rNodes) {
 			var node = this.graph.findNodeByKey(rNode);
-			var pToken = new PropToken(this, node.findLinksOutOf("e")[0]);
-			this.propTokens.push(pToken);
 			node.changeType(ModType.M);
-			node.numParents = 1;
+			if (node.numParents == 0) {
+				var pToken = new PropToken(this, node.findLinksOutOf("e")[0]);
+				this.propTokens.push(pToken);
+				node.numParents = 1;
+			}
 		}
 	}
 
