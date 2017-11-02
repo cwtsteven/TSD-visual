@@ -105,6 +105,7 @@ class Node {
 
 	shallowUnfolding(group) {
 		var con = new Contract(this.name).addToGroup(group);
+		this.findLinksInto(null)[0].changeTo(con.key);
 		new Link(con.key, this.key, "n", "s").addToGroup(group);
 		return con;
 	}

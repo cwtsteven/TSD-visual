@@ -142,9 +142,9 @@ class Mod extends Node {
 			}
 			else if (data == CompData.LAMBDA) {
 				var outNode = this.graph.findNodeByKey(this.findLinksOutOf("e")[0].to);
-				var newRight = outNode.deepUnfolding(this);
+				var newLeft = outNode.deepUnfolding(this);
 				
-				new Link(this.key, newRight.key, "w", "s").addToGroup(this.group);
+				new Link(this.key, newLeft.key, "w", "s").addToGroup(this.group);
 				token.rewrite = true;
 			}
 

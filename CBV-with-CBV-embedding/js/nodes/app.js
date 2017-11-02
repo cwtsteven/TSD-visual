@@ -84,7 +84,7 @@ class App extends Node {
 				//new Link(newApp.key, newRight.prin.key, "e", "s").addToGroup(this.group);
 				var link = next.findLinksOutOf("e")[0];
 				var con = this.graph.findNodeByKey(link.to).shallowUnfolding(this.group);
-				link.changeTo(con.key, "s");
+				//link.changeTo(con.key, "s");
 				new Link(newApp.key, con.key, "e", "s").addToGroup(this.group);
 				next = this.graph.findNodeByKey(next.findLinksOutOf("w")[0].to);
 				prev = newApp;
@@ -102,7 +102,7 @@ class App extends Node {
 		//new Link(prev.key, newLeft.prin.key, prevPort, "s").addToGroup(this.group);
 		var link = next.findLinksInto(null)[0];
 		var con = this.graph.findNodeByKey(link.to).shallowUnfolding(this.group);
-		link.changeTo(con.key, "s");
+		//link.changeTo(con.key, "s");
 		new Link(prev.key, con.key, "n", "s").addToGroup(this.group);
 	}
 

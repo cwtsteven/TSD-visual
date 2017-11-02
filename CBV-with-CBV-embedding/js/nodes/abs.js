@@ -13,6 +13,11 @@ class Abs extends Node {
 				token.forward = false;
 				return link;
 			}
+			else if (data[0] == CompData.DELTA) {
+				token.dataStack.pop();
+				token.forward = false;
+				return link;
+			}
 			else if (data == CompData.R) {
 				token.dataStack.pop();
 				token.rewriteFlag = RewriteFlag.F_LAMBDA;

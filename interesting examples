@@ -16,10 +16,10 @@ let x = {1} in
 let f = {λx.set x to 2} in
 f x
 
-// set within changeable function during propagation - solved
+// set within changeable function during propagation - maybe solved
 let y = {1} in
-let f = {λx.(set y to 1);x + y} in
-(set y to (f 1));
+let f = {λx.(set y to 2);x + y} in
+(set y to (f 3));
 prop;
 y
 
@@ -38,3 +38,19 @@ let h = {λx.g x} in
 (set f to λx. h x);
 prop;
 (f 1)
+
+// does not change y - solved
+let y = {1} in
+let f = {λx.x} in
+let m = f 2 in
+(set f to (λx.(set y to x);x));
+prop;
+m
+
+// order of effects
+let x = {1} in
+let f = {λy. ((set x to y);x + y)} in
+let m = (f 2) + (f 3) in
+(set x to 4);
+prop;
+m
