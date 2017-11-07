@@ -2,7 +2,7 @@ var ModType = {
 	M: 'M',
 	R: 'R',
 	I: 'I',
-	U: 'U',
+	//U: 'U',
 }
 
 class Mod extends Node {
@@ -134,12 +134,17 @@ class Mod extends Node {
 			var leftLink = this.findLinksOutOf("w")[0];
 
 			if ((Number.isInteger(data) || typeof(data) === "boolean")) {
-				var wrapper = BoxWrapper.create().addToGroup(this.group);
-				var con = new Const(data).addToGroup(wrapper.box);
-				new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper);
-				new Link(this.key, wrapper.prin.key, "w", "s").addToGroup(this.group);
+				var value = this.graph.findNodeByKey(leftLink.to).group.box.nodes[0];
+				value.text = data;
+				value.name = data;
+				console.log(value);
+				//var wrapper = BoxWrapper.create().addToGroup(this.group);
+				//var con = new Const(data).addToGroup(wrapper.box);
+				//new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper);
+				//new Link(this.key, wrapper.prin.key, "w", "s").addToGroup(this.group);
 				token.rewrite = true;
 			}
+			/*
 			else if (data == CompData.LAMBDA) {
 				var outNode = this.graph.findNodeByKey(this.findLinksOutOf("e")[0].to);
 				var newLeft = outNode.deepUnfolding(this);
@@ -147,9 +152,10 @@ class Mod extends Node {
 				new Link(this.key, newLeft.key, "w", "s").addToGroup(this.group);
 				token.rewrite = true;
 			}
+			*/
 
-			var weak = new Weak(this.graph.findNodeByKey(leftLink.to).name).addToGroup(this.group);
-			leftLink.changeFrom(weak.key, "n");
+			//var weak = new Weak(this.graph.findNodeByKey(leftLink.to).name).addToGroup(this.group);
+			//leftLink.changeFrom(weak.key, "n");
 
 			evalToken.reset();
 			return this.findLinksInto(null)[0];
@@ -184,11 +190,13 @@ class Inter extends Mod {
 			return this.findLinksOutOf("w")[0];
 		}
 		else if (link.from == this.key && link.fromPort == "w") {
+			/*
 			if (this.type == ModType.U) {
 				token.copyStack.pop();
 				this.changeType(ModType.I);
 				token.rewriteFlag = RewriteFlag.F_U;
 			}
+			*/
 			return this.findLinksInto(null)[0];
 		}
 		else if (link.from == this.key && link.fromPort == "e") {
@@ -196,6 +204,7 @@ class Inter extends Mod {
 		}
 	}
 
+	/*
 	rewrite(token, nextLink) {
 		if (token.rewriteFlag == RewriteFlag.F_U) {
 			token.rewriteFlag = RewriteFlag.EMPTY;
@@ -211,7 +220,8 @@ class Inter extends Mod {
 			return nextLink;
 		}
 	}
-
+	*/
+	/*
 	propagate(token) {
 		var evalToken = token.evalToken;
 
@@ -251,6 +261,7 @@ class Inter extends Mod {
 		else
 			return super.propagate(token);
 	}
+	*/
 
 	copy() {
 		var mod = new Inter();

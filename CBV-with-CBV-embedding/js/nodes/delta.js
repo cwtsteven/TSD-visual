@@ -7,7 +7,7 @@ class Delta extends Node {
 	transition(token, link) {
 		if (link.to == this.key) {
 			token.dataStack.push(CompData.PROMPT);
-			token.copyStack.push(CopyData.C);
+			//token.copyStack.push(CopyData.C);
 			return this.findLinksOutOf("e")[0];
 		}
 		else if (link.from == this.key) {
@@ -19,8 +19,8 @@ class Delta extends Node {
 			}
 			else if (link.fromPort == "w") {
 				token.dataStack.pop();
-				token.dataStack.push("()");
-				token.copyStack.pop();
+				token.dataStack.push(CompData.UNIT);
+				//token.copyStack.pop();
 				token.rewriteFlag = RewriteFlag.F_DELTA;
 				return this.findLinksInto(null)[0];
 			}

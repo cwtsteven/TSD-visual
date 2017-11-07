@@ -48,6 +48,7 @@ var CompData = {
 	R: '@',
 	I: 'I',
 	DELTA: 'Δ',
+	UNIT: '•',
 }
 
 var RewriteFlag = {

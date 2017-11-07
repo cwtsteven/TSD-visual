@@ -39,7 +39,9 @@ class UnOp extends Node {
 
 			else {
 				var prev = this.graph.findNodeByKey(this.findLinksInto(null)[0].from);
-				if (prev instanceof Mod || prev instanceof BinOp || prev instanceof UnOp || prev instanceof If || prev instanceof If1 || prev instanceof If2 || prev instanceof Prov) {
+				if (prev instanceof Mod || prev instanceof BinOp || prev instanceof UnOp 
+					|| prev instanceof If || prev instanceof If1 || prev instanceof If2 
+					|| prev instanceof Prov || prev instanceof Delta) {
 
 				}
 				else {

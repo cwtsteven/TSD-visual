@@ -433,8 +433,8 @@ class GoIMachine {
 		dataStack.val(dataStr + '\n' + dataStack.val());
 		var boxStr = token.boxStack.length == 0 ? '□' : Array.from(token.boxStack).reverse().toString() + ',□';
 		boxStack.val(boxStr + '\n' + boxStack.val());
-		var modStr = token.copyStack.length == 0 ? '□' : Array.from(token.copyStack).reverse().toString() + ',□';
-		modStack.val(modStr + '\n' + modStack.val());
+		//var modStr = token.copyStack.length == 0 ? '□' : Array.from(token.copyStack).reverse().toString() + ',□';
+		//modStack.val(modStr + '\n' + modStack.val());
 	}
 
 }

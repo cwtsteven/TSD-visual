@@ -12,7 +12,7 @@ class Prop extends Node {
 			token.rewriteFlag = RewriteFlag.F_PROP;
 			token.forward = false;
 			token.dataStack.pop();
-			token.dataStack.push("()");
+			token.dataStack.push(CompData.UNIT);
 			return link;
 		}
 	}

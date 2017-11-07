@@ -44,7 +44,7 @@ class Lexer {
         break;
 
       case ';':
-        this._token = new Token(Token.SEQ, null, 1);
+        this._token = new Token(Token.SEQ);
         break;
 
       case '(':

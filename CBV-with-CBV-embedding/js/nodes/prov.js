@@ -34,6 +34,7 @@ class Prov extends Node {
 				this.delete();
 				token.rewrite = true;
 			}
+			/*
 			else if (data == CompData.LAMBDA) {
 				var mod = new Mod().addToGroup(this.group);
 				var outLink = this.findLinksOutOf(null)[0];
@@ -47,6 +48,7 @@ class Prov extends Node {
 
 				token.rewrite = true;
 			}
+			*/
 
 			return nextLink;
 		}

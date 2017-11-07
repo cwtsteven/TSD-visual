@@ -13,8 +13,8 @@ class Parser {
 
   // term ::= LAMBDA LCID DOT term
   //        | LET LCID DEFINE term IN term 
-  //        | IF cond THEN term ELSE term
   //        | REC LPAREN LCID COMMA LCID RPAREN DOT term
+  //        | IF term THEN term ELSE term
   //        | application
   term(ctx) {
     if (this.lexer.skip(Token.LAMBDA)) {
@@ -44,14 +44,6 @@ class Parser {
         }
       }
     } 
-    else if (this.lexer.skip(Token.IF)) {
-      const cond = this.atom(ctx);
-      this.lexer.match(Token.THEN);
-      const t1 = this.atom(ctx);
-      this.lexer.match(Token.ELSE);
-      const t2 = this.atom(ctx);
-      return new IfThenElse(cond, t1, t2);
-    }
     else if (this.lexer.skip(Token.REC)) {
       this.lexer.match(Token.LPAREN);
       const id = this.lexer.token(Token.LCID);
@@ -62,11 +54,13 @@ class Parser {
       const term = this.term([id2].concat([id].concat(ctx)));
       return new Recursion(id, id2, term);
     }
-    else if (this.lexer.skip(Token.CHANGE)) {
-      const id = this.lexer.token(Token.LCID);
-      this.lexer.match(Token.TO);
-      const term = this.term(ctx);
-      return new Change(id, term);
+    else if (this.lexer.skip(Token.IF)) {
+      const cond = this.term(ctx);
+      this.lexer.match(Token.THEN);
+      const t1 = this.term(ctx);
+      this.lexer.match(Token.ELSE);
+      const t2 = this.term(ctx);
+      return new IfThenElse(cond, t1, t2);
     }
     else {
       return this.application(ctx);
@@ -77,18 +71,19 @@ class Parser {
     return token.type == Token.AND || token.type == Token.OR 
         || token.type == Token.PLUS || token.type == Token.SUB  
         || token.type == Token.MULT || token.type == Token.DIV 
-        || token.type == Token.LTE || token.type == Token.SEQ
+        || token.type == Token.LTE 
   }
 
-  parseApplication(ctx, lhs, pred) {
+  parseBinop(ctx, lhs, pred) {
     var nextToken = this.lexer.lookahead();
     while (this.isBinaryOp(nextToken) && nextToken.pred >= pred) {
       var op = nextToken;
       this.lexer._nextToken();
       var rhs = this.atom(ctx);
+      //var rhs = this.term(ctx);
       nextToken = this.lexer.lookahead();
       while (this.isBinaryOp(nextToken) && nextToken.pred > op.pred) {
-        rhs = this.parseApplication(ctx, rhs, nextToken.pred);
+        rhs = this.parseBinop(ctx, rhs, nextToken.pred);
         nextToken = this.lexer.lookahead();
       }
       if (op.type == Token.AND) {
@@ -112,23 +107,19 @@ class Parser {
       else if (op.type == Token.LTE) {
         lhs = new BinaryOp(BinOpType.Lte, "<=", lhs, rhs);
       }
-      else if (op.type == Token.SEQ) {
-        lhs = new Application(new Abstraction('_', rhs), lhs);
-      }
     }
     return lhs;
   }
 
-
   application(ctx) {
-    let lhs = this.atom(ctx);
-    if (this.isBinaryOp(this.lexer.lookahead()))
-      return this.parseApplication(ctx, lhs, 0);
+    let lhs = this.atom(ctx);    
 
     while (true) {
       var rhs;
-
-      if (this.lexer.skip(Token.CLPAREN)) {
+      if (this.isBinaryOp(this.lexer.lookahead())) {
+        lhs = this.parseBinop(ctx, lhs, 0);
+      }
+      else if (this.lexer.skip(Token.CLPAREN)) {
         rhs = this.term(ctx);
         this.lexer.match(Token.CRPAREN);
         lhs = new ProvApplication(lhs, rhs);
@@ -139,11 +130,10 @@ class Parser {
         if (!rhs) {
           return lhs;
         } else {
-            lhs = new Application(lhs, rhs);
+          lhs = new Application(lhs, rhs);
         }
       }
     }
-
   }
 
   // atom ::= LPAREN term RPAREN
@@ -152,8 +142,8 @@ class Parser {
   //        | TRUE
   //        | FALSE
   //        | NOT term
-  //        | LSPAREN int RSPAREN
-  //        | LCPAREN int RCPAREN
+  //        | PROP | PROP SEQ term
+  //        | CHANGE LCID TO term | CHANGE LCID TO term SEQ term
   atom(ctx) {
     if (this.lexer.skip(Token.LPAREN)) {
       const term = this.term(ctx);
@@ -178,8 +168,21 @@ class Parser {
       const term = this.term(ctx);
       return new UnaryOp(UnOpType.Not, "~", term);
     }
+
     else if (this.lexer.skip(Token.PROP)) {
+      if (this.lexer.skip(Token.SEQ)) {
+        return new Application(new Abstraction('_', this.term(ctx)), new Propagation());
+      }
       return new Propagation();
+    }
+    else if (this.lexer.skip(Token.CHANGE)) {
+      const id = this.lexer.token(Token.LCID);
+      this.lexer.match(Token.TO);
+      const term = this.term(ctx);
+      if (this.lexer.skip(Token.SEQ)) {
+        return new Application(new Abstraction('_', this.term(ctx)), new Change(id, term));
+      }
+      return new Change(id, term);
     }
     else {
       return undefined;

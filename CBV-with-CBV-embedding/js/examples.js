@@ -10,34 +10,13 @@ var fact =
 var prov = 
   'let x = {1} in\n'
 + 'let y = x + 2 in\n'
-+ '(set x to 3);\n'
++ 'set x to 3;\n'
 + 'prop;\n'
 + 'y'
 
-var prop_within_fun = 
-  'let x = {1} in\n'
-+ 'let f = {λy. ((set x to y);prop;x + y)} in\n'
-+ 'f 3'
-
-var effect_order = 
-  'let x = {1} in\n'
-+ 'let f = {λy. ((set x to y);x + y)} in\n'
-+ 'let m = (f 2) + (f 3) in\n'
-+ '(set x to 4);\n'
-+ 'prop;\n'
-+ 'm'
-
-var concurrent_prop = 
-  'let x = {1} in\n'
-+ 'let f = {λy.x+y} in\n'
-+ 'let m = (f x) + (f 2) + (f 3) in\n'
-+ '(set x to 2);\n'
-+ 'prop;\n'
-+ 'm'
-
 var circular = 
   'let x = {1} in\n'
-+ '(set x to (x + 1));\n'
++ 'set x to (x + 1);\n'
 + 'prop;\n'
 + 'prop;\n'
 + 'prop;\n'
@@ -49,8 +28,8 @@ var batch_update =
 + 'let m = x + 3 in\n'
 + 'let n = y + 4 in\n'
 + 'let z = m + n in\n'
-+ '(set x to 5);\n'
-+ '(set y to 6);\n'
++ 'set x to 5;\n'
++ 'set y to 6;\n'
 + 'prop;\n'
 + 'z'
 
@@ -64,14 +43,6 @@ var fact_inc =
 + '\n'
 + 'let x = {3} in\n'
 + 'let m = fact x in\n'
-+ '(set x to 2);\n'
-+ 'prop;\n'
-+ 'm'
-
-var if_inc = 
-  'let x = {1} in\n'
-+ 'let f = if (x <= 2) then (λx.x) else (λx.x+1) in\n'
-+ 'let m = f 3 in\n'
-+ '(set x to 4);\n'
++ 'set x to 2;\n'
 + 'prop;\n'
 + 'm'

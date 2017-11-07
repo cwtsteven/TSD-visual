@@ -24,13 +24,8 @@
   					switch($("#sm-example option:selected").val()) {
   						case "fact": prog = fact; break;
   						case "prov": prog = prov; break;
-  						case "prop_within_fun": prog = prop_within_fun; break;
-  						case "prop_within_prop": prog = prop_within_prop; break;
-  						case "concurrent_prop": prog = concurrent_prop; break;
   						case "circular": prog = circular; break;
   						case "batch_update": prog = batch_update; break;
-  						case "effect_order": prog = effect_order; break; 
-  						case "if_inc": prog = if_inc; break;
   						case "fact_inc": prog = fact_inc; break;
   					}
   					$("#ta-program").val(prog);
@@ -48,12 +43,8 @@
 		<select id="sm-example">
 			<option value="fact" selected>Factorial</option>
 			<option value="prov">Provisonal argument</option>
-			<option value="prop_within_fun">Propagation within function</option>
-			<option value="effect_order">Order of effects</option>
-			<option value="concurrent_prop">Concurrent propagation</option>
 			<option value="circular">Circular dependence</option>
 			<option value="batch_update">Batch update</option>
-			<option value="if_inc">If then else</option>
 			<option value="fact_inc">Factorial (incremental)</option>
 		</select>
 		<button id="btn-info">?</button>
@@ -78,10 +69,10 @@
 			<button id="btn-make-graph" style="width:100%;height:10%">>></button>
 		</div>
 		<div align="center" class="right">
-			<textarea id="flag" rows="4" wrap="off" class="stack-trace" style="width: 10%;"></textarea>
-	    	<textarea id="dataStack" rows="4" wrap="off" class="stack-trace" style="width: 29%;"></textarea>
-			<textarea id="boxStack" rows="4" wrap="off" class="stack-trace" style="width: 29%;"></textarea>
-			<textarea id="modStack" rows="4" wrap="off" class="stack-trace" style="width: 29%;"></textarea>
+			<textarea id="flag" rows="4" wrap="off" class="stack-trace" style="width: 33%;"></textarea>
+	    	<textarea id="dataStack" rows="4" wrap="off" class="stack-trace" style="width: 33%;"></textarea>
+			<textarea id="boxStack" rows="4" wrap="off" class="stack-trace" style="width: 33%;"></textarea>
+			<!--<textarea id="modStack" rows="4" wrap="off" class="stack-trace" style="width: 29%;"></textarea>-->
 		</div>
 	<div>
 	<div style="clear: both;">

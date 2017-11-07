@@ -18,7 +18,9 @@ class If2 extends Node {
 			token.rewriteFlag = RewriteFlag.EMPTY;
 
 			var prev = this.graph.findNodeByKey(this.findLinksInto(null)[0].from);
-			if (prev instanceof Mod || prev instanceof BinOp || prev instanceof UnOp || prev instanceof If || prev instanceof If1 || prev instanceof If2 || prev instanceof Der || prev instanceof Prov) {
+			if (prev instanceof Mod || prev instanceof BinOp || prev instanceof UnOp 
+				|| prev instanceof If || prev instanceof If1 || prev instanceof If2 
+				|| prev instanceof Prov || prev instanceof Delta || prev instanceof Contract) {
 
 			}
 
@@ -35,6 +37,7 @@ class If2 extends Node {
 					new Link(mod.key, this.key, "e", "s").addToGroup(this.group);
 					token.rewrite = true;
 				}
+				/*
 				else if (data == CompData.LAMBDA) {
 					var mod = new Mod().addToGroup(this.group);
 					new Link(mod.key, this.key, "e", "s").addToGroup(this.group);
@@ -44,6 +47,7 @@ class If2 extends Node {
 					new Link(mod.key, newLeft.prin.key, "w", "s").addToGroup(this.group);
 					token.rewrite = true;
 				}
+				*/
 			}
 			
 			token.rewrite = true;

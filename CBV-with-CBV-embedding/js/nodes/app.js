@@ -7,16 +7,17 @@ class App extends Node {
 	transition(token, link) {
 		if (link.to == this.key) {
 			token.dataStack.push(CompData.PROMPT);
-			token.copyStack.push(CopyData.C);
+			//token.copyStack.push(CopyData.C);
 			return this.findLinksOutOf("e")[0];
 		}
 		else if (link.from == this.key && link.fromPort == "e") {
 			token.dataStack.pop();
 			token.dataStack.push(CompData.R);
-			token.copyStack.pop();
+			//token.copyStack.pop();
 			token.forward = true;
 			return this.findLinksOutOf("w")[0];
 		}
+		/*
 		else if (link.from == this.key && link.fromPort == "w") {
 			if (token.dataStack.last() == CompData.R) {	
 				token.dataStack.pop();
@@ -30,8 +31,10 @@ class App extends Node {
 			token.rewriteFlag = RewriteFlag.F_INTER;
 			return this.findLinksInto(null)[0];
 		}
+		*/
 	}
 
+	/*
 	rewrite(token, nextLink) {
 		if (token.rewriteFlag == RewriteFlag.F_INTER) {
 			token.rewriteFlag = RewriteFlag.EMPTY;
@@ -105,6 +108,7 @@ class App extends Node {
 		//link.changeTo(con.key, "s");
 		new Link(prev.key, con.key, "n", "s").addToGroup(this.group);
 	}
+	*/
 
 	copy() {
 		return new App();

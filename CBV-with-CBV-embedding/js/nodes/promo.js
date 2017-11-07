@@ -19,6 +19,7 @@ class Promo extends Expo {
 			token.rewriteFlag = RewriteFlag.EMPTY;
 			var prev = this.graph.findNodeByKey(this.findLinksInto(null)[0].from);
 
+			/*
 			if (prev instanceof Mod && prev.type != ModType.U && token.copyStack.last() == CopyData.U) {
 				var newBoxWrapper = this.group.copy().addToGroup(this.group.group);
 				Term.joinAuxs(this.group.auxs, newBoxWrapper.auxs, newBoxWrapper.group);
@@ -26,17 +27,9 @@ class Promo extends Expo {
 				link.changeTo(newBoxWrapper.prin.key, "s");
 				token.rewriteFlag = RewriteFlag.F_PROMO;
 				token.rewrite = true;
-				/*
-				for (let _token of Array.from(nextLink.tokens)) {
-					if (_token.boxStack.last() == link) {
-						_token.boxStack.pop();
-						_token.setLink(newLink);
-						_token.rewriteFlag = RewriteFlag.F_PROMO;
-					}
-				}
-				*/
 				return newBoxWrapper.prin.findLinksOutOf(null)[0];
 			}
+			*/
 
 			if (prev instanceof Der) {
 				var oldGroup = this.group;
@@ -60,15 +53,6 @@ class Promo extends Expo {
 						Term.joinAuxs(this.group.auxs, newBoxWrapper.auxs, newBoxWrapper.group);
 						link.changeTo(newBoxWrapper.prin.key, "s");
 						var newLink = newBoxWrapper.prin.findLinksOutOf(null)[0];
-						/*
-						for (let _token of Array.from(nextLink.tokens)) {
-							if (_token.boxStack.last() == link) {
-								_token.boxStack.pop();
-								_token.setLink(newLink);
-								_token.rewriteFlag = RewriteFlag.F_PROMO;
-							}
-						}
-						*/
 					}
 					token.rewriteFlag = RewriteFlag.F_PROMO;
 					token.rewrite = true;
@@ -80,12 +64,12 @@ class Promo extends Expo {
 		}
 		
 		else if (token.rewriteFlag == RewriteFlag.EMPTY) {
+			/*
 			if (token.dataStack.last() == CompData.R) {
-				//token.dataStack.pop();
-				//token.dataStack.push(CompData.I);
 				nextLink = this.findLinksInto(null)[0];
 				token.forward = false;
 			}
+			*/
 			token.rewrite = false;
 			return nextLink;
 		}

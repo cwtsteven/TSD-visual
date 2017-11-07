@@ -98,7 +98,7 @@ require(["jquery", "renderer", "goi-machine"],
 
 		function next() {
 			if (!finished) {
-				machine.pass($("#flag"), $("#dataStack"), $("#boxStack"), $("#modStack"));
+				machine.pass($("#flag"), $("#dataStack"), $("#boxStack")); //, $("#modStack"));
 				draw();
 			}
 		}
@@ -116,12 +116,12 @@ require(["jquery", "renderer", "goi-machine"],
 		    specialChar(this);
 		}).trigger('input');
 
-		var $stacks = $('#flag, #dataStack, #boxStack', '#modStack');
+		var $stacks = $('#flag, #dataStack, #boxStack'); //, #modStack');
 		var sync = function(e){
 		    var $other = $stacks.not(this);
 		    $other.get(0).scrollTop = this.scrollTop;
 		    $other.get(1).scrollTop = this.scrollTop;
-		    $other.get(2).scrollTop = this.scrollTop;
+		    //$other.get(2).scrollTop = this.scrollTop;
 		}
 		$stacks.on('scroll', sync);
 
