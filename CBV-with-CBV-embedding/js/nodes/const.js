@@ -11,11 +11,13 @@ class Const extends Node {
 			token.forward = false;
 			return link;
 		}
+		/*
 		else if (token.dataStack.last()[0] == CompData.DELTA) {
 			token.dataStack.pop();
 			token.forward = false;
 			return link;
 		}
+		*/
 	}
 
 	copy() {

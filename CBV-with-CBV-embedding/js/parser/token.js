@@ -52,5 +52,5 @@ class Token {
   'CHANGE',
   'TO',
   'PROP',
-  'SEQ',
+  //'SEQ',
 ].forEach(token => Token[token] = token);

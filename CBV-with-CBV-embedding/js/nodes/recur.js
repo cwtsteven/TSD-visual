@@ -23,7 +23,7 @@ class Recur extends Expo {
 			this.group.moveOut();
 			var leftLink = this.findLinksInto("w")[0];
 			leftLink.changeTo(wrapper.prin.key, "s");
-			leftLink.fromPort = "n";
+			//leftLink.fromPort = "n";
 			leftLink.reverse = false;
 			var inLink = this.findLinksInto("s")[0];
 			var outLink = this.findLinksOutOf("e")[0];

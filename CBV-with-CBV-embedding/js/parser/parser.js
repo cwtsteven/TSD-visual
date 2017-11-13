@@ -126,8 +126,8 @@ class Parser {
   //        | TRUE
   //        | FALSE
   //        | NOT term
-  //        | PROP | PROP SEQ term
-  //        | CHANGE LCID TO term | CHANGE LCID TO term SEQ term
+  //        | PROP 
+  //        | CHANGE LCID TO term
   atom(ctx) {
     if (this.lexer.skip(Token.LPAREN)) {
       const term = this.term(ctx);
@@ -153,9 +153,6 @@ class Parser {
       return new UnaryOp(UnOpType.Not, "~", term);
     }
     else if (this.lexer.skip(Token.PROP)) {
-      if (this.lexer.skip(Token.SEQ)) {
-        return new Application(new Abstraction('_', this.term(ctx)), new Propagation());
-      }
       return new Propagation();
     }
     else if (this.lexer.skip(Token.CLPAREN)) {
@@ -167,9 +164,6 @@ class Parser {
       const id = this.lexer.token(Token.LCID);
       this.lexer.match(Token.TO);
       const term = this.term(ctx);
-      if (this.lexer.skip(Token.SEQ)) {
-        return new Application(new Abstraction('_', this.term(ctx)), new Change(id, term));
-      }
       return new Change(id, term);
     }
     else {

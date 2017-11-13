@@ -121,7 +121,7 @@ class Lexer {
 
       default:
         // text for string
-        if (/[a-z]|'/.test(c)) {
+        if (/[a-z]|_|'/.test(c)) {
           let str = '';
           do {
             str += c;
