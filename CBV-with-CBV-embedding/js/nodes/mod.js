@@ -20,7 +20,8 @@ class Mod extends Node {
 			var data = token.dataStack.last();
 
 			if (data[0] == CompData.DELTA) {
-				token.rewriteFlag = RewriteFlag.F_MODIFY;
+				if (this.type.substring(0,1) == 'M')
+					token.rewriteFlag = RewriteFlag.F_MODIFY;
 				return this.findLinksOutOf("e")[0];
 			}
 			else {
@@ -128,22 +129,6 @@ class Inter extends Mod {
 	constructor() {
 		super();
 		this.changeType(ModType.I);
-	}
-
-	transition(token, link) {
-		if (link.to == this.key) {
-			return this.findLinksOutOf("w")[0];
-		}
-		else if (link.from == this.key && link.fromPort == "w") {
-			return this.findLinksInto(null)[0];
-		}
-		else if (link.from == this.key && link.fromPort == "e") {
-			if (token.machine.evaluating) {
-				token.rewriteFlag = RewriteFlag.F_UPDATE;
-				token.machine.readyEvalTokens++;
-			}
-			return this.findLinksInto(null)[0];
-		}
 	}
 
 	copy() {
