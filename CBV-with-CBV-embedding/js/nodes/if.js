@@ -61,11 +61,6 @@ class If extends Node {
 		}
 	}
 
-	analyse(token) {
-		this.halt = false;
-		return super.analyse(token);
-	}
-
 	copy() {
 		return new If();
 	}

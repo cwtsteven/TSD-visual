@@ -6,13 +6,9 @@ class Prop extends Node {
 
 	transition(token, link) {
 		if (link.to == this.key) {
-			if (!token.machine.propagating) {
-				token.machine.startAnalysis();
-			}
 			token.rewriteFlag = RewriteFlag.F_PROP;
 			token.forward = false;
-			token.dataStack.pop();
-			token.dataStack.push(CompData.UNIT);
+			token.machine.startPropagation();
 			return link;
 		}
 	}
@@ -20,8 +16,11 @@ class Prop extends Node {
 	rewrite(token, nextLink) {
 		if (token.rewriteFlag == RewriteFlag.F_PROP && nextLink.to == this.key) {
 			token.rewriteFlag = RewriteFlag.EMPTY;
+			var data = token.machine.dNodes.length;
+			token.dataStack.pop();
+			token.dataStack.push(data);
 			var wrapper = BoxWrapper.create().addToGroup(this.group);
-			var con = new Const(token.dataStack.last()).addToGroup(wrapper.box);
+			var con = new Const(data).addToGroup(wrapper.box);
 			new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper);
 			nextLink.changeTo(wrapper.prin.key, "s");
 			this.delete();

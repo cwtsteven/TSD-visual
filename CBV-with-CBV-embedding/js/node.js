@@ -146,10 +146,6 @@ class Node {
 		return nextLink;
 	}
 
-	analyse(token) {
-		return this.findLinksInto('s')[0];
-	}
-
 	propagate(token) {
 		return this.findLinksInto('s')[0];
 	}

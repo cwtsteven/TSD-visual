@@ -18,11 +18,13 @@ class Delta extends Node {
 				return this.findLinksOutOf("w")[0];
 			}
 			else if (link.fromPort == "w") {
-				token.dataStack.pop();
-				token.dataStack.push(CompData.UNIT);
-				//token.copyStack.pop();
-				token.rewriteFlag = RewriteFlag.F_DELTA;
-				return this.findLinksInto(null)[0];
+				if (token.dataStack.last() == CompData.PROMPT) {
+					token.dataStack.pop();
+					token.dataStack.push(CompData.UNIT);
+					//token.copyStack.pop();
+					token.rewriteFlag = RewriteFlag.F_DELTA;
+					return this.findLinksInto(null)[0];
+				}
 			}
 		}
 	}
@@ -52,13 +54,8 @@ class Delta extends Node {
 		}
 	}
 
-	analyse(token) {
-		token.machine.aTokens.splice(token.machine.aTokens.indexOf(token), 1);		
-		return null;
-	}
-
 	propagate(token) {
-		token.machine.propTokens.splice(token.machine.propTokens.indexOf(token), 1);
+		token.delete();
 		return null;
 	}
 

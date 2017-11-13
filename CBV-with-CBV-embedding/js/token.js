@@ -29,6 +29,7 @@ class EvaluationToken extends MachineToken {
 	constructor(machine) {
 		super(machine);
 		this.colour = 'red';
+		this.isMain = false;
 	}
 
 	reset() {
@@ -38,7 +39,11 @@ class EvaluationToken extends MachineToken {
 		this.rewriteFlag = RewriteFlag.EMPTY;
 		this.dataStack = [CompData.PROMPT];
 		this.boxStack = [];
-		this.copyStack = [CopyData.C];
+	}
+
+	delete() {
+		this.setLink(null);
+		this.machine.evalTokens.splice(this.machine.evalTokens.indexOf(this),1);
 	}
 }
 
@@ -65,14 +70,10 @@ var RewriteFlag = {
 	F_DELTA: '<∇>',
 	F_MODIFY: '<Δ>',
 	F_PROP: '<P>',
+	F_UPDATE: '<U>'
 }
 
 var BoxData = {
 
-}
-
-var CopyData = {
-	C: '©',
-	U: 'U',
 }
 

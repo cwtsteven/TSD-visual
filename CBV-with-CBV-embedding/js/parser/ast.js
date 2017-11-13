@@ -19,8 +19,10 @@ class Application {
   }
 }
 
-class ProvApplication extends Application {
-
+class ProvisionalConstant {
+  constructor(term) {
+    this.term = term;
+  }
 }
 
 class Change {
@@ -81,9 +83,8 @@ class IfThenElse {
 }
 
 class Recursion {
-  constructor(p1, p2, body) {
-    this.p1 = p1;
-    this.p2 = p2;
+  constructor(param, body) {
+    this.param = param;
     this.body = body;
   }
 }

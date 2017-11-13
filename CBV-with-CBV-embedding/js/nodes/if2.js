@@ -60,25 +60,25 @@ class If2 extends Node {
 		}
 	}
 
-	analyse(token) {
-		if (token.link.fromPort == "w") {
+	propagate(token) {
+		var link = token.link;
+
+		if (link.from == this.key && link.fromPort == "w") {
 			var newIf = new If().addToGroup(this.group);
-			for (let link of this.findLinksOutOf(null)) {
+
+			for (let link of this.findLinksOutOf(null))
 				link.changeFrom(newIf.key, link.fromPort);
-			}
 			this.findLinksInto(null)[0].changeTo(newIf.key, "s");
 			this.delete();
-			return token.link;
+			return newIf.findLinksInto(null)[0];
 		}
-
-		else if (token.link.fromPort == "n") {
-			this.halt = true;	
-			return token.link;
-		}
-
-		else if (token.link.fromPort == "e") {
+		else if (link.from == this.key && link.fromPort == "n") {
+			token.delete();
+			return null;
+		} 
+		else if (link.from == this.key && link.fromPort == "e") {
 			return this.findLinksInto(null)[0];
-		}
+		} 
 	}
 
 	copy() {

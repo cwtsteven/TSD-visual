@@ -58,23 +58,11 @@ class Contract extends Expo {
 		}
 	}
 
-	analyse(token) {
-		for (let link of this.findLinksInto(null)) {
-			var newToken = new AnalysisToken(token.machine, link);
-			newToken.mNodes = Array.from(token.mNodes);
-			token.machine.aTokens.push(newToken);
-		}
-		token.machine.aTokens.splice(token.machine.aTokens.indexOf(token), 1);
-		return null;
-	}
-
 	propagate(token) {
 		for (let link of this.findLinksInto(null)) {
 			var newToken = new PropToken(token.machine, link);
-			token.machine.propTokens.push(newToken);
-			newToken.mNodes = Array.from(token.mNodes);
 		}
-		token.machine.propTokens.splice(token.machine.propTokens.indexOf(token), 1);
+		token.delete();
 		return null;
 	}
 

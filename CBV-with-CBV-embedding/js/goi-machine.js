@@ -21,10 +21,13 @@ class GoIMachine {
 		graph = this.graph; // cheating!
 		this.token = new EvaluationToken(this);
 		this.token.isMain = true;
-		this.aTokens = [];
+		this.evalTokens = [];
 		this.propTokens = [];
-		this.rNodes = [];
-		this.analysing = false;
+		this.dNodes = [];
+		this.pNodes = [];
+		this.readyEvalTokens = 0;
+		this.evaluating = false;
+		this.updating = false;
 		this.propagating = false;
 		this.gc = new GC(this.graph);
 		this.count = 0;
@@ -37,10 +40,13 @@ class GoIMachine {
 		// init
 		this.graph.clear();
 		this.token.reset();
-		this.aTokens = [];
+		this.evalTokens = [];
 		this.propTokens = [];
-		this.rNodes = [];
-		this.analysing = false;
+		this.dNodes = [];
+		this.pNodes = [];
+		this.readyEvalTokens = 0;
+		this.evaluating = false;
+		this.updating = false;
 		this.propagating = false;
 		this.count = 0;
 		// create graph
@@ -90,6 +96,7 @@ class GoIMachine {
 			return new Term(wrapper.prin, wrapper.auxs);
 		} 
 
+		/*
 		else if (ast instanceof ProvApplication) {
 			var app = new App().addToGroup(group);
 			//lhs
@@ -101,21 +108,13 @@ class GoIMachine {
 			var right = this.toGraph(ast.rhs, group);	
 			var prov = new Prov().addToGroup(group);
 			new Link(prov.key, right.prin.key, "n", "s").addToGroup(group);
-			/*	
-			var mod = new Mod().addToGroup(group);
-			//var contract = new Contract(right.name).addToGroup(group);
-			new Link(mod.key, right.prin.key, "e", "s").addToGroup(group);
-			new Link(mod.key, rightCopy.prin.key, "w", "s").addToGroup(group);
-			//new Link(contract.key, right.prin.key, "n", "s").addToGroup(group);
-			var auxs = Term.joinAuxs(rightCopy.auxs, right.auxs, group);
-			*/
-			
 			
 			new Link(app.key, der.key, "w", "s").addToGroup(group);
 			new Link(app.key, prov.key, "e", "s").addToGroup(group);
 
 			return new Term(app, Term.joinAuxs(left.auxs, right.auxs, group));
 		} 
+		*/
 
 		else if (ast instanceof Application) {
 			var app = new App().addToGroup(group);
@@ -176,14 +175,13 @@ class GoIMachine {
 		}
 
 		else if (ast instanceof Recursion) {
-			var p1 = ast.p1
-			var p2 = ast.p2;
+			var p1 = ast.param;
 			// recur term
 			var wrapper = BoxWrapper.create().addToGroup(group);
 			wrapper.prin.delete();
 			var recur = new Recur().addToGroup(wrapper);
 			wrapper.prin = recur;
-			var box = this.toGraph(new Abstraction(p2, ast.body), wrapper.box);
+			var box = this.toGraph(ast.body, wrapper.box);
 			wrapper.auxs = Array.from(box.auxs);
 			recur.box = box;
 
@@ -207,6 +205,13 @@ class GoIMachine {
 			new Link(auxNode1.key, recur.key, "nw", "w", true).addToGroup(wrapper);
 
 			return new Term(wrapper.prin, wrapper.auxs);
+		}
+
+		else if (ast instanceof ProvisionalConstant) {
+			var term = this.toGraph(ast.term, group);
+			var prov = new Prov().addToGroup(group);
+			new Link(prov.key, term.prin.key, "n", "s").addToGroup(group);
+			return new Term(prov, term.auxs);
 		}
 
 		else if (ast instanceof Change) {
@@ -253,25 +258,13 @@ class GoIMachine {
 		}
 	}
 
-	startAnalysis() {
-		this.propagating = true;
-		this.analysing = true;
-		for (let rNode of this.rNodes) {
-			var aToken = new AnalysisToken(this, this.graph.findNodeByKey(rNode).findLinksInto(null)[0]);
-			aToken.mNodes.push(rNode);
-			this.aTokens.push(aToken);
-		}
-	}
-
 	startPropagation() {
-		for (let rNode of this.rNodes) {
-			var node = this.graph.findNodeByKey(rNode);
-			node.changeType(ModType.M);
-			if (node.numParents == 0) {
-				var pToken = new PropToken(this, node.findLinksOutOf("e")[0]);
-				this.propTokens.push(pToken);
-				node.numParents = 1;
-			}
+		this.evaluating = true;
+		for (let key of this.dNodes) {
+			var cell = this.graph.findNodeByKey(key);
+			var evalToken = new EvaluationToken(this);
+			evalToken.setLink(cell.findLinksOutOf('e')[0]);
+			this.evalTokens.push(evalToken);
 		}
 	}
 
@@ -285,75 +278,70 @@ class GoIMachine {
 	    }
 	}
 
+	batchPass(tokens) {
+		var arr_2 = Array.from(tokens);
+		// random
+		/*
+		var arr = Array.from(new Array(tokens.length),(val,index)=>index+1);
+		this.shuffle(arr);
+		for (var i=0; i<arr.length; i++) {
+			var token = arr_2[arr[i]-1];
+			this.tokenPass(token, flag, dataStack, boxStack, modStack);
+		}
+		*/
+		
+		// all progress 1 step
+		for (var i=0; i<arr_2.length; i++) {
+			var token = arr_2[i];
+			
+			this.tokenPass(token);
+		}
+		
+	}
+
 	// machine step
 	pass(flag, dataStack, boxStack, modStack) {	
 		if (!finished) {
+			/*
 			this.count++;
 			if (this.count == 200) {
 				this.count = 0;
 				this.gc.collect();
 			}
-
-			if (this.propagating) {
-				if (this.analysing) {
-					var arr = Array.from(new Array(this.aTokens.length),(val,index)=>index+1);
-					this.shuffle(arr);
-					var arr_2 = Array.from(this.aTokens);
-					var num = Math.ceil((Math.random() * arr.length));
-					// random
-					for (var i=0; i<arr.length; i++) {
-						this.tokenPass(arr_2[arr[i]-1], flag, dataStack, boxStack, modStack);
-					}
-					/*
-					// all progress 1 step
-					for (var i=0; i<arr_2.length; i++) {
-						this.tokenPass(arr_2[i], flag, dataStack, boxStack, modStack);
-					}
-					*/
-
-					var finished = true;
-					for (let aToken of this.aTokens) {
-						if (!aToken.halt) {
-							finished = false;
-							break;
-						}
-					}
-
-					if (finished) {
-						this.analysing = false;
-						this.aTokens = [];
-						this.startPropagation();
-					}
-				}
-				else {
-					var arr = Array.from(new Array(this.propTokens.length),(val,index)=>index+1);
-					this.shuffle(arr);
-					var arr_2 = Array.from(this.propTokens);
-					var num = Math.ceil((Math.random() * arr.length));
-					// random
-					for (var i=0; i<arr.length; i++) {
-						var token = arr_2[arr[i]-1];
-						if (token.evaluating) 
-							this.tokenPass(token.evalToken, flag, dataStack, boxStack, modStack);
-						
-						this.tokenPass(token, flag, dataStack, boxStack, modStack);
-					}
-					/*
-					// all progress 1 step
-					for (var i=0; i<arr_2.length; i++) {
-						var token = arr_2[i];
-						if (token.evaluating) 
-							this.tokenPass(token.evalToken, flag, dataStack, boxStack, modStack);
-						
-						this.tokenPass(token, flag, dataStack, boxStack, modStack);
-					}
-					*/
-
-					if (this.propTokens.length == 0) {
-						this.propagating = false;
-					}
+			*/
+			if (this.evaluating) {
+				this.batchPass(this.evalTokens);
+				if (this.readyEvalTokens == this.evalTokens.length) {
+					this.evaluating = false;
+					this.updating = true;
+					this.readyEvalTokens = 0;
+					return;
 				}
 			}
+				
+
+			else if (this.updating) {
+				if (this.evalTokens.length == 0) {
+					this.updating = false;
+					this.propagating = true;
+					while (this.pNodes.length != 0) {
+						var pNode = this.graph.findNodeByKey(this.pNodes.pop());
+						var propToken = new PropToken(this, pNode.findLinksInto(null)[0]);
+						pNode.changeType(pNode.type.substring(0,1));
+					}
+					return;
+				}
+				this.batchPass(this.evalTokens);
+			}
+
+			else if (this.propagating) {
+				if (this.propTokens.length == 0) {
+					this.propagating = false;
+					return;
+				}
+				this.batchPass(this.propTokens);
+			}
+
 			else
 				this.tokenPass(this.token, flag, dataStack, boxStack, modStack);
 		}
@@ -376,10 +364,6 @@ class GoIMachine {
 				nextLink = node.transition(token, token.link);
 				token.transited = true;
 			}
-			else if (token instanceof AnalysisToken) {
-				nextLink = node.analyse(token);
-				token.transited = false; // becoz there is no rewrite for this token
-			}
 			else if (token instanceof PropToken) {
 				nextLink = node.propagate(token);
 				token.transited = false;
@@ -398,7 +382,7 @@ class GoIMachine {
 				token.setLink(null);
 				token.transited = false;
 				if (token.isMain) {
-					this.gc.collect();
+					//this.gc.collect();
 					play = false;
 					playing = false;
 					finished = true;
@@ -439,7 +423,7 @@ class GoIMachine {
 
 }
 
-define('goi-machine', ['gc', 'graph', 'node', 'group', 'link', 'term', 'token', 'token_a', 'token_p', 'op', 'parser/ast', 'parser/token', 'parser/lexer', 'parser/parser'
+define('goi-machine', ['gc', 'graph', 'node', 'group', 'link', 'term', 'token', 'token_p', 'op', 'parser/ast', 'parser/token', 'parser/lexer', 'parser/parser'
 					, 'nodes/expo', 'nodes/abs', 'nodes/app', 'nodes/binop', 'nodes/const', 'nodes/contract'
 					, 'nodes/der', 'nodes/if', 'nodes/if1', 'nodes/if2', 'nodes/pax', 'nodes/promo'
 					, 'nodes/recur', 'nodes/start', 'nodes/unop', 'nodes/weak', 'nodes/prov', 'nodes/mod', 'nodes/delta', 'nodes/prop'],

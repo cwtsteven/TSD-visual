@@ -1,5 +1,5 @@
 var fact = 
-  'let fact = rec(f,x).\n'
+  'let fact = rec f. λx.\n'
 + '  if (x <= 1)\n'
 + '  then 1\n'
 + '  else (x * (f (x - 1)))\n'
@@ -34,7 +34,7 @@ var batch_update =
 + 'z'
 
 var fact_inc = 
-  'let fact = rec(f,x).\n'
+  'let fact = rec f. λx.\n'
 + '  let y = x <= 1 in\n'
 + '    if y\n'
 + '    then 1\n'

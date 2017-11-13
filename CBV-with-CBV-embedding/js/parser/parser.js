@@ -13,7 +13,7 @@ class Parser {
 
   // term ::= LAMBDA LCID DOT term
   //        | LET LCID DEFINE term IN term 
-  //        | REC LPAREN LCID COMMA LCID RPAREN DOT term
+  //        | REC LCID DOT term
   //        | IF term THEN term ELSE term
   //        | application
   term(ctx) {
@@ -26,33 +26,17 @@ class Parser {
     
     else if (this.lexer.skip(Token.LET)) {
       const id = this.lexer.token(Token.LCID);
-      
-      if (this.lexer.skip(Token.DEFINE)) { 
-        var N;
-        if (this.lexer.skip(Token.CLPAREN)) {
-          N = this.term(ctx);
-          this.lexer.match(Token.CRPAREN);
-          this.lexer.match(Token.IN);
-          const M = this.term([id].concat(ctx));
-          return new ProvApplication(new Abstraction(id, M), N);
-        }  
-        else {
-          N = this.term(ctx);
-          this.lexer.match(Token.IN);
-          const M = this.term([id].concat(ctx));
-          return new Application(new Abstraction(id, M), N);
-        }
-      }
+      this.lexer.match(Token.DEFINE)
+      var N = this.term(ctx);
+      this.lexer.match(Token.IN);
+      const M = this.term([id].concat(ctx));
+      return new Application(new Abstraction(id, M), N);
     } 
     else if (this.lexer.skip(Token.REC)) {
-      this.lexer.match(Token.LPAREN);
       const id = this.lexer.token(Token.LCID);
-      this.lexer.match(Token.COMMA);
-      const id2 = this.lexer.token(Token.LCID);
-      this.lexer.match(Token.RPAREN);
       this.lexer.match(Token.DOT);
-      const term = this.term([id2].concat([id].concat(ctx)));
-      return new Recursion(id, id2, term);
+      const term = this.term([id].concat(ctx));
+      return new Recursion(id, term);
     }
     else if (this.lexer.skip(Token.IF)) {
       const cond = this.term(ctx);
@@ -168,12 +152,16 @@ class Parser {
       const term = this.term(ctx);
       return new UnaryOp(UnOpType.Not, "~", term);
     }
-
     else if (this.lexer.skip(Token.PROP)) {
       if (this.lexer.skip(Token.SEQ)) {
         return new Application(new Abstraction('_', this.term(ctx)), new Propagation());
       }
       return new Propagation();
+    }
+    else if (this.lexer.skip(Token.CLPAREN)) {
+      var term = this.term(ctx);
+      this.lexer.match(Token.CRPAREN);
+      return new ProvisionalConstant(term);
     }
     else if (this.lexer.skip(Token.CHANGE)) {
       const id = this.lexer.token(Token.LCID);

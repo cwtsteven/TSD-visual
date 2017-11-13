@@ -2,21 +2,20 @@ class PropToken extends MachineToken {
 
 	constructor(machine, link) {
 		super(machine);
-		this.colour = 'cyan';
+		this.colour = 'green';
 		this.forward = false;
 		this.setLink(link);
-		this.evalToken = new EvaluationToken(machine);
-		this.evalToken.isMain = false;
-		this.evaluating = false;
+		machine.propTokens.push(this);
 	}
 
 	reset() {
 		super.reset();
 		this.node = null;
-		this.evalToken = new EvaluationToken(this.machine);
-		this.evalToken.isMain = false;
-		this.mNodes = [];
-		this.evaluating = false;
+	}
+
+	delete() {
+		this.setLink(null);
+		this.machine.propTokens.splice(this.machine.propTokens.indexOf(this),1);
 	}
 	
 }
