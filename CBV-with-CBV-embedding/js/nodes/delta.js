@@ -18,7 +18,8 @@ class Delta extends Node {
 				return this.findLinksOutOf("w")[0];
 			}
 			else if (link.fromPort == "w") {
-				if (token.dataStack.last() == CompData.PROMPT) {
+				if (token.dataStack[token.dataStack.length-2] == CompData.PROMPT) {
+					token.dataStack.pop();
 					token.dataStack.pop();
 					token.dataStack.push(CompData.UNIT);
 					//token.copyStack.pop();

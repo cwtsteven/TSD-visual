@@ -8,7 +8,15 @@ class Prov extends Node {
 
 	transition(token, link) {
 		if (link.to == this.key) {
-			return this.findLinksOutOf(null)[0];
+			var data = token.dataStack.last();
+
+			if (data[0] == CompData.DELTA) {
+				token.rewriteFlag = RewriteFlag.F_MODIFY;
+				return this.findLinksOutOf(null)[0];
+			}
+
+			else
+				return this.findLinksOutOf(null)[0];
 		}
 		else if (link.from == this.key) {
 			token.rewriteFlag = RewriteFlag.F_MOD;
@@ -17,7 +25,7 @@ class Prov extends Node {
 	}
 
 	rewrite(token, nextLink) {
-		if (token.rewriteFlag == RewriteFlag.F_MOD) {
+		if (nextLink.to == this.key && token.rewriteFlag == RewriteFlag.F_MOD) {
 			token.rewriteFlag = RewriteFlag.EMPTY;
 			var data = token.dataStack.last();
 
@@ -50,6 +58,26 @@ class Prov extends Node {
 			}
 			*/
 
+			return nextLink;
+		}
+
+		else if (nextLink.from == this.key && token.rewriteFlag == RewriteFlag.F_MODIFY) {
+			token.rewriteFlag = RewriteFlag.EMPTY;
+
+			var data = token.dataStack.pop();
+			var key = data.substring(2,data.length - 1);
+			var delta = this.graph.findNodeByKey(key);
+			var link = delta.findLinksOutOf("e")[0];
+			var toNode = this.graph.findNodeByKey(link.to);
+			var weak = new Weak().addToGroup(this.group);
+			new Link(weak.key, nextLink.to, "n", "s").addToGroup(this.group);
+			var con = new Contract(toNode.name).addToGroup(this.group);
+			nextLink.changeTo(con.key, "s");
+			new Link(delta.key, con.key, link.fromPort, "s").addToGroup(this.group);
+			link.changeFrom(con.key, "n");
+
+			token.dataStack.push(CompData.PROMPT);
+			token.rewrite = true;
 			return nextLink;
 		}
 

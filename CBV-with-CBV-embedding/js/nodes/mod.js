@@ -24,6 +24,7 @@ class Mod extends Node {
 					token.rewriteFlag = RewriteFlag.F_MODIFY;
 				return this.findLinksOutOf("e")[0];
 			}
+			
 			else {
 				return this.findLinksOutOf("w")[0];
 			}
@@ -58,6 +59,7 @@ class Mod extends Node {
 			token.rewriteFlag = RewriteFlag.EMPTY;
 
 			var data = token.dataStack.pop();
+			token.dataStack.push(CompData.UNIT);
 			var key = data.substring(2,data.length - 1);
 			var delta = this.graph.findNodeByKey(key);
 			var link = delta.findLinksOutOf("e")[0];

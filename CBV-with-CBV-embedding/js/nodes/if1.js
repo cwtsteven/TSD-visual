@@ -8,11 +8,12 @@ class If1 extends Node {
 			return this.findLinksOutOf("n")[0];
 		}
 		else if (link.from == this.key && link.fromPort == "n") {
-			token.rewriteFlag = RewriteFlag.F_INTER;
+			//token.rewriteFlag = RewriteFlag.F_INTER;
 			return this.findLinksInto(null)[0];
 		} 
 	}
 
+/*
 	rewrite(token, nextLink) {
 		if (token.rewriteFlag == RewriteFlag.F_INTER) {
 			token.rewriteFlag = RewriteFlag.EMPTY;
@@ -37,17 +38,6 @@ class If1 extends Node {
 					new Link(mod.key, this.key, "e", "s").addToGroup(this.group);
 					token.rewrite = true;
 				}
-				/*
-				else if (data == CompData.LAMBDA) {
-					var mod = new Mod().addToGroup(this.group);
-					new Link(mod.key, this.key, "e", "s").addToGroup(this.group);
-					var inLink = this.findLinksInto(null)[0];
-					inLink.changeTo(mod.key, "s");
-					var newLeft = mod.graph.findNodeByKey(mod.findLinksOutOf("e")[0].to).deepUnfolding(mod);
-					new Link(mod.key, newLeft.prin.key, "w", "s").addToGroup(this.group);
-					token.rewrite = true;
-				}
-				*/
 			}
 
 			token.rewrite = true;
@@ -59,6 +49,7 @@ class If1 extends Node {
 			return nextLink;
 		}
 	}
+*/
 
 	propagate(token) {
 		var link = token.link;
