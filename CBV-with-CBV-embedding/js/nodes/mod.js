@@ -19,12 +19,11 @@ class Mod extends Node {
 		if (link.to == this.key) {
 			var data = token.dataStack.last();
 
-			if (data[0] == CompData.DELTA) {
-				if (this.type.substring(0,1) == 'M')
-					token.rewriteFlag = RewriteFlag.F_MODIFY;
+			if (this.type.substring(0,1) == 'M' && data[0] == CompData.DELTA) {
+				token.rewriteFlag = RewriteFlag.F_MODIFY;
 				return this.findLinksOutOf("e")[0];
 			}
-			
+
 			else {
 				return this.findLinksOutOf("w")[0];
 			}
@@ -108,8 +107,10 @@ class Mod extends Node {
 	}
 
 	propagate(token) {
-		this.changeType(this.type.substring(0,1)+'ᵈ');
-		token.machine.dNodes.push(this.key);
+		if (token.machine.dNodes.indexOf(this.key) == -1) {
+			this.changeType(this.type.substring(0,1)+'ᵈ');
+			token.machine.dNodes.push(this.key);
+		}
 		token.delete();
 		return null;
 	}

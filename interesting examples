@@ -54,3 +54,15 @@ let m = (f 2) + (f 3) in
 set x to 4;
 prop;
 m
+
+// if then else
+let x = {1} in
+let y = if x <= 1 then {2} else {3} in
+let z = y + 1 in
+let _ = set y to 4 in
+let _ = set x to 2 in
+let i = prop in
+let i = prop in
+let _ = set y to 5 in
+let i = prop in
+z

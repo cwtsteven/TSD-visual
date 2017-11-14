@@ -11,7 +11,7 @@ class Prov extends Node {
 			var data = token.dataStack.last();
 
 			if (data[0] == CompData.DELTA) {
-				token.rewriteFlag = RewriteFlag.F_MODIFY;
+				token.dataStack.push(CompData.PROMPT);
 				return this.findLinksOutOf(null)[0];
 			}
 
@@ -28,6 +28,7 @@ class Prov extends Node {
 		if (nextLink.to == this.key && token.rewriteFlag == RewriteFlag.F_MOD) {
 			token.rewriteFlag = RewriteFlag.EMPTY;
 			var data = token.dataStack.last();
+			var data2 = token.dataStack[token.dataStack.length-2];
 
 			if ((Number.isInteger(data) || typeof(data) === "boolean")) {
 				var mod = new Mod().addToGroup(this.group);
@@ -57,27 +58,10 @@ class Prov extends Node {
 				token.rewrite = true;
 			}
 			*/
-
-			return nextLink;
-		}
-
-		else if (nextLink.from == this.key && token.rewriteFlag == RewriteFlag.F_MODIFY) {
-			token.rewriteFlag = RewriteFlag.EMPTY;
-
-			var data = token.dataStack.pop();
-			var key = data.substring(2,data.length - 1);
-			var delta = this.graph.findNodeByKey(key);
-			var link = delta.findLinksOutOf("e")[0];
-			var toNode = this.graph.findNodeByKey(link.to);
-			var weak = new Weak().addToGroup(this.group);
-			new Link(weak.key, nextLink.to, "n", "s").addToGroup(this.group);
-			var con = new Contract(toNode.name).addToGroup(this.group);
-			nextLink.changeTo(con.key, "s");
-			new Link(delta.key, con.key, link.fromPort, "s").addToGroup(this.group);
-			link.changeFrom(con.key, "n");
-
-			token.dataStack.push(CompData.PROMPT);
-			token.rewrite = true;
+			if (data2[0] == CompData.DELTA) {
+				token.dataStack.pop();
+				token.forward = true; 
+			}
 			return nextLink;
 		}
 

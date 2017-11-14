@@ -32,3 +32,13 @@ var batch_update =
 + 'let _ = set y to 6 in\n'
 + 'let i = prop in\n'
 + 'z'
+
+var if_then_else = 
+  'let x = {1} in\n'
++ 'let y = if x <= 1 then {2} else {3} in\n'
++ 'let _ = set y to 4 in\n'
++ 'let _ = set x to 2 in\n'
++ 'let i = prop in\n'
++ 'let _ = set y to 5 in\n'
++ 'let i = prop in\n'
++ 'y'
