@@ -11,15 +11,15 @@ var prov =
   'let x = {1} in\n'
 + 'let y = x + 2 in\n'
 + 'let _ = set x to 3 in\n'
-+ 'let n = prop in\n'
++ 'let i = prop in\n'
 + 'y'
 
 var circular = 
   'let x = {1} in\n'
 + 'let _ = set x to (x + 1) in\n'
-+ 'let n = prop in\n'
-+ 'let n = prop in\n'
-+ 'let n = prop in\n'
++ 'let i = prop in\n'
++ 'let i = prop in\n'
++ 'let i = prop in\n'
 + 'x'
 
 var batch_update = 
@@ -30,19 +30,5 @@ var batch_update =
 + 'let z = m + n in\n'
 + 'let _ = set x to 5 in\n'
 + 'let _ = set y to 6 in\n'
-+ 'let n = prop in\n'
++ 'let i = prop in\n'
 + 'z'
-
-var fact_inc = 
-  'let fact = rec f. λx.\n'
-+ '  let y = x <= 1 in\n'
-+ '    if y\n'
-+ '    then 1\n'
-+ '    else (x * (f (x - 1)))\n'
-+ 'in\n'
-+ '\n'
-+ 'let x = {3} in\n'
-+ 'let m = fact x in\n'
-+ 'let _ = set x to 2 in\n'
-+ 'let n = prop in\n'
-+ 'm'
