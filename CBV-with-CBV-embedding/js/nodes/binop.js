@@ -59,10 +59,8 @@ class BinOp extends Node {
 				else {
 					var data = token.dataStack.last();
 					var mod = new Inter().addToGroup(this.group);
-					var wrapper = BoxWrapper.create().addToGroup(mod.group);
-					var con = new Const(data).addToGroup(wrapper.box);
-					new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper);
-					new Link(mod.key, wrapper.prin.key, "w", "s").addToGroup(this.group);
+					var con = new Const(data).addToGroup(this.group);
+					new Link(mod.key, con.key, "w", "s").addToGroup(this.group);
 					var inLink = this.findLinksInto(null)[0];
 					inLink.changeTo(mod.key, "s");
 					new Link(mod.key, this.key, "e", "s").addToGroup(this.group);

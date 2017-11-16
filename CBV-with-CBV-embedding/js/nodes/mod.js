@@ -45,7 +45,7 @@ class Mod extends Node {
 		var leftLink = this.findLinksOutOf("w")[0];
 
 		if ((Number.isInteger(data) || typeof(data) === "boolean")) {
-			var value = this.graph.findNodeByKey(leftLink.to).group.box.nodes[0];
+			var value = this.graph.findNodeByKey(leftLink.to);
 			var oldData = value.name;
 			value.text = data;
 			value.name = data;

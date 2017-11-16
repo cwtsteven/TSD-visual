@@ -32,10 +32,8 @@ class Prov extends Node {
 
 			if ((Number.isInteger(data) || typeof(data) === "boolean")) {
 				var mod = new Mod().addToGroup(this.group);
-				var wrapper = BoxWrapper.create().addToGroup(mod.group);
-				var con = new Const(data).addToGroup(wrapper.box);
-				new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper);
-				new Link(mod.key, wrapper.prin.key, "w", "s").addToGroup(this.group);
+				var con = new Const(data).addToGroup(this.group);
+				new Link(mod.key, con.key, "w", "s").addToGroup(this.group);
 				var outLink = this.findLinksOutOf(null)[0];
 				outLink.changeFrom(mod.key, "e");
 				var inLink = this.findLinksInto(null)[0];
