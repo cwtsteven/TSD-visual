@@ -23,6 +23,9 @@ class If extends Node {
 				return this.findLinksOutOf("e")[0];
 			}
 		} 
+		else if (link.from == this.key) {
+			return this.findLinksInto(null)[0];
+		}
 	}
 
 	rewrite(token, nextLink) {
@@ -38,6 +41,7 @@ class If extends Node {
 				this.delete();
 				left.group.delete();
 			}
+			/*
 			else {
 				var newIf;
 				if (nextLink.fromPort == "n") 
@@ -50,6 +54,7 @@ class If extends Node {
 				this.findLinksInto(null)[0].changeTo(newIf.key, "s");
 				this.delete();
 			}
+			*/
 			
 			token.rewrite = true;
 			return nextLink;

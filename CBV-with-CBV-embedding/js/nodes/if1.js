@@ -51,27 +51,6 @@ class If1 extends Node {
 	}
 */
 
-	propagate(token) {
-		var link = token.link;
-
-		if (link.from == this.key && link.fromPort == "w") {
-			var newIf = new If().addToGroup(this.group);
-
-			for (let link of this.findLinksOutOf(null))
-				link.changeFrom(newIf.key, link.fromPort);
-			this.findLinksInto(null)[0].changeTo(newIf.key, "s");
-			this.delete();
-			return newIf.findLinksInto(null)[0];
-		}
-		else if (link.from == this.key && link.fromPort == "n") {
-			return this.findLinksInto(null)[0];
-		} 
-		else if (link.from == this.key && link.fromPort == "e") {
-			token.delete();
-			return null;
-		} 
-	}
-
 	copy() {
 		return new If1();
 	}

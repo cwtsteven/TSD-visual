@@ -1,11 +1,6 @@
 var ModType = {
 	M: 'M',
-	MD: "Mᵈ",
-	MP: "Mᵖ",
-	I: 'I',
-	ID: "Iᵈ",
-	IP: "Iᵖ",
-	//U: 'U',
+	MU: "Mᵘ",
 }
 
 class Mod extends Node {
@@ -13,13 +8,14 @@ class Mod extends Node {
 	constructor() {
 		super(null, "M");
 		this.type = ModType.M;
+		this.graph.machine.cells.push(this.key);
 	}
 
 	transition(token, link) {
 		if (link.to == this.key) {
 			var data = token.dataStack.last();
 
-			if (this.type.substring(0,1) == 'M' && data[0] == CompData.DELTA) {
+			if (data[0] == CompData.DELTA) {
 				token.rewriteFlag = RewriteFlag.F_MODIFY;
 				return this.findLinksOutOf("e")[0];
 			}
@@ -70,10 +66,6 @@ class Mod extends Node {
 			new Link(delta.key, con.key, link.fromPort, "s").addToGroup(this.group);
 			link.changeFrom(con.key, "n");
 
-			this.changeType(ModType.MD);
-			if (token.machine.dNodes.indexOf(this.key) == -1)
-				token.machine.dNodes.push(this.key);
-
 			token.forward = false;
 			token.rewrite = true;
 			return nextLink;
@@ -87,13 +79,11 @@ class Mod extends Node {
 
 			else if (token.machine.updating) {
 				var oldData = this.update(token.dataStack.last());
-				if (this.type == ModType.MD || this.type == ModType.ID)
-					token.machine.dNodes.splice(token.machine.dNodes.indexOf(this),1);
-				this.changeType(this.type.substring(0,1));
 
 				if (oldData != token.dataStack.last()) {
-					this.changeType(this.type.substring(0,1)+'ᵖ');
-					token.machine.pNodes.push(this.key);
+					this.changeType(ModType.MU);
+					token.machine.uNodes.push(this.key);
+					token.machine.cells.splice(token.machine.cells.indexOf(this.key),1);
 				}
 				token.delete();
 				return null;
@@ -105,16 +95,7 @@ class Mod extends Node {
 			return nextLink;
 		}
 	}
-
-	propagate(token) {
-		if (token.machine.dNodes.indexOf(this.key) == -1) {
-			this.changeType(this.type.substring(0,1)+'ᵈ');
-			token.machine.dNodes.push(this.key);
-		}
-		token.delete();
-		return null;
-	}
-
+	
 	changeType(type) {
 		this.type = type;
 		this.text = type;
@@ -122,20 +103,6 @@ class Mod extends Node {
 
 	copy() {
 		var mod = new Mod();
-		mod.changeType(this.type);
-		return mod;
-	}
-}
-
-class Inter extends Mod {
-
-	constructor() {
-		super();
-		this.changeType(ModType.I);
-	}
-
-	copy() {
-		var mod = new Inter();
 		mod.changeType(this.type);
 		return mod;
 	}

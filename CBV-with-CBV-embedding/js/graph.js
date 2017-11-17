@@ -1,7 +1,8 @@
 // general graph
 class Graph {
 	
-	constructor() {
+	constructor(machine) {
+		this.machine = machine;
 		this.clear();
 	}
 

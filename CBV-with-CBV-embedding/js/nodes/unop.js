@@ -36,7 +36,7 @@ class UnOp extends Node {
 
 				token.rewriteFlag = RewriteFlag.F_PROMO;
 			}
-
+			/*
 			else {
 				var prev = this.graph.findNodeByKey(this.findLinksInto(null)[0].from);
 				if (prev instanceof Mod || prev instanceof BinOp || prev instanceof UnOp 
@@ -55,6 +55,7 @@ class UnOp extends Node {
 					token.rewrite = true;
 				}
 			}
+			*/
 
 			token.rewrite = true;
 			return nextLink;

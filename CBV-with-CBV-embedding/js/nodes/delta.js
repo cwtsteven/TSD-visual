@@ -55,11 +55,6 @@ class Delta extends Node {
 		}
 	}
 
-	propagate(token) {
-		token.delete();
-		return null;
-	}
-
 	copy() {
 		return new Delta();
 	}

@@ -12,11 +12,6 @@ class Start extends Node {
 		else 
 			return null;
 	}
-
-	propagate(token) {
-		token.delete();
-		return null;
-	}
 	
 	copy() {
 		return new Start();

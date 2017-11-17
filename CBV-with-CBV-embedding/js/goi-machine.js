@@ -17,18 +17,17 @@ function union_arrays (x, y) {
 class GoIMachine {
 	
 	constructor() {
-		this.graph = new Graph();
+		this.graph = new Graph(this);
 		graph = this.graph; // cheating!
 		this.token = new EvaluationToken(this);
 		this.token.isMain = true;
 		this.evalTokens = [];
-		this.propTokens = [];
-		this.dNodes = [];
-		this.pNodes = [];
+		this.cells = [];
+		this.uNodes = [];
 		this.readyEvalTokens = 0;
 		this.evaluating = false;
 		this.updating = false;
-		this.propagating = false;
+		this.lastProp = 0;
 		this.gc = new GC(this.graph);
 		this.count = 0;
 	}
@@ -41,13 +40,12 @@ class GoIMachine {
 		this.graph.clear();
 		this.token.reset();
 		this.evalTokens = [];
-		this.propTokens = [];
-		this.dNodes = [];
-		this.pNodes = [];
+		this.cells = [];
+		this.uNodes = [];
 		this.readyEvalTokens = 0;
 		this.evaluating = false;
 		this.updating = false;
-		this.propagating = false;
+		this.lastProp = 0;
 		this.count = 0;
 		// create graph
 		var start = new Start().addToGroup(this.graph.child);
@@ -260,7 +258,7 @@ class GoIMachine {
 
 	startPropagation() {
 		this.evaluating = true;
-		for (let key of this.dNodes) {
+		for (let key of this.cells) {
 			var cell = this.graph.findNodeByKey(key);
 			var evalToken = new EvaluationToken(this);
 			evalToken.setLink(cell.findLinksOutOf('e')[0]);
@@ -323,23 +321,21 @@ class GoIMachine {
 			else if (this.updating) {
 				if (this.evalTokens.length == 0) {
 					this.updating = false;
-					this.propagating = true;
-					while (this.pNodes.length != 0) {
-						var pNode = this.graph.findNodeByKey(this.pNodes.pop());
-						var propToken = new PropToken(this, pNode.findLinksInto(null)[0]);
-						pNode.changeType(pNode.type.substring(0,1));
+					if (this.uNodes.length != this.lastProp) {
+						this.lastProp = this.uNodes.length;
+						this.startPropagation();
+					}
+					else {
+						while (this.uNodes.length != 0) {
+							var key = this.uNodes.pop();
+							this.graph.findNodeByKey(key).changeType(ModType.M);
+							this.cells.push(key);
+						}
+						this.lastProp = 0;
 					}
 					return;
 				}
 				this.batchPass(this.evalTokens);
-			}
-
-			else if (this.propagating) {
-				if (this.propTokens.length == 0) {
-					this.propagating = false;
-					return;
-				}
-				this.batchPass(this.propTokens);
 			}
 
 			else
@@ -423,7 +419,7 @@ class GoIMachine {
 
 }
 
-define('goi-machine', ['gc', 'graph', 'node', 'group', 'link', 'term', 'token', 'token_p', 'op', 'parser/ast', 'parser/token', 'parser/lexer', 'parser/parser'
+define('goi-machine', ['gc', 'graph', 'node', 'group', 'link', 'term', 'token', 'op', 'parser/ast', 'parser/token', 'parser/lexer', 'parser/parser'
 					, 'nodes/expo', 'nodes/abs', 'nodes/app', 'nodes/binop', 'nodes/const', 'nodes/contract'
 					, 'nodes/der', 'nodes/if', 'nodes/if1', 'nodes/if2', 'nodes/pax', 'nodes/promo'
 					, 'nodes/recur', 'nodes/start', 'nodes/unop', 'nodes/weak', 'nodes/prov', 'nodes/mod', 'nodes/delta', 'nodes/prop'],

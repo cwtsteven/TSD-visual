@@ -58,14 +58,6 @@ class Contract extends Expo {
 		}
 	}
 
-	propagate(token) {
-		for (let link of this.findLinksInto(null)) {
-			var newToken = new PropToken(token.machine, link);
-		}
-		token.delete();
-		return null;
-	}
-
 	copy() {
 		var con = new Contract(this.name);
 		con.text = this.text;
