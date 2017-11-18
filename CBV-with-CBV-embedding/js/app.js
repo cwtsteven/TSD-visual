@@ -4,6 +4,10 @@ Array.prototype.last = function() {
     return this[this.length-1];
 }
 
+function isNumber(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 var play = false;
 var playing = false;
 var finished = false;

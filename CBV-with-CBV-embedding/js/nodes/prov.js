@@ -30,7 +30,7 @@ class Prov extends Node {
 			var data = token.dataStack.last();
 			var data2 = token.dataStack[token.dataStack.length-2];
 
-			if ((Number.isInteger(data) || typeof(data) === "boolean")) {
+			if ((isNumber(data) || typeof(data) === "boolean")) {
 				var mod = new Mod().addToGroup(this.group);
 				var con = new Const(data).addToGroup(this.group);
 				new Link(mod.key, con.key, "w", "s").addToGroup(this.group);
