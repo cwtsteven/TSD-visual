@@ -37,6 +37,12 @@ class Propagation {
   }
 }
 
+class Deprecate {
+  constructor(term) {
+    this.term = term;
+  }
+}
+
 class Identifier {
   /**
    * name is the string matched for this identifier.

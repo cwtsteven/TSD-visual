@@ -155,6 +155,10 @@ class Parser {
     else if (this.lexer.skip(Token.PROP)) {
       return new Propagation();
     }
+    else if (this.lexer.skip(Token.DEP)) {
+      var term = this.term(ctx);
+      return new Deprecate(term);
+    }
     else if (this.lexer.skip(Token.CLPAREN)) {
       var term = this.term(ctx);
       this.lexer.match(Token.CRPAREN);

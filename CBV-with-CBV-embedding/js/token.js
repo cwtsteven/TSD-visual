@@ -70,7 +70,8 @@ var RewriteFlag = {
 	F_DELTA: '<∇>',
 	F_MODIFY: '<Δ>',
 	F_PROP: '<P>',
-	F_UPDATE: '<U>'
+	F_UPDATE: '<U>',
+	F_DEP: '<D>',
 }
 
 var BoxData = {

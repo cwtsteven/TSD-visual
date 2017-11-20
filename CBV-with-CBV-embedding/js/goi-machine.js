@@ -212,6 +212,13 @@ class GoIMachine {
 			return new Term(prov, term.auxs);
 		}
 
+		else if (ast instanceof Deprecate) {
+			var term = this.toGraph(ast.term, group);
+			var dep = new Dep().addToGroup(group);
+			new Link(dep.key, term.prin.key, "n", "s").addToGroup(group);
+			return new Term(dep, term.auxs);
+		}
+
 		else if (ast instanceof Change) {
 			var param = ast.param;
 			var delta = new Delta().addToGroup(group);
@@ -422,7 +429,7 @@ class GoIMachine {
 define('goi-machine', ['gc', 'graph', 'node', 'group', 'link', 'term', 'token', 'op', 'parser/ast', 'parser/token', 'parser/lexer', 'parser/parser'
 					, 'nodes/expo', 'nodes/abs', 'nodes/app', 'nodes/binop', 'nodes/const', 'nodes/contract'
 					, 'nodes/der', 'nodes/if', 'nodes/if1', 'nodes/if2', 'nodes/pax', 'nodes/promo'
-					, 'nodes/recur', 'nodes/start', 'nodes/unop', 'nodes/weak', 'nodes/prov', 'nodes/mod', 'nodes/delta', 'nodes/prop'],
+					, 'nodes/recur', 'nodes/start', 'nodes/unop', 'nodes/weak', 'nodes/prov', 'nodes/dep', 'nodes/mod', 'nodes/delta', 'nodes/prop'],
 	function() {
 		return new GoIMachine();	
 	}
