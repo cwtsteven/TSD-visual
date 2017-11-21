@@ -1,6 +1,5 @@
 var ModType = {
 	M: 'M',
-	MU: "Mᵘ",
 }
 
 class Mod extends Node {
@@ -81,9 +80,7 @@ class Mod extends Node {
 				var oldData = this.update(token.dataStack.last());
 
 				if (oldData != token.dataStack.last()) {
-					this.changeType(ModType.MU);
-					token.machine.uNodes.push(this.key);
-					token.machine.cells.splice(token.machine.cells.indexOf(this.key),1);
+					token.machine.hasUpdate = true;
 				}
 				token.delete();
 				return null;

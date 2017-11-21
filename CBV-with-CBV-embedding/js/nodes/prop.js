@@ -16,7 +16,7 @@ class Prop extends Node {
 	rewrite(token, nextLink) {
 		if (token.rewriteFlag == RewriteFlag.F_PROP && nextLink.to == this.key) {
 			token.rewriteFlag = RewriteFlag.EMPTY;
-			var data = CompData.UNIT; //token.machine.dNodes.length;
+			var data = !token.machine.hasUpdate; //token.machine.dNodes.length;
 			token.dataStack.pop();
 			token.dataStack.push(data);
 			var wrapper = BoxWrapper.create().addToGroup(this.group);

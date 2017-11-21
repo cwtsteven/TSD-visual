@@ -23,11 +23,10 @@ class GoIMachine {
 		this.token.isMain = true;
 		this.evalTokens = [];
 		this.cells = [];
-		this.uNodes = [];
 		this.readyEvalTokens = 0;
 		this.evaluating = false;
 		this.updating = false;
-		this.lastProp = 0;
+		this.hasUpdate = false;
 		this.gc = new GC(this.graph);
 		this.count = 0;
 	}
@@ -41,11 +40,10 @@ class GoIMachine {
 		this.token.reset();
 		this.evalTokens = [];
 		this.cells = [];
-		this.uNodes = [];
 		this.readyEvalTokens = 0;
 		this.evaluating = false;
 		this.updating = false;
-		this.lastProp = 0;
+		this.hasUpdate = false;
 		this.count = 0;
 		// create graph
 		var start = new Start().addToGroup(this.graph.child);
@@ -265,6 +263,7 @@ class GoIMachine {
 
 	startPropagation() {
 		this.evaluating = true;
+		this.hasUpdate = false;
 		for (let key of this.cells) {
 			var cell = this.graph.findNodeByKey(key);
 			var evalToken = new EvaluationToken(this);
@@ -323,23 +322,10 @@ class GoIMachine {
 					return;
 				}
 			}
-				
 
 			else if (this.updating) {
 				if (this.evalTokens.length == 0) {
 					this.updating = false;
-					if (this.uNodes.length != this.lastProp) {
-						this.lastProp = this.uNodes.length;
-						this.startPropagation();
-					}
-					else {
-						while (this.uNodes.length != 0) {
-							var key = this.uNodes.pop();
-							this.graph.findNodeByKey(key).changeType(ModType.M);
-							this.cells.push(key);
-						}
-						this.lastProp = 0;
-					}
 					return;
 				}
 				this.batchPass(this.evalTokens);
