@@ -127,7 +127,7 @@ class Lexer {
             str += c;
             c = this._nextChar();
 
-          } while (/[a-zA-Z]|'|_/.test(c));
+          } while (/[a-zA-Z]|'|_|[0-9]/.test(c));
 
           // put back the last char which is not part of the identifier
           this._index--;

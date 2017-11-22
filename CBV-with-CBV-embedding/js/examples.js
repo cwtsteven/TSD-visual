@@ -23,6 +23,14 @@ var circular =
 + 'let b = prop in\n'
 + 'x'
 
+var deprec = 
+  'let x = {1} in\n'
++ 'let y = dep x in\n'
++ 'let _ = set x to 2 in\n'
++ 'let b = prop in\n'
++ 'let b = prop in\n'
++ 'y'
+
 var batch_update = 
   'let x = {1} in\n'
 + 'let y = {2} in\n'
