@@ -58,7 +58,7 @@ require(["jquery", "renderer", "goi-machine"],
 		});
 
 		$("#btn-info").click(function (event) {
-		      alert("'λ' = \\lambda\n'⊞' = \\sq+\n'⊠' = \\sq*\n'⊡' = \\sq.");
+		      alert("'λ' = \\lambda");
 		});
 
 		$('#cb-show-key').change(function() {
