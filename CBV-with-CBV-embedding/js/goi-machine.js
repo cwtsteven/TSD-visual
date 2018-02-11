@@ -415,9 +415,9 @@ class GoIMachine {
 define('goi-machine', 
 	function(require) {
 		require('gc');
-		require('graph');
 		require('node');
 		require('group');
+		require('graph');
 		require('link');
 		require('term');
 		require('token');
