@@ -417,6 +417,10 @@ define('goi-machine', ['gc', 'graph', 'node', 'group', 'link', 'term', 'token', 
 					, 'nodes/der', 'nodes/if', 'nodes/if1', 'nodes/if2', 'nodes/pax', 'nodes/promo'
 					, 'nodes/recur', 'nodes/start', 'nodes/unop', 'nodes/weak', 'nodes/prov', 'nodes/dep', 'nodes/mod', 'nodes/delta', 'nodes/prop'],
 	function() {
+		requirejs(['gc', 'graph', 'node', 'group', 'link', 'term', 'token', 'op', 'parser/ast', 'parser/token', 'parser/lexer', 'parser/parser'
+					, 'nodes/expo', 'nodes/abs', 'nodes/app', 'nodes/binop', 'nodes/const', 'nodes/contract'
+					, 'nodes/der', 'nodes/if', 'nodes/if1', 'nodes/if2', 'nodes/pax', 'nodes/promo'
+					, 'nodes/recur', 'nodes/start', 'nodes/unop', 'nodes/weak', 'nodes/prov', 'nodes/dep', 'nodes/mod', 'nodes/delta', 'nodes/prop'])
 		return new GoIMachine();	
 	}
 );
