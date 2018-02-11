@@ -412,15 +412,39 @@ class GoIMachine {
 
 }
 
-define('goi-machine', ['gc', 'graph', 'node', 'group', 'link', 'term', 'token', 'op', 'parser/ast', 'parser/token', 'parser/lexer', 'parser/parser'
-					, 'nodes/expo', 'nodes/abs', 'nodes/app', 'nodes/binop', 'nodes/const', 'nodes/contract'
-					, 'nodes/der', 'nodes/if', 'nodes/if1', 'nodes/if2', 'nodes/pax', 'nodes/promo'
-					, 'nodes/recur', 'nodes/start', 'nodes/unop', 'nodes/weak', 'nodes/prov', 'nodes/dep', 'nodes/mod', 'nodes/delta', 'nodes/prop'],
-	function() {
-		requirejs(['gc', 'graph', 'node', 'group', 'link', 'term', 'token', 'op', 'parser/ast', 'parser/token', 'parser/lexer', 'parser/parser'
-					, 'nodes/expo', 'nodes/abs', 'nodes/app', 'nodes/binop', 'nodes/const', 'nodes/contract'
-					, 'nodes/der', 'nodes/if', 'nodes/if1', 'nodes/if2', 'nodes/pax', 'nodes/promo'
-					, 'nodes/recur', 'nodes/start', 'nodes/unop', 'nodes/weak', 'nodes/prov', 'nodes/dep', 'nodes/mod', 'nodes/delta', 'nodes/prop'])
+define('goi-machine', 
+	function(require) {
+		require('gc');
+		require('graph');
+		require('node');
+		require('group');
+		require('link');
+		require('term');
+		require('token');
+		require('op');
+		require('parser/ast');
+		require('parser/token');
+		require('parser/lexer');
+		require('parser/parser');
+		require('nodes/expo');
+		require('nodes/abs');
+		require('nodes/app');
+		require('nodes/binop');
+		require('nodes/const');
+		require('nodes/contract');
+		require('nodes/der');
+		require('nodes/if');
+		require('nodes/pax');
+		require('nodes/promo');
+		require('nodes/recur');
+		require('nodes/start');
+		require('nodes/unop');
+		require('nodes/weak');
+		require('nodes/prov');
+		require('nodes/dep');
+		require('nodes/mod');
+		require('nodes/delta');
+		require('nodes/prop');
 		return new GoIMachine();	
 	}
 );
