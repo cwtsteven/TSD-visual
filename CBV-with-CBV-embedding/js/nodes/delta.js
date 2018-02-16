@@ -1,61 +1,78 @@
-class Delta extends Node {
+define(function(require) {
 
-	constructor() {
-		super(null, "Δ");
-	}
-	
-	transition(token, link) {
-		if (link.to == this.key) {
-			token.dataStack.push(CompData.PROMPT);
-			//token.copyStack.push(CopyData.C);
-			return this.findLinksOutOf("e")[0];
+	var Node = require('node');
+	var CompData = require('token').CompData();
+	var RewriteFlag = require('token').RewriteFlag();
+	var BoxWrapper = require('box-wrapper');
+	var Const = require('nodes/const');
+	var Link = require('link');
+	var Weak = require('nodes/weak');
+
+	class Delta extends Node {
+
+		constructor() {
+			super(null, "Δ");
 		}
-		else if (link.from == this.key) {
-			if (link.fromPort == "e") {
-				token.dataStack.pop();
-				token.dataStack.push(CompData.DELTA + '(' + this.key + ')');
-				token.forward = true;
-				return this.findLinksOutOf("w")[0];
+		
+		transition(token, link) {
+			if (link.to == this.key) {
+				token.dataStack.push(CompData.PROMPT);
+				return this.findLinksOutOf("e")[0];
 			}
-			else if (link.fromPort == "w") {
-				if (token.dataStack[token.dataStack.length-2] == CompData.PROMPT) {
+			else if (link.from == this.key) {
+				if (link.fromPort == "e") {
 					token.dataStack.pop();
-					token.dataStack.pop();
-					token.dataStack.push(CompData.UNIT);
-					//token.copyStack.pop();
-					token.rewriteFlag = RewriteFlag.F_DELTA;
-					return this.findLinksInto(null)[0];
+					token.dataStack.push(CompData.DELTA);
+					token.forward = true;
+					return this.findLinksOutOf("w")[0];
+				}
+				else if (link.fromPort == "w") {
+					if (token.dataStack[token.dataStack.length-2] == CompData.PROMPT) {
+						var data = token.dataStack.pop();
+						token.dataStack.pop();
+						token.dataStack.push(CompData.UNIT);
+
+						token.rewriteFlag = RewriteFlag.F_NABLA + data.substring(2,data.length-1);
+						return this.findLinksInto(null)[0];
+					}
 				}
 			}
 		}
-	}
 
-	rewrite(token, nextLink) {
-		if (token.rewriteFlag == RewriteFlag.F_DELTA && nextLink.to == this.key) {
-			token.rewriteFlag = RewriteFlag.EMPTY;
-			var data = token.dataStack.last();
-			var weak1 = new Weak().addToGroup(this.group);
-			var weak2 = new Weak().addToGroup(this.group);
-			this.findLinksOutOf("w")[0].changeFrom(weak1.key, "n");
-			this.findLinksOutOf("e")[0].changeFrom(weak2.key, "n");
-			var wrapper = BoxWrapper.create().addToGroup(this.group);
-			var con = new Const(data).addToGroup(wrapper.box);
-			new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper);
-			this.findLinksInto(null)[0].changeTo(wrapper.prin.key, "s");
-			this.delete();
+		rewrite(token, nextLink) {
+			if (token.rewriteFlag.substring(0,3) == RewriteFlag.F_NABLA && nextLink.to == this.key) {
+				var key = token.rewriteFlag.substring(3,token.rewriteFlag.length);
+				token.rewriteFlag = RewriteFlag.EMPTY;
 
-			token.rewriteFlag = RewriteFlag.F_PROMO;
-			token.rewrite = true;
-			return nextLink;
+				var data = token.dataStack.last();
+				var weak1 = new Weak().addToGroup(this.group);
+				this.findLinksOutOf("w")[0].changeFrom(weak1.key, "n");
+
+				var mod = this.graph.findNodeByKey(key);
+				var weak2 = new Weak().addToGroup(this.group);
+				mod.findLinksOutOf('e')[0].changeFrom(weak2.key, 'n');
+				this.findLinksOutOf("e")[0].changeFrom(mod.key, "e");
+
+				var wrapper = BoxWrapper.create().addToGroup(this.group);
+				var con = new Const(data).addToGroup(wrapper.box);
+				new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper);
+				this.findLinksInto(null)[0].changeTo(wrapper.prin.key, "s");
+				this.delete();
+
+				token.rewrite = true;
+				return nextLink;
+			}
+
+			else if (token.rewriteFlag == RewriteFlag.EMPTY) {
+				token.rewrite = false;
+				return nextLink;
+			}
 		}
 
-		else if (token.rewriteFlag == RewriteFlag.EMPTY) {
-			token.rewrite = false;
-			return nextLink;
+		copy() {
+			return new Delta();
 		}
 	}
 
-	copy() {
-		return new Delta();
-	}
-}
+	return Delta;
+});

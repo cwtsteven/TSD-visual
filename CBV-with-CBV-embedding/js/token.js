@@ -1,80 +1,74 @@
-class MachineToken {
+define(function() {
 
-	constructor(machine) {
-		this.machine = machine;
-		this.reset();
+
+	var CompData = {
+		PROMPT: '*',
+		LAMBDA: 'λ',
+		R: '@',
+		DELTA: 'Δ',
+		NABLA: '∇',
+		UNIT: '•',
 	}
 
-	setLink(link) {
-		if (this.link != null) {
-			this.link.tokens.splice(this.link.tokens.indexOf(this), 1);
-			this.link.clearFocus();
+	var RewriteFlag = {
+		EMPTY: '□',
+		F_LAMBDA: '<λ>',
+		F_OP: '<$>',
+		F_IF: '<if>',
+		F_C: '<C>',
+		F_PROMO: '<!>',
+		F_RECUR: '<μ>',
+		F_MOD: '<M>',
+		F_DEP: '<D>',
+		F_NABLA: '<∇>',
+		F_DELTA: '<Δ>',
+		F_PROP: '<P>',
+	}
+
+	class MachineToken {
+
+		static CompData() { return CompData; }
+
+		static RewriteFlag() { return RewriteFlag; }
+
+		constructor(machine) {
+			this.machine = machine;
+			this.reset();
 		}
-		this.link = link;
-		if (this.link != null) {
-			this.link.tokens.push(this);
-			this.link.focus(this.colour);
+
+		setLink(link) {
+			if (this.link != null) {
+				//this.link.tokens.splice(this.link.tokens.indexOf(this), 1);
+				this.link.clearFocus();
+			}
+			this.link = link;
+			if (this.link != null) {
+				//this.link.tokens.push(this);
+				if (this.isMain)
+					this.link.focus("red");
+				else
+					this.link.focus("green");
+			}
+		}
+
+		reset() {
+			this.forward = true;
+			this.rewrite = false;
+			this.transited = false;
+			
+			this.link = null;
+			
+			this.rewriteFlag = RewriteFlag.EMPTY;
+			this.dataStack = [CompData.PROMPT];
+			this.boxStack = [];
+		}
+
+		delete() {
+			this.setLink(null);
+			this.machine.evalTokens.splice(this.machine.evalTokens.indexOf(this),1);
 		}
 	}
 
-	reset() {
-		this.forward = true;
-		this.transited = false;
-		this.setLink(null);
-	}
-}
-
-class EvaluationToken extends MachineToken {
-
-	constructor(machine) {
-		super(machine);
-		this.colour = 'red';
-		this.isMain = false;
-	}
-
-	reset() {
-		super.reset();
-
-		this.rewrite = false;
-		this.rewriteFlag = RewriteFlag.EMPTY;
-		this.dataStack = [CompData.PROMPT];
-		this.boxStack = [];
-	}
-
-	delete() {
-		this.setLink(null);
-		this.machine.evalTokens.splice(this.machine.evalTokens.indexOf(this),1);
-	}
-}
-
-var CompData = {
-	PROMPT: '*',
-	LAMBDA: 'λ',
-	R: '@',
-	I: 'I',
-	DELTA: 'Δ',
-	UNIT: '•',
-}
-
-var RewriteFlag = {
-	EMPTY: '□',
-	F_LAMBDA: '<λ>',
-	F_OP: '<$>',
-	F_IF: '<if>',
-	F_C: '<C>',
-	F_PROMO: '<!>',
-	F_RECUR: '<μ>',
-	F_MOD: '<M>',
-	F_INTER: '<I>',
-	F_U: '<U>',
-	F_DELTA: '<∇>',
-	F_MODIFY: '<Δ>',
-	F_PROP: '<P>',
-	F_UPDATE: '<U>',
-	F_DEP: '<D>',
-}
-
-var BoxData = {
-
-}
+	return MachineToken;
+});
 

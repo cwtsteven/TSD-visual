@@ -1,106 +1,81 @@
-var ModType = {
-	M: 'M',
-}
+define(function(require) {
 
-class Mod extends Node {
-	
-	constructor() {
-		super(null, "M");
-		this.type = ModType.M;
-		this.graph.machine.cells.push(this.key);
-	}
+	var Node = require('node');
+	var CompData = require('token').CompData();
+	var RewriteFlag = require('token').RewriteFlag();
+	var Delta = require('nodes/delta');
+	var Weak = require('nodes/weak');
+	var Contract = require('nodes/contract');
 
-	transition(token, link) {
-		if (link.to == this.key) {
-			var data = token.dataStack.last();
+	class Mod extends Node {
+		
+		constructor() {
+			super(null, "M");
+			this.graph.machine.cells.push(this.key);
+		}
 
-			if (data[0] == CompData.DELTA) {
-				token.rewriteFlag = RewriteFlag.F_MODIFY;
-				return this.findLinksOutOf("e")[0];
+		transition(token, link) {
+			if (link.to == this.key) {
+				var data = token.dataStack.last();
+
+				if (data == CompData.DELTA) {
+					token.dataStack.pop();
+					token.rewriteFlag = RewriteFlag.F_DELTA;
+					return this.findLinksOutOf("e")[0];
+				}
+
+				else {
+					return this.findLinksOutOf("w")[0];
+				}
 			}
-
-			else {
-				return this.findLinksOutOf("w")[0];
+			else if (link.from == this.key && link.fromPort == "w") {
+				return this.findLinksInto(null)[0];
+			}
+			else if (link.from == this.key && link.fromPort == "e") {
+				if (token.machine.evaluating) {
+					token.machine.newValues.set(this.key, token.dataStack.last());
+					token.delete();
+					return null;
+				}
+				
+				return this.findLinksInto(null)[0];
 			}
 		}
-		else if (link.from == this.key && link.fromPort == "w") {
-			return this.findLinksInto(null)[0];
-		}
-		else if (link.from == this.key && link.fromPort == "e") {
-			if (token.machine.evaluating) {
-				token.rewriteFlag = RewriteFlag.F_UPDATE;
-				token.machine.readyEvalTokens++;
+
+		update(data) {
+			var leftLink = this.findLinksOutOf("w")[0];
+
+			if ((isNumber(data) || typeof(data) === "boolean")) {
+				var value = this.graph.findNodeByKey(leftLink.to);
+				var oldData = value.name;
+				value.text = data;
+				value.name = data;
+				return oldData;
 			}
-			
-			return this.findLinksInto(null)[0];
-		}
-	}
-
-	update(data) {
-		var leftLink = this.findLinksOutOf("w")[0];
-
-		if ((isNumber(data) || typeof(data) === "boolean")) {
-			var value = this.graph.findNodeByKey(leftLink.to);
-			var oldData = value.name;
-			value.text = data;
-			value.name = data;
-			return oldData;
-		}
-	}
-
-	rewrite(token, nextLink) {
-		if (token.rewriteFlag == RewriteFlag.F_MODIFY && nextLink.from == this.key) {
-			token.rewriteFlag = RewriteFlag.EMPTY;
-
-			var data = token.dataStack.pop();
-			token.dataStack.push(CompData.UNIT);
-			var key = data.substring(2,data.length - 1);
-			var delta = this.graph.findNodeByKey(key);
-			var link = delta.findLinksOutOf("e")[0];
-			var toNode = this.graph.findNodeByKey(link.to);
-			var weak = new Weak().addToGroup(this.group);
-			new Link(weak.key, nextLink.to, "n", "s").addToGroup(this.group);
-			var con = new Contract(toNode.name).addToGroup(this.group);
-			nextLink.changeTo(con.key, "s");
-			new Link(delta.key, con.key, link.fromPort, "s").addToGroup(this.group);
-			link.changeFrom(con.key, "n");
-
-			token.forward = false;
-			token.rewrite = true;
-			return nextLink;
 		}
 
-		else if (token.rewriteFlag == RewriteFlag.F_UPDATE && nextLink.to == this.key) {
-			if (token.machine.evaluating) {
+		rewrite(token, nextLink) {
+			if (token.rewriteFlag == RewriteFlag.F_DELTA && nextLink.from == this.key) {
+				token.rewriteFlag = RewriteFlag.EMPTY;
+
+				token.dataStack.push(CompData.NABLA + '(' + this.key + ')');
+
+				token.forward = false;
 				token.rewrite = true;
 				return nextLink;
 			}
 
-			else if (token.machine.updating) {
-				var oldData = this.update(token.dataStack.last());
-
-				if (oldData != token.dataStack.last()) {
-					token.machine.hasUpdate = true;
-				}
-				token.delete();
-				return null;
+			else if (token.rewriteFlag == RewriteFlag.EMPTY) {
+				token.rewrite = false;
+				return nextLink;
 			}
 		}
 
-		else if (token.rewriteFlag == RewriteFlag.EMPTY) {
-			token.rewrite = false;
-			return nextLink;
+		copy() {
+			var mod = new Mod();
+			return mod;
 		}
 	}
-	
-	changeType(type) {
-		this.type = type;
-		this.text = type;
-	}
 
-	copy() {
-		var mod = new Mod();
-		mod.changeType(this.type);
-		return mod;
-	}
-}
+	return Mod;
+});

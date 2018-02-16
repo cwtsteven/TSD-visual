@@ -1,15 +1,21 @@
-class Pax extends Expo {
+define(function(require) {
 
-	constructor(name) {
-		super(null, "?", name);
-	}
+	var Expo = require('nodes/expo');
 
-	copy() {
-		return new Pax(this.name);
-	}
+	class Pax extends Expo {
 
-	delete() {
-		this.group.auxs.splice(this.group.auxs.indexOf(this), 1);
-		super.delete();
+		constructor(name) {
+			super(null, "?", name);
+		}
+
+		copy() {
+			return new Pax(this.name);
+		}
+
+		delete() {
+			this.group.auxs.splice(this.group.auxs.indexOf(this), 1);
+			super.delete();
+		}
 	}
-}
+	return Pax;
+});
