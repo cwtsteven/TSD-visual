@@ -3,6 +3,7 @@ define(function(require) {
 	var Node = require('node');
 	var CompData = require('token').CompData();
 	var RewriteFlag = require('token').RewriteFlag();
+	var State = require('link').State();
 	var Delta = require('nodes/delta');
 	var Weak = require('nodes/weak');
 	var Contract = require('nodes/contract');
@@ -19,17 +20,25 @@ define(function(require) {
 				var data = token.dataStack.last();
 
 				if (data == CompData.DELTA) {
-					token.dataStack.pop();
-					token.rewriteFlag = RewriteFlag.F_DELTA;
-					return this.findLinksOutOf("e")[0];
+					var nextLink = this.findLinksOutOf("e")[0];
+					return this.checkLinkState(nextLink, function() {
+						token.dataStack.pop();
+						token.rewriteFlag = RewriteFlag.F_DELTA;
+						return nextLink;
+					});
 				}
 
 				else {
-					return this.findLinksOutOf("w")[0];
+					var nextLink = this.findLinksOutOf("w")[0];
+					return this.checkLinkState(nextLink, function() {
+						return nextLink;
+					});
 				}
 			}
 			else if (link.from == this.key && link.fromPort == "w") {
-				return this.findLinksInto(null)[0];
+				var nextLink = this.findLinksInto(null)[0];
+				nextLink.state = State.O;
+				return nextLink;
 			}
 			else if (link.from == this.key && link.fromPort == "e") {
 				if (token.machine.evaluating) {
@@ -37,8 +46,9 @@ define(function(require) {
 					token.delete();
 					return null;
 				}
-				
-				return this.findLinksInto(null)[0];
+				var nextLink = this.findLinksInto(null)[0];
+				nextLink.state = State.O;
+				return nextLink;
 			}
 		}
 

@@ -3,6 +3,7 @@ define(function(require) {
 	var Node = require('node');
 	var CompData = require('token').CompData();
 	var RewriteFlag = require('token').RewriteFlag();
+	var State = require('link').State();
 	var BoxWrapper = require('box-wrapper');
 	var Const = require('nodes/const');
 	var Link = require('link');
@@ -16,8 +17,11 @@ define(function(require) {
 
 		transition(token, link) {
 			if (link.to == this.key) {
-				token.dataStack.push(CompData.PROMPT);
-				return this.findLinksOutOf(null)[0];
+				var nextLink = this.findLinksOutOf(null)[0];
+				return this.checkLinkState(nextLink, function() {
+					token.dataStack.push(CompData.PROMPT);
+					return nextLink;
+				});
 			}
 			else if (link.from == this.key) {
 				if (token.dataStack[token.dataStack.length-2] == CompData.PROMPT) {
@@ -42,13 +46,14 @@ define(function(require) {
 
 					var wrapper = BoxWrapper.create().addToGroup(this.group);
 					var newConst = new Const(data).addToGroup(wrapper.box);
-					new Link(wrapper.prin.key, newConst.key, "n", "s").addToGroup(wrapper);
+					new Link(wrapper.prin.key, newConst.key, "n", "s").addToGroup(wrapper).state = State.O;
 					nextLink.changeTo(wrapper.prin.key, "s");
 					
 					this.delete();
 					token.rewrite = true;
 				}
 
+				nextLink.state = State.O;
 				return nextLink;
 			}
 

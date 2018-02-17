@@ -2,6 +2,7 @@ define(function(require) {
 
 	var Node = require('node');
 	var CompData = require('token').CompData();
+	var State = require('link').State();
 
 	class Const extends Node {
 
@@ -14,6 +15,7 @@ define(function(require) {
 				token.dataStack.pop();
 				token.dataStack.push(this.name);
 				token.forward = false;
+				link.state = State.O;
 				return link;
 			}
 		}

@@ -3,6 +3,7 @@ define(function(require) {
 	var Node = require('node');
 	var CompData = require('token').CompData();
 	var RewriteFlag = require('token').RewriteFlag();
+	var State = require('link').State();
 	var BoxWrapper = require('box-wrapper');
 	var Const = require('nodes/const');
 	var Link = require('link');
@@ -34,10 +35,11 @@ define(function(require) {
 				token.dataStack.push(data);
 				var wrapper = BoxWrapper.create().addToGroup(this.group);
 				var con = new Const(data).addToGroup(wrapper.box);
-				new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper);
+				new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper).state = State.O;
 				nextLink.changeTo(wrapper.prin.key, "s");
 				this.delete();
 
+				nextLink.state = State.O;
 				token.rewrite = true;
 				return nextLink;
 			}

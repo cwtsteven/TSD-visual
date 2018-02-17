@@ -3,6 +3,7 @@ define(function(require) {
 	var Node = require('node');
 	var CompData = require('token').CompData();
 	var RewriteFlag = require('token').RewriteFlag();
+	var State = require('link').State();
 	var Term = require('term');
 	var Link = require('link');
 	var Expo = require('nodes/expo');
@@ -15,8 +16,11 @@ define(function(require) {
 
 		transition(token, link) {
 			if (link.to == this.key) {
-				token.rewriteFlag = RewriteFlag.F_RECUR;
-				return this.findLinksOutOf("e")[0];
+				var nextLink = this.findLinksOutOf("e")[0];
+				return this.checkLinkState(nextLink, function() {
+					token.rewriteFlag = RewriteFlag.F_RECUR;
+					return nextLink;
+				});
 			}
 		}
 

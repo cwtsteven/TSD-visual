@@ -2,6 +2,8 @@ var showKey = false;
 
 define(function(require) {
 
+	var State = require('link').State();
+
 	class Node {
 
 		constructor(shape, text, name) {
@@ -56,6 +58,16 @@ define(function(require) {
 					links.push(link);
 			}
 			return links;
+		}
+
+		checkLinkState(nextLink, callback) {
+			if (nextLink.state == State.U || nextLink.state == State.O) {
+				if (nextLink.state == State.U)
+					nextLink.state = State.B;
+				return callback();
+			}
+			else
+				return null;
 		}
 
 		copy(graph) {

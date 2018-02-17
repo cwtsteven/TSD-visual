@@ -3,6 +3,7 @@ define(function(require) {
 	var Node = require('node');
 	var CompData = require('token').CompData();
 	var RewriteFlag = require('token').RewriteFlag();
+	var State = require('link').State();
 	var Promo = require('nodes/promo');
 	var Weak = require('nodes/weak');
 
@@ -14,25 +15,36 @@ define(function(require) {
 
 		transition(token, link) {
 			if (link.to == this.key) {
-				token.dataStack.push(CompData.PROMPT);
-				return this.findLinksOutOf("w")[0];
+				var nextLink = this.findLinksOutOf("w")[0];
+				return this.checkLinkState(nextLink, function() {
+					token.dataStack.push(CompData.PROMPT);
+					return nextLink;
+				});
 			}
 			else if (link.from == this.key && link.fromPort == "w") {
 				if (token.dataStack.last() == true) {
-					token.dataStack.pop();
-					token.rewriteFlag = RewriteFlag.F_IF;
-					token.forward = true;
-					return this.findLinksOutOf("n")[0];
+					var nextLink = this.findLinksOutOf("n")[0];
+					return this.checkLinkState(nextLink, function() {
+						token.dataStack.pop();
+						token.rewriteFlag = RewriteFlag.F_IF;
+						token.forward = true;
+						return nextLink;
+					});
 				}
 				else if (token.dataStack.last() == false) {
-					token.dataStack.pop();
-					token.rewriteFlag = RewriteFlag.F_IF;
-					token.forward = true;
-					return this.findLinksOutOf("e")[0];
+					var nextLink = this.findLinksOutOf("e")[0];
+					return this.checkLinkState(nextLink, function() {
+						token.dataStack.pop();
+						token.rewriteFlag = RewriteFlag.F_IF;
+						token.forward = true;
+						return nextLink;
+					});
 				}
 			} 
 			else if (link.from == this.key) {
-				return this.findLinksInto(null)[0];
+				var nextLink = this.findLinksInto(null)[0];
+				nextLink.state = State.O;
+				return nextLink;
 			}
 		}
 

@@ -12,10 +12,15 @@ define(function(require) {
 
 		transition(token, link) {
 			if (link.to == this.key) {
-				return this.findLinksOutOf(null)[0];
+				var nextLink = this.findLinksOutOf(null)[0];
+				return this.checkLinkState(nextLink, function() {
+					return nextLink;
+				});
 			}
 			else if (link.from == this.key) {
-				return this.findLinksInto(null)[0];
+				var nextLink = this.findLinksInto(null)[0];
+				nextLink.state = State.O;
+				return nextLink;
 			}
 		}
 
@@ -24,6 +29,7 @@ define(function(require) {
 			var outLink = this.findLinksOutOf(null)[0];
 			if (outLink != null && inLink != null) {
 				inLink.changeTo(outLink.to, outLink.toPort);
+				inLink.state = outLink.state;
 			}
 			super.delete();
 		}

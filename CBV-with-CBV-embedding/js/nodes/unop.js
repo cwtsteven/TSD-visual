@@ -3,6 +3,7 @@ define(function(require) {
 	var Node = require('node');
 	var CompData = require('token').CompData();
 	var RewriteFlag = require('token').RewriteFlag();
+	var State = require('link').State();
 	var Link = require('link');
 	var BoxWrapper = require('box-wrapper');
 	var Promo = require('nodes/promo');
@@ -18,8 +19,11 @@ define(function(require) {
 
 		transition(token, link) {
 			if (link.to == this.key) {
-				token.dataStack.push(CompData.PROMPT);
-				return this.findLinksOutOf(null)[0];
+				var nextLink = this.findLinksOutOf(null)[0];
+				return this.checkLinkState(nextLink, function() {
+					token.dataStack.push(CompData.PROMPT);
+					return nextLink;
+				});
 			}
 			else if (link.from == this.key) {
 				if (token.dataStack[token.dataStack.length-2] == CompData.PROMPT) {
@@ -40,12 +44,13 @@ define(function(require) {
 				if (prev instanceof Promo) {
 					var wrapper = BoxWrapper.create().addToGroup(this.group);
 					var newConst = new Const(token.dataStack.last()).addToGroup(wrapper.box);
-					new Link(wrapper.prin.key, newConst.key, "n", "s").addToGroup(wrapper);
+					new Link(wrapper.prin.key, newConst.key, "n", "s").addToGroup(wrapper).state = State.O;
 					nextLink.changeTo(wrapper.prin.key, "s");
 					prev.group.delete();
 					this.delete();
 				}
-
+				
+				nextLink.state = State.O;
 				token.rewrite = true;
 				return nextLink;
 			}

@@ -3,6 +3,7 @@ define(function(require) {
 	var Node = require('node');
 	var CompData = require('token').CompData();
 	var RewriteFlag = require('token').RewriteFlag();
+	var State = require('link').State();
 	var Link = require('link');
 	var BoxWrapper = require('box-wrapper');
 	var Promo = require('nodes/promo');
@@ -18,13 +19,19 @@ define(function(require) {
 		
 		transition(token, link) {
 			if (link.to == this.key) {
-				token.dataStack.push(CompData.PROMPT);
-				return this.findLinksOutOf("e")[0];
+				var nextLink = this.findLinksOutOf("e")[0];
+				return this.checkLinkState(nextLink, function() {
+					token.dataStack.push(CompData.PROMPT);
+					return nextLink;
+				});
 			}
 			else if (link.from == this.key && link.fromPort == "e") {
-				token.dataStack.push(CompData.PROMPT);
-				token.forward = true;
-				return this.findLinksOutOf("w")[0];
+				var nextLink = this.findLinksOutOf("w")[0];
+				return this.checkLinkState(nextLink, function() {
+					token.dataStack.push(CompData.PROMPT);
+					token.forward = true;
+					return nextLink;
+				});
 			}
 			else if (link.from == this.key && link.fromPort == "w") {
 				if (token.dataStack[token.dataStack.length-3] == CompData.PROMPT) {
@@ -34,9 +41,9 @@ define(function(require) {
 				 	var result = this.binOpApply(this.subType, l, r);
 
 					token.dataStack.push(result);
-					token.rewriteFlag = RewriteFlag.F_OP;
-					return this.findLinksInto(null)[0];
-				}
+					token.rewriteFlag = RewriteFlag.F_OP;	
+					return this.findLinksInto(null)[0];;
+				}	
 			}
 		}
 
@@ -50,7 +57,7 @@ define(function(require) {
 				if (left instanceof Promo && right instanceof Promo) {
 					var wrapper = BoxWrapper.create().addToGroup(this.group);
 					var newConst = new Const(token.dataStack.last()).addToGroup(wrapper.box);
-					new Link(wrapper.prin.key, newConst.key, "n", "s").addToGroup(wrapper);
+					new Link(wrapper.prin.key, newConst.key, "n", "s").addToGroup(wrapper).state = State.O;
 					nextLink.changeTo(wrapper.prin.key, "s");
 					
 					left.group.delete();
@@ -58,6 +65,7 @@ define(function(require) {
 					this.delete();
 				}
 				
+				nextLink.state = State.O;
 				token.rewrite = true;
 				return nextLink;
 			}

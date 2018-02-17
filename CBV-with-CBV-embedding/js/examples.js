@@ -55,6 +55,18 @@ var if_then_else =
 + 'let _ = prop in\n'
 + 'y'
 
+var rewrite_in_prop =
+  'let x = {1} in\n'
++ 'let a = 3 in \n'
++ 'let f = λz.z + a in\n'
++ 'let y = if x <= 1 then {2} + a else f x in\n'
++ 'let m = {y + 4} in\n'
++ 'let n = {y + 5} in\n'
++ 'let _ = set x to 2 in\n'
++ 'let _ = prop in\n'
++ 'let _ = prop in\n'
++ 'm + n'
+
 var newton_method = 
   'let f = λx. 4*x*x*x + 3*x*x + 2*x + 1 in\n'
 + 'let f\' = λx. 12*x*x + 6*x + 2 in\n'

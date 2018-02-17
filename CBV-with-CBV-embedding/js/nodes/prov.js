@@ -3,6 +3,7 @@ define(function(require) {
 	var Node = require('node');
 	var CompData = require('token').CompData();
 	var RewriteFlag = require('token').RewriteFlag();
+	var State = require('link').State();
 	var Mod = require('nodes/mod');
 	var Const = require('nodes/const');
 	var Link = require('link');
@@ -17,8 +18,11 @@ define(function(require) {
 
 		transition(token, link) {
 			if (link.to == this.key) {
-				token.dataStack.push(CompData.PROMPT);
-				return this.findLinksOutOf(null)[0];
+				var nextLink = this.findLinksOutOf(null)[0];
+				return this.checkLinkState(nextLink, function() {
+					token.dataStack.push(CompData.PROMPT);
+					return nextLink;
+				});
 			}
 			else if (link.from == this.key) {
 				var data = token.dataStack.pop();
@@ -46,7 +50,7 @@ define(function(require) {
 				if ((isNumber(data) || typeof(data) === "boolean")) {
 					var mod = new Mod().addToGroup(this.group);
 					var con = new Const(data).addToGroup(this.group);
-					new Link(mod.key, con.key, "w", "s").addToGroup(this.group);
+					new Link(mod.key, con.key, "w", "s").addToGroup(this.group).state = State.O;
 					var outLink = this.findLinksOutOf(null)[0];
 					outLink.changeFrom(mod.key, "e");
 					var inLink = this.findLinksInto(null)[0];
@@ -54,7 +58,8 @@ define(function(require) {
 					this.delete();
 					token.rewrite = true;
 				}
-
+				
+				nextLink.state = State.O;
 				return nextLink;
 			}
 

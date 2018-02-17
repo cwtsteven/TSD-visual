@@ -3,6 +3,7 @@ define(function(require) {
 	var Node = require('node');
 	var CompData = require('token').CompData();
 	var RewriteFlag = require('token').RewriteFlag();
+	var State = require('link').State();
 	var BoxWrapper = require('box-wrapper');
 	var Const = require('nodes/const');
 	var Link = require('link');
@@ -16,15 +17,21 @@ define(function(require) {
 		
 		transition(token, link) {
 			if (link.to == this.key) {
-				token.dataStack.push(CompData.PROMPT);
-				return this.findLinksOutOf("e")[0];
+				var nextLink = this.findLinksOutOf("e")[0];
+				return this.checkLinkState(nextLink, function() {
+					token.dataStack.push(CompData.PROMPT);
+					return nextLink;
+				});
 			}
 			else if (link.from == this.key) {
 				if (link.fromPort == "e") {
-					token.dataStack.pop();
-					token.dataStack.push(CompData.DELTA);
-					token.forward = true;
-					return this.findLinksOutOf("w")[0];
+					var nextLink = this.findLinksOutOf("w")[0];
+					return this.checkLinkState(nextLink, function() {
+						token.dataStack.pop();
+						token.dataStack.push(CompData.DELTA);
+						token.forward = true;
+						return nextLink;
+					});
 				}
 				else if (link.fromPort == "w") {
 					if (token.dataStack[token.dataStack.length-2] == CompData.PROMPT) {
@@ -55,10 +62,11 @@ define(function(require) {
 
 				var wrapper = BoxWrapper.create().addToGroup(this.group);
 				var con = new Const(data).addToGroup(wrapper.box);
-				new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper);
+				new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper).state = State.O;
 				this.findLinksInto(null)[0].changeTo(wrapper.prin.key, "s");
 				this.delete();
-
+				
+				nextLink.state = State.O;
 				token.rewrite = true;
 				return nextLink;
 			}

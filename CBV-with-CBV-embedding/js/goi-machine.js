@@ -345,6 +345,7 @@ define('goi-machine', function(require) {
 				*/
 				if (this.evaluating) {
 					this.batchPass(this.evalTokens);
+					console.log(this.evalTokens);
 					if (this.evalTokens.length == 0) {
 						this.evaluating = false;
 						var machine = this;
@@ -376,10 +377,10 @@ define('goi-machine', function(require) {
 				
 				var nextLink;
 
-
 				token.rewrite = false;
 				nextLink = node.transition(token, token.link);
-				
+				console.log(nextLink);
+
 
 				if (nextLink != null) {
 					token.setLink(nextLink);
@@ -389,20 +390,24 @@ define('goi-machine', function(require) {
 					}
 				}
 				else {
-					token.setLink(null);
 					token.transited = false;
 					if (token.isMain) {
+						token.setLink(null);
 						//this.gc.collect();
 						play = false;
 						playing = false;
 						finished = true;
 					}
+					else
+						token.setLink(token.link);
 				}
 			}
+
 			else {
 				var target = token.forward ? token.link.from : token.link.to;
 				node = this.graph.findNodeByKey(target);
 				var nextLink = node.rewrite(token, token.link);
+				console.log(nextLink);
 				if (!token.rewrite) {
 					token.transited = false;
 					this.tokenPass(token, flag, dataStack, boxStack);

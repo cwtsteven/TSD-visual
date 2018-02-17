@@ -2,6 +2,7 @@ define(function(require) {
 	var Node = require('node');
 	var CompData = require('token').CompData();
 	var RewriteFlag = require('token').RewriteFlag();
+	var State = require('link').State();
 	var App = require('nodes/app');
 	var Expo = require('nodes/expo');	
 
@@ -18,12 +19,16 @@ define(function(require) {
 					token.dataStack.pop();
 					token.dataStack.push(CompData.LAMBDA);
 					token.forward = false;
+					link.state = State.O;
 					return link;
 				}
 				else if (data == CompData.R) {
-					token.dataStack.pop();
-					token.rewriteFlag = RewriteFlag.F_LAMBDA;
-					return this.findLinksOutOf(null)[0];
+					var nextLink = this.findLinksOutOf(null)[0];
+					return this.checkLinkState(nextLink, function() {
+						token.dataStack.pop();
+						token.rewriteFlag = RewriteFlag.F_LAMBDA;
+						return nextLink;
+					});
 				}
 			}
 		}
@@ -41,9 +46,11 @@ define(function(require) {
 
 					nextLink.changeFrom(appLink.from, appLink.fromPort);
 					nextLink.changeToGroup(appLink.group);
+					nextLink.state = appLink.state;
 					
 					otherNextLink.changeTo(appOtherLink.to, appOtherLink.toPort);
 					otherNextLink.reverse = false;
+					otherNextLink.state = appOtherLink.state;
 
 					var otherNode = this.graph.findNodeByKey(otherNextLink.from);
 					if (otherNode instanceof Expo) 
