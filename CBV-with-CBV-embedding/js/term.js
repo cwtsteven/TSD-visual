@@ -49,6 +49,7 @@ define('term', function(require) {
 						var outLink = leftAux.findLinksOutOf(null)[0];
 						if (typeof outLink != 'undefined') {
 							outLink.changeFrom(con.key, outLink.fromPort);
+							outLink.state = State.U;
 						}
 
 						new Link(rightAux.key, con.key, "n", "s").addToGroup(group).state = State.U;

@@ -50,7 +50,7 @@ define(function(require) {
 					
 					otherNextLink.changeTo(appOtherLink.to, appOtherLink.toPort);
 					otherNextLink.reverse = false;
-					otherNextLink.state = appOtherLink.state;
+					otherNextLink.state = State.U; //appOtherLink.state;
 
 					var otherNode = this.graph.findNodeByKey(otherNextLink.from);
 					if (otherNode instanceof Expo) 

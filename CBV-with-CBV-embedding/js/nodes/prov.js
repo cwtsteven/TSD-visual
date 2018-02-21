@@ -28,7 +28,7 @@ define(function(require) {
 				var data = token.dataStack.pop();
 				var data2 = token.dataStack.pop();
 				token.dataStack.push(data);
-				if (data2[0] == CompData.DELTA)
+				if (data2 == CompData.DELTA)
 					token.dataStack.push(CompData.NABLA);
 				token.rewriteFlag = RewriteFlag.F_MOD;
 				return this.findLinksInto(null)[0];
