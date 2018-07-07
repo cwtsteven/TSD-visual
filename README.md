@@ -8,11 +8,12 @@
          | λ <var>. <expr>
          | <expr> <expr>
          | <const>
+         | ~ <expr> 
          | <expr> + <expr> | <expr> - <expr> | <expr> * <expr> | <expr> / <expr> | <expr> <= <expr>
          | <expr> && <expr> | <expr> || <expr> 
          | rec <var>. <expr>
          | let <var> = <expr> in <expr>
-         | {<expr>}
-         | set <var> to <expr>
-         | prop
+         | { <expr> }
+         | link <var> to <expr>
+         | step
 ```
