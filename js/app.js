@@ -58,7 +58,7 @@ require(["jquery", "renderer", "goi-machine"],
 		});
 
 		$("#btn-info").click(function (event) {
-		      alert("'λ' = \\lambda");
+		      alert(info);
 		});
 
 		$('#cb-show-key').change(function() {
@@ -144,3 +144,24 @@ function specialChar(textarea) {
 		textarea.setSelectionRange(selection-6, selection-6);
 	}
 }
+
+var info = 
+  '<var> ::= {variables}\n'
++ '<bool> ::= true | false\n'
++ '<num> ::= {num}\n'
++ '<const> ::= <bool> | <num>\n'
++ '<expr> ::= <var>\n'
++ '         | λ <var>. <expr>\n'
++ '         | <expr> <expr>\n'
++ '         | <const>\n'
++ '         | ~ <expr> \n'
++ '         | <expr> + <expr> | <expr> - <expr> | <expr> * <expr> | <expr> / <expr> | <expr> <= <expr>\n'
++ '         | <expr> && <expr> | <expr> || <expr> \n'
++ '         | rec <var>. <expr>\n'
++ '         | let <var> = <expr> in <expr>\n'
++ '         | { <expr> }\n'
++ '         | link <var> to <expr>\n'
++ '         | step\n'
++ '\n'
++ '\n'
++ 'Speical characters: λ=\'\\lambda\''
