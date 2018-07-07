@@ -2,7 +2,6 @@ define(function(require) {
 
 	var CompData = require('token').CompData();
 	var RewriteFlag = require('token').RewriteFlag();
-	var State = require('link').State();
 
 	var Expo = require('nodes/expo');
 
@@ -15,15 +14,12 @@ define(function(require) {
 		transition(token, link) {
 			if (link.to == this.key) {
 				var nextLink = this.findLinksOutOf(null)[0];
-				return this.checkLinkState(nextLink, function() {
-					token.boxStack.push(link);
-					token.rewriteFlag = RewriteFlag.F_C;
-					return nextLink;
-				});
+				token.boxStack.push(link);
+				token.rewriteFlag = RewriteFlag.F_C;
+				return nextLink;
 			}
 			else if (link.from == this.key && token.boxStack.length > 0) {
 				var nextLink = token.boxStack.pop();
-				nextLink.state = State.O;
 				return nextLink;
 			}
 		}

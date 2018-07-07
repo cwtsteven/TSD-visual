@@ -1,14 +1,6 @@
 define(function() {
 
-	var State = {
-		U: 0,
-		B: 1,
-		O: 2,
-	}
-
 	class Link {
-
-		static State() { return State; }
 
 		constructor(from, to, fromPort, toPort, reverse) {
 			this.from = from;
@@ -21,8 +13,6 @@ define(function() {
 			this.penWidth = null;
 			this.addToGraph(graph); // cheating
 			this.addToNode(); // cheating
-
-			this.state = State.U;
 		}
 
 		addToNode() {

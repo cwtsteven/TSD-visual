@@ -300,7 +300,7 @@ define('goi-machine', function(require) {
 				evalToken.isMain = false;
 				evalToken.setLink(cell.findLinksOutOf('e')[0]);
 				this.evalTokens.push(evalToken);
-			}
+			} 
 		}
 
 		shuffle(a) {
@@ -345,7 +345,6 @@ define('goi-machine', function(require) {
 				*/
 				if (this.evaluating) {
 					this.batchPass(this.evalTokens);
-					console.log(this.evalTokens);
 					if (this.evalTokens.length == 0) {
 						this.evaluating = false;
 						var machine = this;
@@ -410,7 +409,7 @@ define('goi-machine', function(require) {
 				console.log(nextLink);
 				if (!token.rewrite) {
 					token.transited = false;
-					this.tokenPass(token, flag, dataStack, boxStack);
+					this.tokenPass(token, flag, dataStack, boxStack); 
 				}
 				else {
 					token.setLink(nextLink);
@@ -419,6 +418,8 @@ define('goi-machine', function(require) {
 				}
 			}
 		}
+
+		
 
 		printHistory(token, flag, dataStack, boxStack) {
 			flag.val(token.rewriteFlag + '\n' + flag.val());

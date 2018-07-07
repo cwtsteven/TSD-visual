@@ -22,21 +22,16 @@
   				select: function(event, ui) {
   					var prog;
   					switch($("#sm-example option:selected").val()) {
-  						case "fact": prog = fact; break;
-  						case "prov": prog = prov; break;
-  						case "circular": prog = circular; break;
-  						case "deprec": prog = deprec; break;
-  						case "batch_update": prog = batch_update; break;
-  						case "if_then_else": prog = if_then_else; break;
-  						case "rewrite_in_prop": prog = rewrite_in_prop; break;
-  						case "newton_method": prog = newton_method; break;
+  						case "max": prog = max_ex; break;
+  						case "alt": prog = alt_ex; break;
+  						case "fir3": prog = fir3_ex; break;
+  						case "rsum": prog = rsum_ex; break;
   					}
   					$("#ta-program").val(prog);
   					$("#btn-make-graph").click();
   				}
   			});
-			
-  			//$("#ta-program").val(prov);
+
   		});
   	</script>
 </head>
@@ -44,14 +39,10 @@
 <body>
 	<div class="left">
 		<select id="sm-example">
-			<!--<option value="fact" selected>Factorial</option>-->
-			<option value="prov">Provisonal terms</option>
-			<option value="circular">Circular dependence</option>
-			<option value="deprec">Deprecate</option>
-			<option value="batch_update">Batch update</option>
-			<option value="if_then_else">If then else</option>
-			<option value="rewrite_in_prop">Rewrite in propagation</option>
-			<option value="newton_method">Newton method</option>
+			<option value="max">Maximum of two int</option>
+			<option value="alt">Alternating signal</option>
+			<option value="fir3">Finite impulse response filter</option>
+			<option value="rsum">Running sum</option>
 		</select>
 		<button id="btn-info">?</button>
 		<textarea id="ta-program" rows="40" spellcheck=false style="width: 100%; height: 37%; resize: none; font-size: 12px;">

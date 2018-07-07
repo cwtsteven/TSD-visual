@@ -2,12 +2,13 @@ define(function() {
 
 
 	var CompData = {
+		EMPTY: '-',
 		PROMPT: '*',
 		LAMBDA: 'λ',
 		R: '@',
-		DELTA: 'Δ',
-		NABLA: '∇',
 		UNIT: '•',
+		IF0: 'if0',
+		IF1: 'if1',
 	}
 
 	var RewriteFlag = {
@@ -19,10 +20,9 @@ define(function() {
 		F_PROMO: '<!>',
 		F_RECUR: '<μ>',
 		F_MOD: '<M>',
-		F_DEP: '<D>',
-		F_NABLA: '<∇>',
+		F_DEP: '<p>',
 		F_DELTA: '<Δ>',
-		F_PROP: '<P>',
+		F_PROP: '<s>',
 	}
 
 	class MachineToken {

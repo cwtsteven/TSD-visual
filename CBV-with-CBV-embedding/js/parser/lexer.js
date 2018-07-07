@@ -140,7 +140,7 @@ define(function(require) {
               this._token = new Token(Token.LET);
             else if (str == "in")
               this._token = new Token(Token.IN);
-            else if (str == "rec")
+            else if (str == "rec") 
               this._token = new Token(Token.REC);
             else if (str == "true")
               this._token = new Token(Token.TRUE);
@@ -152,13 +152,13 @@ define(function(require) {
               this._token = new Token(Token.THEN);
             else if (str == "else")
               this._token = new Token(Token.ELSE);
-            else if (str == "set")
+            else if (str == "link")
               this._token = new Token(Token.CHANGE);
             else if (str == "to")
               this._token = new Token(Token.TO);
-            else if (str == "prop")
+            else if (str == "step")
               this._token = new Token(Token.PROP);
-            else if (str == "dep")
+            else if (str == "peek")
               this._token = new Token(Token.DEP)
             else
               this._token = new Token(Token.LCID, str);

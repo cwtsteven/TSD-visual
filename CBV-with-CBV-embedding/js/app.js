@@ -131,7 +131,7 @@ require(["jquery", "renderer", "goi-machine"],
 
 		renderer.init("#graph");
 		//renderer.init({element: "#graph", zoom: {extent: [0.1, 10]}})
-		$("#ta-program").val(prov);
+		$("#ta-program").val(max_ex);
   		$("#btn-make-graph").click();
 	}
 );

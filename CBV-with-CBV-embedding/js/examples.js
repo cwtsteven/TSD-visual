@@ -1,85 +1,58 @@
-var fact = 
-  'let fact = rec f. λx.\n'
-+ '  if (x <= 1)\n'
-+ '  then 1\n'
-+ '  else (x * (f (x - 1)))\n'
+var max_ex = 
+  'let max = λx.λy.if x <= y then y else x in\n'
++ '\n'
++ 'let x = {1} in\n'
++ 'let y = {2} in\n'
++ 'let m = max x y in\n'
++ 'let _ = step in\n'
++ 'let _ = link x to 3 in\n'
++ 'let _ = step in\n'
++ 'm';
+
+var alt_ex =
+  'let s = {true} in\n' 
++ 'let _ = link s to (~s) in\n' 
++ 'let _ = step in\n' 
++ 'let _ = step in\n' 
++ 'let _ = step in\n' 
++ 's'; 
+
+var fir3_ex =
+  'let fir3 = λf.λx. \n' 
++ '  let s0 = {0} in\n'
++ '  let s1 = {0} in\n'
++ '  let s2 = {0} in\n'
++ '  let _ = link s0 to x in\n'
++ '  let _ = link s1 to s0 in\n'
++ '  let _ = link s2 to s2 in\n'
++ '  ((f 0 s0) + (f 1 s1) + (f 2 s2))\n'
 + 'in\n'
 + '\n'
-+ 'fact 4';
-
-var prov = 
-  'let x = {1} in\n'
-+ 'let y = {x + 2} in\n'
-+ 'let _ = set x to 3 in\n'
-+ 'let b = prop in\n'
-+ 'let b = prop in\n'
-+ 'y'
-
-var circular = 
-  'let x = {1} in\n'
-+ 'let _ = set x to (x + 1) in\n'
-+ 'let b = prop in\n'
-+ 'let b = prop in\n'
-+ 'let b = prop in\n'
-+ 'x'
-
-var deprec = 
-  'let x = {1} in\n'
-+ 'let y = dep x in\n'
-+ 'let _ = set x to 2 in\n'
-+ 'let b = prop in\n'
-+ 'let b = prop in\n'
-+ 'y'
-
-var batch_update = 
-  'let x = {1} in\n'
-+ 'let y = {2} in\n'
-+ 'let m = {x + 3} in\n'
-+ 'let n = {y + 4} in\n'
-+ 'let z = {m + n} + {m + n} in\n'
-+ 'let _ = set x to 5 in\n'
-+ 'let _ = set y to 6 in\n'
-+ 'let b = prop in\n'
-+ 'let b = prop in\n'
-+ 'let b = prop in\n'
-+ 'let b = prop in\n'
-+ 'z'
-
-var if_then_else = 
-  'let x = {1} in\n'
-+ 'let y = if x <= 1 then {2} else {3} in\n'
-+ 'let _ = set y to 4 in\n'
-+ 'let _ = set x to 2 in\n'
-+ 'let _ = prop in\n'
-+ 'let _ = set y to 5 in\n'
-+ 'let _ = prop in\n'
-+ 'y'
-
-var rewrite_in_prop =
-  'let x = {1} in\n'
-+ 'let a = 3 in \n'
-+ 'let f = λz.z + a in\n'
-+ 'let y = if x <= 1 then {2} + a else f x in\n'
-+ 'let m = {y + 4} in\n'
-+ 'let n = {y + 5} in\n'
-+ 'let _ = set x to 2 in\n'
-+ 'let _ = prop in\n'
-+ 'let _ = prop in\n'
-+ 'm + n'
-
-var newton_method = 
-  'let f = λx. 4*x*x*x + 3*x*x + 2*x + 1 in\n'
-+ 'let f\' = λx. 12*x*x + 6*x + 2 in\n'
-+ 'let x = {1} in\n'
-+ 'let _ = set x to x - (f x) / (f\' x) in\n'
++ 'let avg3 = fir3 (λy.λx. x / 3) {1} in\n' 
 + '\n'
-+ 'let b = prop in\n'
-+ 'let b = prop in\n'
-+ 'let b = prop in\n'
-+ 'let b = prop in\n'
-+ 'let b = prop in\n'
-+ 'let b = prop in\n'
-+ 'let b = prop in\n'
-+ 'let b = prop in\n'
++ 'let _ = step in\n' 
++ 'let _ = step in\n' 
++ 'let _ = step in\n' 
++ 'avg3'; 
+
+var rsum_ex =
+  'let signal =  \n' 
++ '  let s = {1} in\n'
++ '  let _ = link s to (s + 1) in\n'
++ '  s\n'
++ 'in\n'
 + '\n'
-+ 'x\n'
++ 'let rsum = λi. \n' 
++ '  let s = {0} in\n'
++ '  let _ = link s to (s + i) in\n'
++ '  s\n'
++ 'in\n'
++ '\n'
++ 'let o = rsum signal in\n' 
++ 'let _ = step in\n' 
++ 'let _ = step in\n' 
++ 'let _ = step in\n' 
++ 'let _ = step in\n' 
++ 'let _ = step in\n' 
++ 'let _ = step in\n' 
++ 'o'; 

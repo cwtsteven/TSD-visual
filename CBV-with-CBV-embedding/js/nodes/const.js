@@ -2,7 +2,6 @@ define(function(require) {
 
 	var Node = require('node');
 	var CompData = require('token').CompData();
-	var State = require('link').State();
 
 	class Const extends Node {
 
@@ -13,9 +12,8 @@ define(function(require) {
 		transition(token, link) {
 			if (token.dataStack.last() == CompData.PROMPT) {
 				token.dataStack.pop();
-				token.dataStack.push(this.name);
+				token.dataStack.push([this.name,CompData.EMPTY]);
 				token.forward = false;
-				link.state = State.O;
 				return link;
 			}
 		}

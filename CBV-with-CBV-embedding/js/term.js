@@ -1,6 +1,5 @@
 define('term', function(require) {
 
-	var State = require('link').State();
 	var Group = require('group');
 	var Link = require('link');
 	var Pax = require('nodes/pax');
@@ -49,11 +48,10 @@ define('term', function(require) {
 						var outLink = leftAux.findLinksOutOf(null)[0];
 						if (typeof outLink != 'undefined') {
 							outLink.changeFrom(con.key, outLink.fromPort);
-							outLink.state = State.U;
 						}
 
-						new Link(rightAux.key, con.key, "n", "s").addToGroup(group).state = State.U;
-						new Link(leftAux.key, con.key, "n", "s").addToGroup(group).state = State.U;
+						new Link(rightAux.key, con.key, "n", "s").addToGroup(group);
+						new Link(leftAux.key, con.key, "n", "s").addToGroup(group);
 						newAuxs.splice(newAuxs.indexOf(leftAux), 1);
 						newAuxs.splice(newAuxs.indexOf(rightAux), 1);
 						newAuxs.push(con);

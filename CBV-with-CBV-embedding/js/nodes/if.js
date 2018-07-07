@@ -3,7 +3,6 @@ define(function(require) {
 	var Node = require('node');
 	var CompData = require('token').CompData();
 	var RewriteFlag = require('token').RewriteFlag();
-	var State = require('link').State();
 	var Promo = require('nodes/promo');
 	var Weak = require('nodes/weak');
 
@@ -16,35 +15,58 @@ define(function(require) {
 		transition(token, link) {
 			if (link.to == this.key) {
 				var nextLink = this.findLinksOutOf("w")[0];
-				return this.checkLinkState(nextLink, function() {
-					token.dataStack.push(CompData.PROMPT);
-					return nextLink;
-				});
+				token.dataStack.push(CompData.PROMPT);
+				return nextLink;
 			}
 			else if (link.from == this.key && link.fromPort == "w") {
-				if (token.dataStack.last() == true) {
-					var nextLink = this.findLinksOutOf("n")[0];
-					return this.checkLinkState(nextLink, function() {
+				var left = this.graph.findNodeByKey(this.findLinksOutOf("w")[0].to);
+				if (left instanceof Promo) {
+					if (token.dataStack.last()[0] == true) {
+						var nextLink = this.findLinksOutOf("n")[0];
 						token.dataStack.pop();
 						token.rewriteFlag = RewriteFlag.F_IF;
 						token.forward = true;
-						return nextLink;
-					});
+						return nextLink; 
+					}
+					else if (token.dataStack.last()[0] == false) {
+						var nextLink = this.findLinksOutOf("e")[0];
+						token.dataStack.pop();
+						token.rewriteFlag = RewriteFlag.F_IF;
+						token.forward = true;
+						return nextLink; 
+					}
 				}
-				else if (token.dataStack.last() == false) {
-					var nextLink = this.findLinksOutOf("e")[0];
-					return this.checkLinkState(nextLink, function() {
-						token.dataStack.pop();
-						token.rewriteFlag = RewriteFlag.F_IF;
-						token.forward = true;
-						return nextLink;
-					});
+				else {
+					var nextLink = this.findLinksOutOf("n")[0];
+					var data = token.dataStack.pop();
+					token.dataStack.push(data[0]);
+					token.dataStack.push(CompData.PROMPT);
+					token.forward = true;
+					return nextLink; 
 				}
 			} 
 			else if (link.from == this.key) {
-				var nextLink = this.findLinksInto(null)[0];
-				nextLink.state = State.O;
-				return nextLink;
+				if (link.fromPort == "n") {
+					var nextLink = this.findLinksOutOf("e")[0];
+					token.dataStack.push(CompData.PROMPT);
+					token.forward = true;
+					return nextLink; 
+				}
+				else if (link.fromPort == "e") {
+					var nextLink = this.findLinksInto("s")[0];
+					var y = token.dataStack.pop();
+					var x = token.dataStack.pop();
+					var cond = token.dataStack.pop();
+					var result;
+					if (cond) 
+						result = x;
+					else
+						result = y;
+					token.dataStack.pop();
+					token.dataStack.push(result);
+					token.forward = false;
+					return nextLink; 
+				}
 			}
 		}
 

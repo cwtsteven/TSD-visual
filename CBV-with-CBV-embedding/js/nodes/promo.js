@@ -2,7 +2,6 @@ define(function(require) {
 
 	var CompData = require('token').CompData();
 	var RewriteFlag = require('token').RewriteFlag();
-	var State = require('link').State();
 	var Term = require('term');
 	var Link = require('link');
 	var Expo = require('nodes/expo');
@@ -18,14 +17,11 @@ define(function(require) {
 		transition(token, link) {
 			if (link.to == this.key) {
 				var nextLink = this.findLinksOutOf(null)[0];
-				return this.checkLinkState(nextLink, function() {
-					token.rewriteFlag = RewriteFlag.F_PROMO;
-					return nextLink;
-				});
+				token.rewriteFlag = RewriteFlag.F_PROMO;
+				return nextLink;
 			}
 			else if (link.from == this.key) {
 				var nextLink = this.findLinksInto(null)[0];
-				nextLink.state = State.O;
 				return nextLink;
 			}
 		}
@@ -55,13 +51,13 @@ define(function(require) {
 						else {
 							var newBoxWrapper = this.group.copy().addToGroup(this.group.group);
 							Term.joinAuxs(this.group.auxs, newBoxWrapper.auxs, newBoxWrapper.group);
-							link.changeTo(newBoxWrapper.prin.key, "s");
-							link.state = State.U;
-							var newLink = newBoxWrapper.prin.findLinksOutOf(null)[0];
+							var prevLink = prev.findLinksOutOf(null)[0];
+							prevLink.changeTo(newBoxWrapper.prin.key, prev.findLinksOutOf(null)[0].toPort);
+							link.changeTo(this.key, "s");
 						}
 						token.rewriteFlag = RewriteFlag.F_PROMO;
 						token.rewrite = true;
-						return newLink;
+						return nextLink;
 					}
 				}
 				token.rewrite = true;

@@ -125,7 +125,7 @@ define(function(require) {
         else if (this.lexer.skip(Token.CLPAREN)) {
           rhs = this.term(ctx);
           this.lexer.match(Token.CRPAREN);
-          lhs = new ProvApplication(lhs, rhs);
+          lhs = new Application(lhs, rhs);
         }
         else {
           rhs = this.atom(ctx);

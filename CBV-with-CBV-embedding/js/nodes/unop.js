@@ -3,7 +3,6 @@ define(function(require) {
 	var Node = require('node');
 	var CompData = require('token').CompData();
 	var RewriteFlag = require('token').RewriteFlag();
-	var State = require('link').State();
 	var Link = require('link');
 	var BoxWrapper = require('box-wrapper');
 	var Promo = require('nodes/promo');
@@ -20,16 +19,14 @@ define(function(require) {
 		transition(token, link) {
 			if (link.to == this.key) {
 				var nextLink = this.findLinksOutOf(null)[0];
-				return this.checkLinkState(nextLink, function() {
-					token.dataStack.push(CompData.PROMPT);
-					return nextLink;
-				});
+				token.dataStack.push(CompData.PROMPT);
+				return nextLink;
 			}
 			else if (link.from == this.key) {
 				if (token.dataStack[token.dataStack.length-2] == CompData.PROMPT) {
 					var v1 = token.dataStack.pop();
 							 token.dataStack.pop();
-					token.dataStack.push(this.unOpApply(this.subType, v1));
+					token.dataStack.push([this.unOpApply(this.subType, v1[0]),CompData.EMPTY]);
 					token.rewriteFlag = RewriteFlag.F_OP;
 					return this.findLinksInto(null)[0];
 				}
@@ -43,14 +40,13 @@ define(function(require) {
 				var prev = this.graph.findNodeByKey(this.findLinksOutOf(null)[0].to);
 				if (prev instanceof Promo) {
 					var wrapper = BoxWrapper.create().addToGroup(this.group);
-					var newConst = new Const(token.dataStack.last()).addToGroup(wrapper.box);
-					new Link(wrapper.prin.key, newConst.key, "n", "s").addToGroup(wrapper).state = State.O;
+					var newConst = new Const(token.dataStack.last()[0]).addToGroup(wrapper.box);
+					new Link(wrapper.prin.key, newConst.key, "n", "s").addToGroup(wrapper);
 					nextLink.changeTo(wrapper.prin.key, "s");
-					prev.group.delete();
-					this.delete();
+					prev.group.delete(); 
+					this.delete(); 
 				}
 				
-				nextLink.state = State.O;
 				token.rewrite = true;
 				return nextLink;
 			}
