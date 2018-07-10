@@ -122,11 +122,6 @@ define(function(require) {
         if (this.isBinaryOp(this.lexer.lookahead())) {
           lhs = this.parseBinop(ctx, lhs, 0);
         }
-        else if (this.lexer.skip(Token.CLPAREN)) {
-          rhs = this.term(ctx);
-          this.lexer.match(Token.CRPAREN);
-          lhs = new Application(lhs, rhs);
-        }
         else {
           rhs = this.atom(ctx);
           
