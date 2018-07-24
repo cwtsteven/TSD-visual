@@ -10,7 +10,7 @@ define(function(require) {
 	class Mod extends Node {
 		
 		constructor() {
-			super(null, "M", "mediumpurple1");
+			super(null, "M", "indianred1");
 			this.graph.machine.cells.push(this.key);
 		}
 

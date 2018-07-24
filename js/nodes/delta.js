@@ -11,7 +11,7 @@ define(function(require) {
 	class Delta extends Node {
 
 		constructor() {
-			super(null, "Δ", "mediumpurple1");
+			super(null, "Δ", "indianred1");
 		}
 		
 		transition(token, link) {
