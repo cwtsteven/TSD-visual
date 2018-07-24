@@ -10,7 +10,7 @@ define(function(require) {
 	class Recur extends Expo {
 
 		constructor() {
-			super(null, "μ");
+			super(null, "μ", "mediumpurple1");
 		}
 
 		transition(token, link) {

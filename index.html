@@ -2,11 +2,11 @@
 <head>
 	<meta charset="utf-8">
   	<title>GoI-SAC Visualiser</title>
-  	<link rel="stylesheet" type="text/css" href="./css/jquery-ui.css">
+  	<link rel="stylesheet" type="text/css" href="./jquery-ui/jquery-ui.css">
   	<link rel="stylesheet" type="text/css" href="./css/main.css">
-  	<script src="./jquery-ui/jquery.js"></script>
+  	<script src="./jquery-ui/external/jquery/jquery.js"></script>
   	<script src="./jquery-ui/jquery-ui.js"></script>
-  	<script src="./js/examples.js"></script>
+  	<script src="./js/examples.js"></script>  
   	<script>
   		$(function() {
   			$("#btn-make-graph").button();
@@ -19,16 +19,16 @@
         	$("#cb-draw").checkboxradio(); 
   			
   			$("#sm-example").selectmenu({
-  				select: function(event, ui) {
+  				change: function(event, ui) {
   					var prog;
   					switch($("#sm-example option:selected").val()) {
   						case "max": prog = max_ex; break;
   						case "alt": prog = alt_ex; break;
-  						case "fir3": prog = fir3_ex; break;
+  						case "avg3": prog = avg3_ex; break;
   						case "rsum": prog = rsum_ex; break;
   					}
   					$("#ta-program").val(prog);
-  					$("#btn-make-graph").click();
+  					$("#btn-make-graph").click(); 
   				}
   			});
 
@@ -41,7 +41,7 @@
 		<select id="sm-example">
 			<option value="max">Maximum of two int</option>
 			<option value="alt">Alternating signal</option>
-			<option value="fir3">Finite impulse response filter</option>
+			<option value="avg3">Finite impulse response filter (1)</option>
 			<option value="rsum">Running sum</option>
 		</select>
 		<button id="btn-info">?</button>
@@ -74,11 +74,25 @@
 	<div>
 	<div style="clear: both;">
 		This is a simulation tool of a GoI-style abstract machine implementing the S<sup>2</sup>AC calculus.</br>
-		Literature: </br>
-		Implemented by <a href=http://www.cs.bham.ac.uk/~wtc488/ target="_blank">Steven Cheung</a>, using <a href=https://github.com/mstefaniuk/graph-viz-d3-js target="_blank">graph-viz-d3-js</a> for generating diagrams and <a href=https://github.com/tadeuzagallo/lc-js>lo-js</a> for parsing.
+		Implemented using <a href=https://github.com/mstefaniuk/graph-viz-d3-js target="_blank">graph-viz-d3-js</a> for generating diagrams and <a href=https://github.com/tadeuzagallo/lc-js>lo-js</a> for parsing.
 	</div>
 
 	<script src="./bower_components/requirejs/require.js" data-main="main.js"></script>
+	<script type="text/javascript">
+		var url = new URL(window.location.href);
+		var ex = url.searchParams.get('ex');
+		var prog;
+		$("#sm-example").val(ex);
+		
+		switch(ex) {
+			case "max": prog = max_ex; break;
+			case "alt": prog = alt_ex; break;
+			case "avg3": prog = avg3_ex; break;
+			case "rsum": prog = rsum_ex; break;
+			default: prog = max_ex;$("#sm-example").val("max")
+		}
+		$("#ta-program").val(prog);
+	</script>
 </body>
 
 </html>

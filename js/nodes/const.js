@@ -6,7 +6,7 @@ define(function(require) {
 	class Const extends Node {
 
 		constructor(name) {
-			super(null, name, name);
+			super(null, name, "mediumpurple1", name);
 		}
 		
 		transition(token, link) {

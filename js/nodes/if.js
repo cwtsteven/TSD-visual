@@ -9,7 +9,7 @@ define(function(require) {
 	class If extends Node {
 
 		constructor() {
-			super(null, "if");
+			super(null, "if", "mediumpurple1");
 		}
 
 		transition(token, link) {

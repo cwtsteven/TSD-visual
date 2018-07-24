@@ -4,10 +4,11 @@ define(function(require) {
 
 	class Node {
 
-		constructor(shape, text, name) {
+		constructor(shape, text, colour, name) {
 			this.key = null;
 			this.shape = shape;
 			this.text = text;
+			this.colour = colour;
 			this.name = name; // identifier name or constant name if any
 			this.graph = null;
 			this.group = null;
@@ -81,6 +82,8 @@ define(function(require) {
 				str += ',width=' + this.width;
 			if (this.height != null)
 				str += ',height=' + this.height;
+			str += 'style=filled,'
+			str += 'fillcolor=' + this.colour + ",";
 			return str += '];'
 		}
 

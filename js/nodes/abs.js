@@ -8,7 +8,7 @@ define(function(require) {
 	class Abs extends Node {
 
 		constructor() {
-			super(null, "λ");
+			super(null, "λ", "yellow");
 		}
 		
 		transition(token, link) {

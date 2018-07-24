@@ -131,7 +131,7 @@ require(["jquery", "renderer", "goi-machine"],
 
 		renderer.init("#graph");
 		//renderer.init({element: "#graph", zoom: {extent: [0.1, 10]}})
-		$("#ta-program").val(max_ex);
+
   		$("#btn-make-graph").click();
 	}
 );
@@ -161,6 +161,7 @@ var info =
 + '         | let <var> = <expr> in <expr>\n'
 + '         | { <expr> }\n'
 + '         | link <var> to <expr>\n'
++ '         | peek <expr>\n'
 + '         | step\n'
 + '\n'
 + '\n'

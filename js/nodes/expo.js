@@ -5,7 +5,7 @@ define(function(require) {
 	class Expo extends Node {
 
 		constructor(shape, text, name) {
-			super(shape, text, name);
+			super(shape, text, "cyan", name);
 			this.width = ".3";
 			this.height = ".3";
 		}

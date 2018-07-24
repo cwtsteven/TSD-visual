@@ -12,7 +12,7 @@ define(function(require) {
 	class BinOp extends Node {
 
 		constructor(text) {
-			super(null, text);
+			super(null, text, "mediumpurple1");
 			this.subType = null;
 		}
 		

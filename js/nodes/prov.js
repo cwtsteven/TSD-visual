@@ -10,7 +10,7 @@ define(function(require) {
 	class Prov extends Node {
 		
 		constructor() {
-			super('diamond', '');
+			super('diamond', '', "mediumpurple1");
 			this.width = ".3";
 			this.height = ".3";
 		}

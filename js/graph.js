@@ -54,7 +54,7 @@ define(function(require) {
 			return 'digraph G {'
 			   	+'\n  rankdir=BT;'
 			   	+'\n  edge[arrowhead=none,arrowtail=none];'
-			   	+'\n  node[fixedsize=true,shape=circle]'
+			   	+'\n  node[fixedsize=true,shape=circle,style=filled]'
 			   	+'\n  size="' + width + ',' + height + '";'
 			   	+'\n  labeldistance=0;'
 			   	+'\n  nodesep=.175;'

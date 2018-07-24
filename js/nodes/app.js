@@ -6,7 +6,7 @@ define(function(require) {
 	class App extends Node {
 
 		constructor() {
-			super(null, "@");
+			super(null, "@","yellow");
 		}
 		
 		transition(token, link) {

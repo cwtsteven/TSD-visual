@@ -6,7 +6,7 @@ define(function(require) {
 	class Start extends Node {
 
 		constructor() {
-			super("point", "");
+			super("point", "", "black");
 		}
 		
 		transition(token) {

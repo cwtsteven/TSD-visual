@@ -11,7 +11,7 @@ define(function(require) {
 	class Dep extends Node {
 		
 		constructor() {
-			super(null, 'p');
+			super(null, 'p', "mediumpurple1");
 		}
 
 		transition(token, link) {
