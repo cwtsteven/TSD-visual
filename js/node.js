@@ -82,8 +82,7 @@ define(function(require) {
 				str += ',width=' + this.width;
 			if (this.height != null)
 				str += ',height=' + this.height;
-			str += 'style=filled,'
-			str += 'fillcolor=' + this.colour + ",";
+			str += 'fillcolor=' + this.colour;
 			return str += '];'
 		}
 
