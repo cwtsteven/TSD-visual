@@ -15,6 +15,8 @@
          | let <var> = <expr> in <expr>
          | { <expr> }
          | link <var> to <expr>
+         | set <var> to <expr>
          | peek <expr>
+         | deref <expr>
          | step
 ```
