@@ -11,8 +11,10 @@ define(function(require) {
   var Recursion = require('ast/recursion');
   var ProvisionalConstant = require('ast/provisional-constant');
   var Change = require('ast/change');
+  var Assign = require('ast/assign');
   var Propagation = require('ast/propagation');
   var Deprecation = require('ast/deprecation');
+  var Dereference = require('ast/deref');
 
   var BinOpType = require('op').BinOpType;
   var UnOpType = require('op').UnOpType;
@@ -173,6 +175,10 @@ define(function(require) {
         var term = this.term(ctx);
         return new Deprecation(term);
       }
+      else if (this.lexer.skip(Token.DEREF)) {
+        var term = this.term(ctx);
+        return new Dereference(term);
+      }
       else if (this.lexer.skip(Token.CLPAREN)) {
         var term = this.term(ctx);
         this.lexer.match(Token.CRPAREN);
@@ -183,6 +189,12 @@ define(function(require) {
         this.lexer.match(Token.TO);
         const term = this.term(ctx);
         return new Change(id, term);
+      }
+      else if (this.lexer.skip(Token.SET)) {
+        const id = this.lexer.token(Token.LCID);
+        this.lexer.match(Token.TO);
+        const term = this.term(ctx);
+        return new Assign(id, term); 
       }
       else {
         return undefined;

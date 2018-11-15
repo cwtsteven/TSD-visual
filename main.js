@@ -11,8 +11,8 @@ requirejs.config({
         'parser/ast': ['ast/abstraction', 'ast/application', 'ast/identifier'
         			 , 'ast/constant', 'ast/operation', 'ast/unary-op'
         			 , 'ast/binary-op', 'ast/if-then-else', 'ast/recursion'
-        			 , 'ast/provisional-constant', 'ast/change', 'ast/propagation'
-        			 , 'ast/deprecation'],
+        			 , 'ast/provisional-constant', 'ast/change', 'ast/assign', 'ast/propagation'
+        			 , 'ast/deprecation', 'ast/deref'],
         'group': ['group', 'box'],
         'term': ['term', 'box-wrapper'],
         'nodes/der': ['nodes/der', 'nodes/var'],

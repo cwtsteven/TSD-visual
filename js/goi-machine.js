@@ -27,8 +27,10 @@ define('goi-machine', function(require) {
 	var Recursion = require('ast/recursion');
 	var ProvisionalConstant = require('ast/provisional-constant');
 	var Change = require('ast/change');
+	var Assign = require('ast/assign');
 	var Propagation = require('ast/propagation');
 	var Deprecation = require('ast/deprecation');
+	var Dereference = require('ast/deref');
 
 	var Lexer = require('parser/lexer');
 	var Parser = require('parser/parser');
@@ -57,7 +59,9 @@ define('goi-machine', function(require) {
 	var UnOp = require('nodes/unop');
 	var Weak = require('nodes/weak');
 	var Delta = require('nodes/delta');
+	var Set = require('nodes/set');
 	var Dep = require('nodes/dep');
+	var Deref = require('nodes/deref');
 	var Mod = require('nodes/mod');
 	var Prop = require('nodes/prop');
 	var Prov = require('nodes/prov');
@@ -247,6 +251,13 @@ define('goi-machine', function(require) {
 				return new Term(dep, term.auxs);
 			}
 
+			else if (ast instanceof Dereference) {
+				var term = this.toGraph(ast.term, group);
+				var deref = new Deref().addToGroup(group);
+				new Link(deref.key, term.prin.key, "n", "s").addToGroup(group);
+				return new Term(deref, term.auxs); 
+			}
+
 			else if (ast instanceof Change) {
 				var param = ast.param;
 				var delta = new Delta().addToGroup(group);
@@ -274,6 +285,35 @@ define('goi-machine', function(require) {
 					auxs.push(v);
 
 				return new Term(delta, auxs);
+			}
+
+			else if (ast instanceof Assign) {
+				var param = ast.param;
+				var setn = new Set().addToGroup(group);
+				var term = this.toGraph(ast.body, group);
+				var v = new Var(param).addToGroup(group);
+				new Link(setn.key, v.key, "w", "s").addToGroup(group);
+				new Link(setn.key, term.prin.key, "e", "s").addToGroup(group);
+
+				var auxs = Array.from(term.auxs);
+				var p1Used = false;
+				var auxNode1;
+				for (var i=0; i<term.auxs.length; i++) {
+					var aux = auxs[i];
+					if (aux.name == param) {
+						p1Used = true;
+						auxs.splice(i, 1);
+						var con = new Contract(aux.name).addToGroup(group);
+						new Link(aux.key, con.key, "n", "s").addToGroup(group);
+						new Link(v.key, con.key, "n", "s").addToGroup(group);
+						auxs.push(con);
+						break;
+					}
+				}
+				if (!p1Used)
+					auxs.push(v);
+
+				return new Term(setn, auxs);
 			}
 
 			else if (ast instanceof Propagation) {

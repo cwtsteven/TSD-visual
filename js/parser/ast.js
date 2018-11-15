@@ -121,6 +121,16 @@ define('ast/change', function() {
   return Change;
 });
 
+define('ast/assign', function() {
+  class Assign {
+    constructor(param, body) {
+      this.param = param;
+      this.body = body;
+    }
+  }
+  return Assign;
+});
+
 define('ast/propagation', function() {
   class Propagation {
     constructor() {
@@ -136,5 +146,14 @@ define('ast/deprecation', function() {
     }
   }
   return Deprecation;
+});
+
+define('ast/deref', function() {
+  class Dereference {
+    constructor(term) {
+      this.term = term;
+    }
+  }
+  return Dereference;
 });
 

@@ -51,10 +51,12 @@ define(function() {
     'THEN',
     'ELSE',
 
+    'SET',
     'CHANGE',
     'TO',
     'PROP',
     'DEP',
+    'DEREF',
     //'SEQ',
   ].forEach(token => Token[token] = token);
 
