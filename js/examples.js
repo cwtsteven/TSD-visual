@@ -1,3 +1,14 @@
+var basic_ex = 
+  '(λx.x + x + 1) 2'
+
+var dfg_ex = 
+  '(λx.λy.(x + x) + (y + y)) (deref ({0})) 2'
+
+var link_ex = 
+  'let c = {0} in\n'
++ 'let _ = (λx.λy.(x +x)+(y +y)) (deref c) 2 in\n'
++ 'link c to {1}'
+
 var max_ex = 
   'let max = λx.λy.if x <= y then y else x in\n'
 + '\n'
@@ -10,33 +21,52 @@ var max_ex =
 + 'm';
 
 var alt_ex =
-  'let s = {true} in\n' 
-+ 'let _ = link s to (~ (deref s)) in\n' 
-+ 'let _ = step in\n' 
-+ 'let _ = step in\n' 
-+ 'let _ = step in\n' 
-+ 's'; 
-
-var avg3_ex =
-  'let fir3 = λf.λx. \n' 
-+ '  let s0 = {0} in\n'
-+ '  let s1 = {0} in\n'
-+ '  let s2 = {0} in\n'
-+ '  let _ = link s0 to x in\n'
-+ '  let _ = link s1 to s0 in\n'
-+ '  let _ = link s2 to s1 in\n'
-+ '  (f 0 s0) + (f 1 s1) + (f 2 s2)\n'
+  'let state_machine = λinit. λtrans. λinp.\n'
++ '  let state = {init} in\n'
++ '  let _ = link state to (trans state inp) in\n'
++ '  state\n'
 + 'in\n'
 + '\n'
-+ 'let input = {0} in\n'
-+ 'let _ = link input to (deref input) + 1 in\n'
++ 'let alt = state_machine 1 (λs.λ_. 1 - (deref s)) 0 in\n'
++ 'let sum = λinp. state_machine 0 (λs.λi. i + (deref s)) inp in\n'
++ 'let alt_sum = sum (deref alt) in\n'
++ 'let _ = step in\n' 
++ 'let _ = step in\n' 
++ 'let _ = step in\n' 
++ 'peek alt_sum'; 
+
+var fir_ex =
+  'let pair = λx.λy.λz.z x y in\n'
++ 'let fst = λp.p (λx.λy.x) in\n'
++ 'let snd = λp.p (λx.λy.y) in\n'
 + '\n'
-+ 'let avg3 = fir3 (λy.λx. x / 3) (deref input) in\n' 
++ 'let nil = pair true true in \n'
++ 'let isnil = fst in \n'
++ 'let cons = λh.λt. pair false (pair h t) in\n'
++ 'let head = λz. fst (snd z) in\n'
++ 'let tail = λz. snd (snd z) in \n'
 + '\n'
-+ 'let _ = step in\n' 
-+ 'let _ = step in\n' 
-+ 'let _ = step in\n' 
-+ 'avg3'; 
++ 'let fir = rec g. λx. λl.\n'
++ '  if isnil l \n'
++ '  then \n'
++ '    pair x 0\n'
++ '  else \n'
++ '    let f = head l in \n'
++ '    let fs = tail l in \n'
++ '    let result = g x fs in \n'
++ '    let s = {0} in \n'
++ '    let _ = link s to deref (fst result) in \n'
++ '    pair s (f s + (snd result))\n'
++ 'in \n'
++ '\n'
++ 'let avg3 = λx. \n'
++ '   let w = λx. x / 3 in \n'
++ '   let l = cons w (cons w (cons w nil)) in\n'
++ '   snd (fir x l)\n'
++ 'in\n'
++ '\n'
++ 'let inp = {0} in \n'
++ 'avg3 inp\n'
 
 var rsum_ex =
   'let signal =  \n' 

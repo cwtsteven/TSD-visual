@@ -15,6 +15,10 @@ define(function(require) {
 				return this.findLinksInto(null)[0]; 				
 		}
 
+		copy() {
+			return new Deref();
+		}
+
 	}
 	return Deref;
 });

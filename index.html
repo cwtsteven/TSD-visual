@@ -22,9 +22,12 @@
   				change: function(event, ui) {
   					var prog;
   					switch($("#sm-example option:selected").val()) {
+  						case "basic": prog = basic_ex; break;
+  						case "dataflow": prog = dfg_ex; break;
+  						case "link": prog = link_ex; break;
   						case "max": prog = max_ex; break;
   						case "alt": prog = alt_ex; break;
-  						case "avg3": prog = avg3_ex; break;
+  						case "fir": prog = fir_ex; break;
   						case "rsum": prog = rsum_ex; break;
   					}
   					$("#ta-program").val(prog);
@@ -39,9 +42,12 @@
 <body>
 	<div class="left">
 		<select id="sm-example">
+			<option value="basic">Basic</option>
+			<option value="dataflow">Dataflow graph</option>
+			<option value="link">Link</option>
 			<option value="max">Maximum of two int</option>
 			<option value="alt">Alternating signal</option>
-			<option value="avg3">Finite impulse response filter (1)</option>
+			<option value="fir">Finite impulse response filter</option>
 			<option value="rsum">Running sum</option>
 		</select>
 		<button id="btn-info">?</button>
@@ -72,7 +78,7 @@
 			<!--<textarea id="modStack" rows="4" wrap="off" class="stack-trace" style="width: 29%;"></textarea>-->
 		</div>
 	<div>
-	<div style="clear: both;">
+	<div style="clear: both;"> 
 		This is a simulation tool of a GoI-style abstract machine implementing the EFSD calculus.</br>
 		Implemented using <a href=https://github.com/mstefaniuk/graph-viz-d3-js target="_blank">graph-viz-d3-js</a> for generating diagrams and <a href=https://github.com/tadeuzagallo/lc-js>lo-js</a> for parsing.
 	</div>
@@ -85,9 +91,12 @@
 		$("#sm-example").val(ex);
 		
 		switch(ex) {
+			case "basic": prog = basic_ex; break;
+			case "dataflow": prog = dfg_ex; break;
+			case "link": prog = link_ex; break;
 			case "max": prog = max_ex; break;
 			case "alt": prog = alt_ex; break;
-			case "avg3": prog = avg3_ex; break;
+			case "fir": prog = fir_ex; break;
 			case "rsum": prog = rsum_ex; break;
 			default: prog = max_ex;$("#sm-example").val("max")
 		}
