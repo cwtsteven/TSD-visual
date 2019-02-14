@@ -1,6 +1,8 @@
 define(function(require) {
 
   var Token = require('parser/token');
+  var PatternType = require('parser/pattern');
+  var Pattern = require('ast/pattern');
   var Abstraction = require('ast/abstraction');
   var Application = require('ast/application');
   var Identifier = require('ast/identifier');
@@ -9,12 +11,14 @@ define(function(require) {
   var BinaryOp = require('ast/binary-op');
   var IfThenElse = require('ast/if-then-else');
   var Recursion = require('ast/recursion');
+  var Tuple = require('ast/tuple');
   var ProvisionalConstant = require('ast/provisional-constant');
   var Change = require('ast/change');
   var Assign = require('ast/assign');
   var Propagation = require('ast/propagation');
   var Deprecation = require('ast/deprecation');
   var Dereference = require('ast/deref');
+  var GraphAbstraction = require('ast/graphabstraction');
 
   var BinOpType = require('op').BinOpType;
   var UnOpType = require('op').UnOpType;
@@ -42,16 +46,31 @@ define(function(require) {
         const id = this.lexer.token(Token.LCID);
         this.lexer.match(Token.DOT);
         const term = this.term([id].concat(ctx));
-        return new Abstraction(id, term);
+        return new Abstraction(new Pattern(PatternType.Id, id), term);
       } 
       
       else if (this.lexer.skip(Token.LET)) {
-        const id = this.lexer.token(Token.LCID);
-        this.lexer.match(Token.DEFINE)
-        var N = this.term(ctx);
-        this.lexer.match(Token.IN);
-        const M = this.term([id].concat(ctx));
-        return new Application(new Abstraction(id, M), N);
+        if (this.lexer.skip(Token.LPAREN)) {
+          const id1 = this.lexer.token(Token.LCID);
+          this.lexer.match(Token.COMMA);
+          const id2 = this.lexer.token(Token.LCID);
+          this.lexer.match(Token.RPAREN);
+          var pattern = new Pattern(PatternType.Tuple, id1, id2);
+          this.lexer.match(Token.DEFINE)
+          var N = this.term(ctx);
+          this.lexer.match(Token.IN);
+          const M = this.term([id1,id2].concat(ctx));
+          return new Application(new Abstraction(pattern, M), N);
+        }
+        else {
+          var id = this.lexer.token(Token.LCID)
+          var pattern = new Pattern(PatternType.Id, id);
+          this.lexer.match(Token.DEFINE)
+          var N = this.term(ctx);
+          this.lexer.match(Token.IN);
+          const M = this.term([id].concat(ctx));
+          return new Application(new Abstraction(pattern, M), N);
+        }
       } 
       else if (this.lexer.skip(Token.REC)) {
         const id = this.lexer.token(Token.LCID);
@@ -76,7 +95,7 @@ define(function(require) {
       return token.type == Token.AND || token.type == Token.OR 
           || token.type == Token.PLUS || token.type == Token.SUB  
           || token.type == Token.MULT || token.type == Token.DIV 
-          || token.type == Token.LTE 
+          || token.type == Token.LTE || token.type == Token.COMMA
     }
 
     parseBinop(ctx, lhs, pred) {
@@ -111,6 +130,9 @@ define(function(require) {
         }
         else if (op.type == Token.LTE) {
           lhs = new BinaryOp(BinOpType.Lte, "<=", lhs, rhs);
+        }
+        else if (op.type == Token.COMMA) {
+          lhs = new Tuple(lhs, rhs);
         }
       }
       return lhs;
@@ -195,6 +217,10 @@ define(function(require) {
         this.lexer.match(Token.TO);
         const term = this.term(ctx);
         return new Assign(id, term); 
+      }
+      else if (this.lexer.skip(Token.ABS)) {
+        const term = this.term(ctx);
+        return new GraphAbstraction(term); 
       }
       else {
         return undefined;

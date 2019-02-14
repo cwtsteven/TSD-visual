@@ -8,11 +8,11 @@ requirejs.config({
 	//never includes a ".js" extension since
 	//the paths config could be for a directory.
 	bundles: {
-        'parser/ast': ['ast/abstraction', 'ast/application', 'ast/identifier'
+        'parser/ast': ['ast/pattern', 'ast/abstraction', 'ast/application', 'ast/identifier'
         			 , 'ast/constant', 'ast/operation', 'ast/unary-op'
-        			 , 'ast/binary-op', 'ast/if-then-else', 'ast/recursion'
+        			 , 'ast/binary-op', 'ast/if-then-else', 'ast/recursion', 'ast/tuple'
         			 , 'ast/provisional-constant', 'ast/change', 'ast/assign', 'ast/propagation'
-        			 , 'ast/deprecation', 'ast/deref'],
+        			 , 'ast/deprecation', 'ast/deref', 'ast/graphabstraction'],
         'group': ['group', 'box'],
         'term': ['term', 'box-wrapper'],
         'nodes/der': ['nodes/der', 'nodes/var'],

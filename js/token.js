@@ -9,6 +9,9 @@ define(function() {
 		UNIT: '•',
 		IF0: 'if0',
 		IF1: 'if1',
+		PL: 'L',
+		PR: 'R',
+		PE: 'P',
 	}
 
 	var RewriteFlag = {
@@ -23,6 +26,7 @@ define(function() {
 		F_DEP: '<p>',
 		F_DELTA: '<Δ>',
 		F_PROP: '<s>',
+		F_PAIR: '<,>',
 	}
 
 	class MachineToken {

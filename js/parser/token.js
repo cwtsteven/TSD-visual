@@ -56,7 +56,8 @@ define(function() {
     'TO',
     'PROP',
     'DEP',
-    'DEREF',
+    'DEREF', 
+    'ABS', 
     //'SEQ',
   ].forEach(token => Token[token] = token);
 

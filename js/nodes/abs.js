@@ -4,6 +4,7 @@ define(function(require) {
 	var RewriteFlag = require('token').RewriteFlag();
 	var App = require('nodes/app');
 	var Expo = require('nodes/expo');	
+	var PatTuple = require('nodes/pattuple');
 
 	class Abs extends Node {
 
@@ -47,7 +48,7 @@ define(function(require) {
 					otherNextLink.reverse = false;
 
 					var otherNode = this.graph.findNodeByKey(otherNextLink.from);
-					if (otherNode instanceof Expo) 
+					if (otherNode instanceof Expo || otherNode instanceof PatTuple) 
 						otherNextLink.fromPort = "n";
 					otherNextLink.changeToGroup(appOtherLink.group);
 					

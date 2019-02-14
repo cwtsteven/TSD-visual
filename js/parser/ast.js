@@ -1,12 +1,23 @@
+define('ast/pattern', function() {
+  class Pattern {
+    constructor(type, id1, id2) {
+      this.type = type;
+      this.id1 = id1;
+      this.id2 = id2;
+    }
+  }
+  return Pattern;
+});
+
 define('ast/abstraction', function() {
   class Abstraction {
     /**
      * param here is the name of the variable of the abstraction. Body is the
      * subtree  representing the body of the abstraction.
      */
-    constructor(param, body) {
-      this.param = param;
-      this.body = body;
+    constructor(pattern, body) {
+      this.pattern = pattern;
+      this.body = body; 
     }
   }
   return Abstraction;
@@ -102,6 +113,16 @@ define('ast/recursion', function() {
   return Recursion;
 });
 
+define('ast/tuple', function() {
+  class Tuple {
+    constructor(lhs, rhs) {
+      this.lhs = lhs;
+      this.rhs = rhs;
+    }
+  }
+  return Tuple;
+});
+
 define('ast/provisional-constant', function() {
   class ProvisionalConstant {
     constructor(term) {
@@ -157,3 +178,11 @@ define('ast/deref', function() {
   return Dereference;
 });
 
+define('ast/graphabstraction', function() {
+  class GraphAbstraction {
+    constructor(term) {
+      this.term = term;
+    }
+  }
+  return GraphAbstraction;
+});

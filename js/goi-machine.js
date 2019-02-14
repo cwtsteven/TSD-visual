@@ -16,6 +16,8 @@ function union_arrays (x, y) {
 
 
 define('goi-machine', function(require) {
+	var PatternType = require('parser/pattern');
+	var Pattern = require('ast/pattern'); 
 	var Abstraction = require('ast/abstraction');
 	var Application = require('ast/application');
 	var Identifier = require('ast/identifier');
@@ -25,12 +27,14 @@ define('goi-machine', function(require) {
 	var BinaryOp = require('ast/binary-op');
 	var IfThenElse = require('ast/if-then-else');
 	var Recursion = require('ast/recursion');
+	var Tuple = require('ast/tuple');
 	var ProvisionalConstant = require('ast/provisional-constant');
 	var Change = require('ast/change');
 	var Assign = require('ast/assign');
 	var Propagation = require('ast/propagation');
 	var Deprecation = require('ast/deprecation');
 	var Dereference = require('ast/deref');
+	var GraphAbstraction = require('ast/graphabstraction');
 
 	var Lexer = require('parser/lexer');
 	var Parser = require('parser/parser');
@@ -65,6 +69,9 @@ define('goi-machine', function(require) {
 	var Mod = require('nodes/mod');
 	var Prop = require('nodes/prop');
 	var Prov = require('nodes/prov');
+	var PatTuple = require('nodes/pattuple');
+	var Pair = require('nodes/pair');
+	var GAbs = require('nodes/gabs');
 
 	var GC = require('gc');
 
@@ -117,7 +124,19 @@ define('goi-machine', function(require) {
 			} 
 
 			else if (ast instanceof Abstraction) {
-				var param = ast.param;
+				var params;
+				var paramUsed;
+				var auxNodes;
+				if (ast.pattern.type == PatternType.Id) {
+					params = [ast.pattern.id1]; 
+					paramUsed = [false];
+					auxNodes = [null];
+				}
+				else if (ast.pattern.type == PatternType.Tuple) {
+					params = [ast.pattern.id1, ast.pattern.id2];
+					paramUsed = [false,false];
+					auxNodes = [null,null];
+				}
 				var wrapper = BoxWrapper.create().addToGroup(group);
 				var abs = new Abs().addToGroup(wrapper.box);
 				var term = this.toGraph(ast.body, wrapper.box);
@@ -126,21 +145,31 @@ define('goi-machine', function(require) {
 				new Link(abs.key, term.prin.key, "e", "s").addToGroup(abs.group);
 
 				var auxs = Array.from(term.auxs);
-				var paramUsed = false;
-				var auxNode;
-				for (let aux of term.auxs) {
-					if (aux.name == param) {
-						paramUsed = true;
-						auxNode = aux;
-						break;
+				
+				for (var i=0;i<params.length;i++) {
+					for (let aux of term.auxs) {
+						if (aux.name == params[i]) {
+							paramUsed[i] = true;
+							auxNodes[i] = aux;
+							break;
+						}
 					}
 				}
-				if (paramUsed) {
-					auxs.splice(auxs.indexOf(auxNode), 1);
-				} else {
-					auxNode = new Weak(param).addToGroup(abs.group);
+				for (var i=0;i<params.length;i++) {
+					if (paramUsed[i]) {
+						auxs.splice(auxs.indexOf(auxNodes[i]), 1);
+					} else {
+						auxNodes[i] = new Weak(params[i]).addToGroup(abs.group);
+					}	
 				}
-				new Link(auxNode.key, abs.key, "nw", "w", true).addToGroup(abs.group);
+				if (ast.pattern.type == PatternType.Id)
+					new Link(auxNodes[0].key, abs.key, "nw", "w", true).addToGroup(abs.group);
+				else if (ast.pattern.type == PatternType.Tuple) {
+					var pattern = new PatTuple().addToGroup(abs.group);
+					new Link(auxNodes[0].key, pattern.key, "n", "w").addToGroup(abs.group);
+					new Link(auxNodes[1].key, pattern.key, "n", "e").addToGroup(abs.group);
+					new Link(pattern.key, abs.key, "nw", "w", true).addToGroup(abs.group);
+				}
 
 				wrapper.auxs = wrapper.createPaxsOnTopOf(auxs);
 
@@ -237,6 +266,17 @@ define('goi-machine', function(require) {
 				return new Term(wrapper.prin, wrapper.auxs);
 			}
 
+			else if (ast instanceof Tuple) {
+				var pair = new Pair().addToGroup(group);
+				var left = this.toGraph(ast.lhs, group);
+				var right = this.toGraph(ast.rhs, group);
+
+				new Link(pair.key, left.prin.key, "w", "s").addToGroup(group);
+				new Link(pair.key, right.prin.key, "e", "s").addToGroup(group);
+
+				return new Term(pair, Term.joinAuxs(left.auxs, right.auxs, group));
+			}
+
 			else if (ast instanceof ProvisionalConstant) {
 				var term = this.toGraph(ast.term, group);
 				var prov = new Prov().addToGroup(group);
@@ -319,6 +359,15 @@ define('goi-machine', function(require) {
 			else if (ast instanceof Propagation) {
 				var prop = new Prop().addToGroup(group);
 				return new Term(prop, []);
+			}
+
+			else if (ast instanceof GraphAbstraction) {
+				var abs = new GAbs().addToGroup(group);
+				var box = this.toGraph(ast.term, group);
+
+				new Link(abs.key, box.prin.key, "n", "s").addToGroup(group);
+
+				return new Term(abs, box.auxs);
 			}
 		}
 

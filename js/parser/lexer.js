@@ -44,7 +44,7 @@ define(function(require) {
           break;
 
         case ',':
-          this._token = new Token(Token.COMMA);
+          this._token = new Token(Token.COMMA, null, 1);
           break;
 
         case ';':
@@ -164,6 +164,8 @@ define(function(require) {
               this._token = new Token(Token.DEP);
             else if (str == "deref")
               this._token = new Token(Token.DEREF);
+            else if (str == "abs")
+              this._token = new Token(Token.ABS);
             else
               this._token = new Token(Token.LCID, str);
           } 
