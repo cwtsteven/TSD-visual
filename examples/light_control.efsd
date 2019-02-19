@@ -1,0 +1,66 @@
+let unit = false in
+
+let prev = {0} in
+
+let a = 8121 in
+let c = 28411 in
+
+let getModulus = rec f. λnumber. λdivider.
+	if divider <= number
+	then
+		f (number - divider) divider
+	else number
+in
+
+let generateRandomNumber = λmax.
+	let prevValue = peek prev in
+	let prevValue = getModulus (a * prevValue + c) max in
+	let _ = set prev to {prevValue} in
+	let _ = step in
+	prevValue
+in
+
+let generateRandomBool = λ_.
+    generateRandomNumber 100 <= 50
+in
+
+let create_transducer = λinit. λinput. λtransition. λoutF.
+	let state = {init} in 
+	let _ = link state to (transition state input) in 
+ 	input , (outF state)
+in
+
+let on = 1 in
+let off = 0 in
+
+let switchOn = true in
+let switchOff = false in
+
+let run = rec g. λtransducer. λf. λn. 
+	let (input , out) = transducer in
+	if (n <= 0 && 0 <= n) 
+	then
+		unit
+	else
+		let _ = set input to (if (generateRandomBool unit) then switchOn else switchOff) in
+		let _ = step in 
+		let _ = f (peek out) in
+		g (input , out) f (n - 1)
+in
+
+let transition = λstate. λinput.
+	if (state <= on && on <= state) && (input <= switchOff && switchOff <= input)
+	then
+		off
+	else
+		if (state <= off && off <= state) && (input <= switchOn && switchOn <= input) 
+		then 
+			on
+		else
+			state
+in
+
+let n = 100 in 
+let input = {switchOn} in
+let transducer = create_transducer off input transition (λx.x) in
+run transducer (λx.unit) n

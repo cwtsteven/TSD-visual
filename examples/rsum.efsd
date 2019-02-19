@@ -1,0 +1,20 @@
+let signal =  
+  let s = {1} in
+  let _ = link s to (deref s) + 1 in
+  s
+in
+
+let rsum = λi. 
+  let s = {0} in
+  let _ = link s to (deref s) + i in
+  s
+in
+
+let o = rsum signal in
+let _ = step in
+let _ = step in
+let _ = step in
+let _ = step in
+let _ = step in
+let _ = step in
+o

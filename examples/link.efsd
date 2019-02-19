@@ -1,0 +1,3 @@
+let c = {0} in
+let _ = (λx.λy.(x + x) + (y + y)) (deref c) 2 in
+link c to {1}

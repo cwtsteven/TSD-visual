@@ -1,0 +1,20 @@
+let fir3 = λf. λx.
+  let s0 = {0} in
+  let s1 = {0} in
+  let s2 = {0} in
+  let _ = link s0 to x in
+  let _ = link s1 to s0 in
+  let _ = link s2 to s1 in
+  (f 0 s0) + (f 1 s1) + (f 2 s2)
+in
+let input = 
+  let s = {0} in
+  let _ = link s to (s + 1) in
+  s 
+in
+let avg3 = fir3 (λ_.λx. x / 3) input
+in
+let _ = step in
+let _ = step in
+let _ = step in
+peek avg3

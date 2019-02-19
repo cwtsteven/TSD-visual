@@ -1,0 +1,169 @@
+let pair = λx.λy.λp. p x y in
+let fst = λp.p (λx.λy.x) in
+let snd = λp.p (λx.λy.y) in
+
+let nil = pair true true in
+let isnil = fst in
+let cons = λh.λt. pair false (pair h t) in
+let head = λz. fst (snd z) in
+let tail = λz. snd (snd z) in
+
+let unit = false in
+
+let iteri = λf. λx.
+	let aux = rec g. λi. λx.
+		if isnil x 
+		then 
+			nil
+		else
+			cons (f i (head x)) (g (i + 1) (tail x))
+	in
+	aux 0 x
+in
+
+let init = λsize. λf.
+	let aux = rec g. λi.
+		if i <= size && size <= i 
+		then 
+			nil
+		else
+			cons (f i) (g (i + 1))
+	in
+	aux 0
+in
+
+let getNth =  λn. λx.
+	let aux = rec g. λi. λx.
+		if i <= n && n <= i 
+		then 
+			head x
+		else
+			g (i + 1) (tail x)
+	in
+	aux 0  x
+in
+
+let length = λx.
+	let aux = rec g. λacc. λx.
+		if isnil x
+		then 
+			acc
+		else
+			g (acc + 1) (tail x)
+	in aux 0 x
+in
+
+let zero = 0 in
+let one = 1 in
+
+let get_neighbour = λi. λcell_array.
+	let len = (length cell_array) - 1 in
+	if i <= 0 && 0 <= i 
+	then
+		if i<= len && len <= i 
+		then
+			zero , (getNth i cell_array) , zero
+		else
+			zero , (getNth i cell_array) , (getNth (i + 1) cell_array)
+	else
+		if i<= len && len <= i 
+		then
+			(getNth (i - 1) cell_array) , (getNth i cell_array) , zero
+		else
+			(getNth (i - 1) cell_array) , (getNth i cell_array) , (getNth (i + 1) cell_array)
+in
+
+let create_automata = λsize. λinit_array. λtransition.
+	let cell_array = init size (λi. {getNth i init_array}) in
+	iteri (λi. λcell. 
+		let neighbour = get_neighbour i cell_array in
+		let (a , c) = neighbour in 
+		let (a , b) = a in
+		let _ = link cell to (transition a b c) in
+		cell) cell_array
+in
+
+let equal = λa. λb. λc. λcompA. λcompB. λcompC.
+	(a <= compA && compA <= a) && (b <= compB && compB <= b) && (c <= compC && compC <= c)
+in
+
+let rule110 = λa. λb. λc. 
+	if (equal a b c one one one) 
+	then 
+		zero
+    else
+	    if (equal a b c one one zero) 
+		then 
+			one
+	    else
+            if (equal a b c one zero one) 
+			then
+				one
+            else
+                if (equal a b c one zero zero) 
+				then 
+					zero
+	            else
+	                if (equal a b c zero one one) 
+					then 
+						one
+	                else
+	                    if (equal a b c zero one zero) 
+						then 
+							one
+	                    else
+	                        if (equal a b c zero zero one) 
+							then 
+								one
+	                        else
+	                            zero
+in
+
+let rule54 = λa. λb. λc.
+	if (equal a b c one one one) 
+	then 
+		zero
+    else 
+		if (equal a b c one one zero) 
+		then 
+			zero
+		else
+			if (equal a b c one zero one) 
+			then 	
+				one
+			else 
+				if (equal a b c one zero zero) 
+				then 
+					one
+				else                    
+					if (equal a b c zero one one)
+					then 
+						zero
+					else
+						if (equal a b c zero one zero)
+						then 
+							one
+						else
+							if (equal a b c zero zero one)
+							then 
+								one
+							else 
+								zero
+in
+
+let for_loop = λtotal_step.
+	let aux = rec f. λi.
+		if (i <= total_step + 1 && total_step + 1 <= i)
+		then 
+			unit 
+		else 
+			let _ = step in 
+			f (i + 1)
+	in
+	aux 1
+in
+
+let size = 10 in 
+let total_step = 100 in 
+let world = create_automata size (init size (λi. if (i <= (size-1)/2 && (size-1)/2 <= i) || (i <= (size-2)/2 && (size-2)/2 <= i) then one else zero)) rule54 in 
+for_loop total_step

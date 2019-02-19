@@ -1,0 +1,9 @@
+let max = λx.λy.if x <= y then y else x in
+
+let x = {1} in
+let y = {2} in
+let m = max (deref x) (deref y) in
+let _ = step in
+let _ = link x to 3 in
+let _ = step in
+m

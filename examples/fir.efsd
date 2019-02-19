@@ -1,0 +1,43 @@
+let pair = λx.λy.λp. p x y in
+let fst = λp.p (λx.λy.x) in
+let snd = λp.p (λx.λy.y) in
+
+let nil = pair true true in
+let isnil = fst in
+let cons = λh.λt. pair false (pair h t) in
+let head = λz. fst (snd z) in
+let tail = λz. snd (snd z) in
+
+let fir = rec g. λx. λl.
+  if isnil l 
+  then 
+    x , 0
+  else 
+    let f = head l in 
+    let fs = tail l in 
+    let (out , sum) = g x fs in 
+    let s = {0} in 
+    let _ = link s to deref out in 
+    s , (f s + sum)
+in 
+
+let w = λx. x / 3 in
+
+let avg3 = λx. 
+   let weights = cons w (cons w (cons w nil)) in
+   let (out , sum) = fir x weights in
+   sum
+in
+
+let input = 
+  let s = {0} in
+  let _ = link s to (s + 1) in
+  s
+in
+
+let out = avg3 input in
+
+let _ = step in
+let _ = step in
+let _ = step in
+peek out

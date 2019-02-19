@@ -1,0 +1,25 @@
+let unit = false in
+
+let createCells = λn. 
+	let input = {0} in
+	let aux = rec f. λn. λx. 
+		if (n <= 0 && 0 <= n)
+		then 
+			x 
+		else 
+			let c = {x + 1} in 
+			f (n - 1) c 
+	in 
+	let _ = aux (n - 1) input in
+	input 
+in
+
+let stabilise = rec f. λ_.
+	if step then f unit else unit
+in
+
+let n = 100 in 
+let x = createCells n in 
+let _ = set x to 1 in
+let _ = stabilise unit in
+x

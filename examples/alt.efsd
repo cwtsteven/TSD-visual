@@ -1,0 +1,13 @@
+let state_machine = λinit. λtrans. λinp.
+  let state = {init} in
+  let _ = link state to (trans state inp) in
+  state
+in
+
+let alt = state_machine 1 (λs.λ_. 1 - (deref s)) 0 in
+let sum = λinp. state_machine 0 (λs.λi. i + (deref s)) inp in
+let alt_sum = sum (deref alt) in
+let _ = step in
+let _ = step in
+let _ = step in
+peek alt_sum

@@ -1,0 +1,206 @@
+let unit = false in
+
+let prev = {0} in
+
+let a = 8121 in
+let c = 28411 in
+
+let getModulus = rec f. λnumber. λdivider.
+	if divider <= number
+	then
+		f (number - divider) divider
+	else number
+in
+
+let generateRandomNumber = λmax.
+	let prevValue = peek prev in
+	let prevValue = getModulus (a * prevValue + c) max in
+	let _ = set prev to {prevValue} in
+	let _ = step in
+	prevValue
+in
+
+let generateRandomFloat = λmax.
+  let value1 = (generateRandomNumber max) / max in
+  let value2 = (generateRandomNumber max) / max in
+  value1/value2 * max/2
+in
+
+let planet = λid.λmass.λpos.λspeed. (id , mass , pos , speed) in
+
+let get_id = λp.
+  let (lhs , rhs) = p in
+  let (lhs , rhs) = lhs in
+  let (lhs , rhs) = lhs in
+  lhs
+in
+let get_mass = λp.
+  let (lhs , rhs) = p in
+  let (lhs , rhs) = lhs in
+  let (lhs , rhs) = lhs in
+  rhs
+in
+let get_pos = λp.
+  let (lhs , rhs) = p in
+  let (lhs , rhs) = lhs in
+  rhs
+in
+let get_speed = λp.
+  let (lhs , rhs) = p in
+  rhs
+in
+
+let fst = λp. let (x , y) = p in x in
+let snd = λp. let (x , y) = p in y in
+
+let nil = (true , true) in 
+let isnil = fst in 
+let cons = λh. λt. (false , (h , t)) in
+let head = λl. fst (snd l) in
+let tail = λl. snd (snd l) in 
+
+let unit = false in
+
+let iter = λf. λx.
+	let aux = rec g. λx.
+		if isnil x 
+		then 
+			nil
+		else
+      cons (f (head x)) (g (tail x))
+	in
+	aux x
+in
+
+let g = 6.67 in
+let dt = 0.1 in
+let size_x = 1280 in 
+let size_y = 720 in 
+
+let random_speed = λ_.
+  ((generateRandomFloat 0 100) - 50) , ((generateRandomFloat 0 100) - 50) , ((generateRandomFloat 0 100) - 50)
+in
+
+let new_pos = λx. λy.
+  let max_x_2 = size_x / 2 in
+  let max_y_2 = size_y / 2 in
+  (x - max_x_2) , (y - max_y_2) , ((generateRandomFloat 0 200) - 100)
+in
+
+let random_pos = λ_.
+  let x = ((generateRandomNumber 0 200) - 100) + (size_x) / 2 in
+  let y = ((generateRandomNumber 0 200) - 100) + (size_y) / 2 in
+  new_pos x y
+in
+
+let distance2 = λpos. λpos'.
+  let (x , z) = pos in
+  let (x , y) = x in
+  let (x' , z') = pos' in
+  let (x' , y') = x' in
+	(x' - x) * (x' - x) + (y' - y) * (y' - y) + (z' - z) * (z' - z) 
+in
+
+let sqrt = λn. 
+    let e = 0.0001 in
+    let aux = rec g. λguess. λr.
+        if ~((guess * guess - n) <= e)
+        then
+            let r = n/guess in
+            g ((guess + r)/2) r
+        else 
+            guess
+    in
+    aux (n/2) 0
+in
+
+let new_planet = λn.
+  let id = n in
+  let mass = 1 in 
+  let pos = random_pos unit in 
+  let speed = random_speed unit in 
+  {planet id mass pos speed}
+in
+
+let fold = rec g. λf. λacc. λx.
+  if isnil x 
+  then
+    acc
+  else
+    g f (f acc (head x)) (tail x)
+in
+
+let compute_pos = λme. λall.
+  let force = λp1. λp2.
+    let id1 = get_id p1 in
+    let pos1 = get_pos p1 in 
+    let (x1 , z1) = pos1 in
+    let (x1 , y1) = x1 in
+    let id2 = get_id p2 in
+    let pos2 = get_pos p2 in 
+    let (x2 , z2) = pos2 in
+    let (x2 , y2) = x2 in
+    let d2 = distance2 pos1 pos2 in
+    let d = sqrt d2 in 
+    if ~(id1 <= id2 && id2 <= id1) && ~(d <= 0 && 0 <= d)
+    then
+      let f12 = g * (m1 * m2) / d2 in
+      (f12 * (x2 - x1) / d) , (f12 * (y2 - y1) / d) , (f12 * (z2 - z1) / d)
+    else
+      0 , 0 , 0
+  in
+  let id = get_id me in
+  let mass = get_mass me in
+  let pos = get_pos me in
+  let (x , z) = pos in
+  let (x , y) = x in
+  let speed = get_speed me in
+  let (x' , z') = speed in
+  let (x' , y') = x' in
+  let fold_all = fold (λfpos. λp. 
+    let (fx , fz) = fpos in
+    let (fx , fy) = fx in
+    let new_pos = force me (peek p) in
+    let (x , z) = new_pos in
+    let (x , y) = x in
+    (fx + x) , (fy + y) , (fz + z)
+  ) (0 , 0 , 0) all
+  in
+  let (fx , fz) = fold_all in
+  let (fx , fy) = fx in
+  let sx = x' + (fx / m1) * dt in
+  let sy = y' + (fy / m1) * dt in
+  let sz = z' + (fz / m1) * dt in
+  let speed = (sx , sy , sz) in
+  let pos = ((x + sx * dt) , (y + sy * dt) , (z + sz * dt)) in
+  planet id mass pos speed
+in
+
+let create_planets = rec f. λn.
+	if n <= 0 && 0 <= n 
+  then 
+    nil
+  else
+    cons (new_planet n) (f (n-1))
+in
+
+let for_loop = λtotal_step.
+	let aux = rec f. λi.
+		if (i <= total_step + 1 && total_step + 1 <= i)
+		then 
+			unit 
+		else 
+			let _ = step in 
+			f (i + 1)
+	in
+	aux 1
+in
+
+let n = 10 in 
+let total_step = 100 in
+let all = create_planets n in 
+let sun = {planet 0 30000 (0 , 0 , 0) (0 , 0 , 0)} in
+let all = cons sun all in 
+let _ = iter (λp. link p to (compute_pos (peek p) all)) all in
+let _ = for_loop total_step in
+peek sun
