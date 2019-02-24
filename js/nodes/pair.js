@@ -60,7 +60,8 @@ define(function(require) {
 				 			token.dataStack.pop();
 				 			token.dataStack.pop();
 				 	var result = "(" + l[0] + "," + r[0] + ")";
-					token.dataStack.push([result,CompData.EMPTY]);
+				 	var type = (l[1] == CompData.EMPTY && r[1] == CompData.EMPTY) ? CompData.EMPTY : CompData.DEP;
+					token.dataStack.push([result,type]);
 				}	
 				else {
 					token.dataStack.push(CompData.PL); 

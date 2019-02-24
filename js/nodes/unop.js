@@ -8,6 +8,7 @@ define(function(require) {
 	var Promo = require('nodes/promo');
 	var Const = require('nodes/const');
 	var UnOpType = require('op').UnOpType;
+	var Weak = require('nodes/weak');
 
 	class UnOp extends Node {
 
@@ -26,6 +27,7 @@ define(function(require) {
 				if (token.dataStack[token.dataStack.length-2] == CompData.PROMPT) {
 					var v1 = token.dataStack.pop();
 							 token.dataStack.pop();
+					var type = (v1[1] == CompData.EMPTY) ? CompData.EMPTY : CompData.DEP;
 					token.dataStack.push([this.unOpApply(this.subType, v1[0]),CompData.EMPTY]);
 					token.rewriteFlag = RewriteFlag.F_OP;
 					return this.findLinksInto(null)[0];
@@ -37,13 +39,16 @@ define(function(require) {
 			if (token.rewriteFlag == RewriteFlag.F_OP && nextLink.to == this.key) {
 				token.rewriteFlag = RewriteFlag.EMPTY;
 				
-				var prev = this.graph.findNodeByKey(this.findLinksOutOf(null)[0].to);
-				if (prev instanceof Promo) {
+				var prev = this.graph.findNodeByKey(this.findLinksOutOf(null)[0].to); 
+				var data = token.dataStack.last();
+				if (data[1] == CompData.EMPTY) { //if (prev instanceof Promo) {
 					var wrapper = BoxWrapper.create().addToGroup(this.group);
 					var newConst = new Const(token.dataStack.last()[0]).addToGroup(wrapper.box);
 					new Link(wrapper.prin.key, newConst.key, "n", "s").addToGroup(wrapper);
 					nextLink.changeTo(wrapper.prin.key, "s");
-					prev.group.delete(); 
+					//prev.group.delete(); 
+					var weak = new Weak().addToGroup(this.group);
+					new Link(weak.key, prev.key, "n", "s").addToGroup(this.group);
 					this.delete(); 
 				}
 				

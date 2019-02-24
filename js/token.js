@@ -12,6 +12,7 @@ define(function() {
 		PL: 'L',
 		PR: 'R',
 		PE: 'P',
+		DEP : 'd',
 	}
 
 	var RewriteFlag = {

@@ -8,6 +8,7 @@ define(function(require) {
 	var Promo = require('nodes/promo');
 	var Const = require('nodes/const');
 	var BinOpType = require('op').BinOpType;
+	var Weak = require('nodes/weak');
 
 	class BinOp extends Node {
 
@@ -29,13 +30,13 @@ define(function(require) {
 				return nextLink;
 			}
 			else if (link.from == this.key && link.fromPort == "w") {
-				if (token.dataStack[token.dataStack.length-3] == CompData.PROMPT) {
+				if (token.dataStack[token.dataStack.length-3] == CompData.PROMPT) { 
 					var l = token.dataStack.pop();
 					var r = token.dataStack.pop();
 				 			token.dataStack.pop();
 				 	var result = this.binOpApply(this.subType, l[0], r[0]);
-
-					token.dataStack.push([result,CompData.EMPTY]);
+				 	var type = (l[1] == CompData.EMPTY && r[1] == CompData.EMPTY) ? CompData.EMPTY : CompData.DEP;
+					token.dataStack.push([result,type]);
 					token.rewriteFlag = RewriteFlag.F_OP;	
 					return this.findLinksInto(null)[0];;
 				}	
@@ -48,16 +49,20 @@ define(function(require) {
 
 				var left = this.graph.findNodeByKey(this.findLinksOutOf("w")[0].to);
 				var right = this.graph.findNodeByKey(this.findLinksOutOf("e")[0].to);
-
-				if (left instanceof Promo && right instanceof Promo) {
+				var data = token.dataStack.last();
+				if (data[1] == CompData.EMPTY) { //left instanceof Promo && right instanceof Promo) {
 					var wrapper = BoxWrapper.create().addToGroup(this.group);
 					var newConst = new Const(token.dataStack.last()[0]).addToGroup(wrapper.box);
 					new Link(wrapper.prin.key, newConst.key, "n", "s").addToGroup(wrapper);
 					nextLink.changeTo(wrapper.prin.key, "s");
 					
-					left.group.delete();
-					right.group.delete();
-					this.delete();
+					//left.group.delete();
+					//right.group.delete();
+					var weak = new Weak().addToGroup(this.group);
+					new Link(weak.key, left.key, "n", "s").addToGroup(this.group);
+					var weak = new Weak().addToGroup(this.group);
+					new Link(weak.key, right.key, "n", "s").addToGroup(this.group);
+					this.delete(); 
 				}
 				
 				token.rewrite = true;
