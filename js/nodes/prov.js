@@ -35,7 +35,7 @@ define(function(require) {
 				token.rewriteFlag = RewriteFlag.EMPTY;
 				var data = token.dataStack.pop();
 
-				if ((isNumber(data[0]) || typeof(data[0]) === "boolean")) {
+				//if ((isNumber(data[0]) || typeof(data[0]) === "boolean")) {
 					var mod = new Mod().addToGroup(this.group);
 					var con = new Const(data[0]).addToGroup(this.group);
 					new Link(mod.key, con.key, "w", "s").addToGroup(this.group); 
@@ -46,7 +46,7 @@ define(function(require) {
 					this.delete();
 					token.rewrite = true;  
 					token.dataStack.push([data[0],mod.key]); 
-				}
+				//}
 				
 				return nextLink;
 			}

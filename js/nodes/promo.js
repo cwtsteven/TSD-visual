@@ -47,6 +47,8 @@ define(function(require) {
 						var inLinks = prev.findLinksInto(null);
 						if (inLinks.length == 1) { 
 							// this will not happen as the C-node should have taken care of it
+							link.changeTo(this.key, "s");
+							prev.delete();
 						}
 						else {
 							var newBoxWrapper = this.group.copy().addToGroup(this.group.group);

@@ -17,7 +17,7 @@ define(function(require) {
 			if (link.to == this.key) {
 				if (token.dataStack.last() == CompData.PROMPT) {
 					token.dataStack.pop();
-					token.dataStack.push(false);
+					token.dataStack.push([false, CompData.EMPTY]);
 					token.rewriteFlag = RewriteFlag.F_PROP;
 					token.forward = false;
 					token.machine.startPropagation();

@@ -29,42 +29,36 @@ define(function(require) {
 			if (token.rewriteFlag == RewriteFlag.F_C && nextLink.from == this.key) {
 				token.rewriteFlag = RewriteFlag.EMPTY;
 
+				/*
 				if (this.findLinksInto(null).length == 1) {
 					token.boxStack.pop();
-					/*
-					for (let _token of nextLink.tokens)
-						_token.boxStack.pop();
-					*/
 					var inLink = this.findLinksInto(null)[0];
-					/*
-					for (let _token of inLink.tokens)
-						_token.setLink(nextLink);
-					*/
 					nextLink.changeFrom(inLink.from, inLink.fromPort);
 					this.delete();
 				}
 				else {
-					var i = token.boxStack.last();
-					var prev = this.graph.findNodeByKey(i.from);
-					if (prev instanceof Contract) {
-						token.boxStack.pop();
-						/*
-						for (let _token of Array.from(nextLink.tokens)) {
-							if (_token.boxStack.last() == i)
-								_token.boxStack.pop();
-						}
-						for (let _token of Array.from(i.tokens)) {
-							_token.setLink(nextLink);
-							_token.rewriteFlag = RewriteFlag.F_C;
-						}
-						*/
-						for (let link of prev.findLinksInto(null)) {
-							link.changeTo(this.key, "s");
-						}
-						prev.delete();
-						token.rewriteFlag = RewriteFlag.F_C;
+				*/
+				var i = token.boxStack.last();
+				var prev = this.graph.findNodeByKey(i.from);
+				if (prev instanceof Contract) {
+					token.boxStack.pop();
+					/*
+					for (let _token of Array.from(nextLink.tokens)) {
+						if (_token.boxStack.last() == i)
+							_token.boxStack.pop();
 					}
+					for (let _token of Array.from(i.tokens)) {
+						_token.setLink(nextLink);
+						_token.rewriteFlag = RewriteFlag.F_C;
+					}
+					*/
+					for (let link of prev.findLinksInto(null)) {
+						link.changeTo(this.key, "s");
+					}
+					prev.delete();
+					token.rewriteFlag = RewriteFlag.F_C;
 				}
+				//}
 				
 				token.rewrite = true;
 				return nextLink;

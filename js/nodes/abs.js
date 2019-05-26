@@ -14,14 +14,15 @@ define(function(require) {
 		
 		transition(token, link) {
 			if (link.to == this.key && link.toPort == "s") {
+				var prev = this.graph.findNodeByKey(this.findLinksInto("s")[0].from);
 				var data = token.dataStack.last();
-				if (data == CompData.PROMPT) {
+				if (data == CompData.PROMPT && !(prev instanceof App)) {
 					token.dataStack.pop();
 					token.dataStack.push([CompData.LAMBDA,CompData.EMPTY]);
 					token.forward = false;
 					return link;
 				}
-				else if (data == CompData.R) {
+				else if (data == CompData.PROMPT && prev instanceof App) {
 					var nextLink = this.findLinksOutOf(null)[0];
 					token.dataStack.pop();
 					token.rewriteFlag = RewriteFlag.F_LAMBDA;

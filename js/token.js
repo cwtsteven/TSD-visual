@@ -5,14 +5,13 @@ define(function() {
 		EMPTY: '-',
 		PROMPT: '*',
 		LAMBDA: 'λ',
-		R: '@',
 		UNIT: '•',
 		IF0: 'if0',
 		IF1: 'if1',
 		PL: 'L',
 		PR: 'R',
 		PE: 'P',
-		DEP : 'd',
+		DEP : 'g',
 	}
 
 	var RewriteFlag = {
