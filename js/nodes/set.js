@@ -11,7 +11,7 @@ define(function(require) {
 	class Set extends Node {
 
 		constructor() {
-			super(null, "<<~", "indianred1");
+			super(null, "<:=", "indianred1");
 		}
 		
 		transition(token, link) {
@@ -35,7 +35,7 @@ define(function(require) {
 						token.dataStack.pop();
 						token.dataStack.push([CompData.UNIT,CompData.EMPTY]);
 
-						token.rewriteFlag = RewriteFlag.F_DELTA + data[1] +';'+ new_v[0];
+						token.rewriteFlag = RewriteFlag.F_ASSIGN + data[1] +';'+ new_v[0];
 						return this.findLinksInto(null)[0];
 					}
 				}
@@ -43,23 +43,25 @@ define(function(require) {
 		}
 
 		rewrite(token, nextLink) { 
-			if (token.rewriteFlag.substring(0,3) == RewriteFlag.F_DELTA && nextLink.to == this.key) {
+			if (token.rewriteFlag.substring(0,3) == RewriteFlag.F_ASSIGN && nextLink.to == this.key) {
 				var string = token.rewriteFlag.substring(3,token.rewriteFlag.length);
 				var s = string.split(";");
 				var key = s[0];
 				var data = s[1];
 				token.rewriteFlag = RewriteFlag.EMPTY;
 
-				var data = token.dataStack.last();
+				
 				var weak1 = new Weak().addToGroup(this.group);
 				this.findLinksOutOf("w")[0].changeFrom(weak1.key, "n");
 
 				var mod = this.graph.findNodeByKey(key);
 				var weak2 = new Weak().addToGroup(this.group);
-				mod.findLinksOutOf('e')[0].changeFrom(weak2.key, 'n');
-				this.findLinksOutOf("e")[0].changeFrom(mod.key, "e");
-				this.graph.findNodeByKey(mod.findLinksOutOf('e')[0].to).name = s[1];
+				//mod.findLinksOutOf('e')[0].changeFrom(weak2.key, 'n');
+				this.findLinksOutOf("e")[0].changeFrom(weak2.key, "n");
+				this.graph.findNodeByKey(mod.findLinksOutOf('w')[0].to).name = data;
+				this.graph.findNodeByKey(mod.findLinksOutOf('w')[0].to).text = data;
 
+				var data = token.dataStack.last();
 				var wrapper = BoxWrapper.create().addToGroup(this.group);
 				var con = new Const(data[0]).addToGroup(wrapper.box);
 				new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper);

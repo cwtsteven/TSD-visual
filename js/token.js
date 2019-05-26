@@ -25,6 +25,7 @@ define(function() {
 		F_MOD: '<M>',
 		F_DEP: '<p>',
 		F_DELTA: '<Δ>',
+		F_ASSIGN: '<A>',
 		F_PROP: '<s>',
 		F_PAIR: '<,>',
 	}
