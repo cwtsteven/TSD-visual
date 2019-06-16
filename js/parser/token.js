@@ -46,6 +46,9 @@ define(function() {
     'MULT',
     'DIV',
     'LTE',
+    'VECPLUS',
+    'VECMULT',
+    'VECDOT',
     
     'IF',
     'THEN',
@@ -57,7 +60,9 @@ define(function() {
     'PROP',
     'DEP',
     'DEREF', 
-    'ABS', 
+    'FUSE',
+    'PC',
+    'FOLD',
     //'SEQ',
   ].forEach(token => Token[token] = token);
 

@@ -12,6 +12,9 @@ define(function() {
 		Mult: 4,
 		Div: 7,
 		Lte: 5,
+		VecPlus: 6,
+		VecMult: 8,
+		VecDot: 9,
 	}
 
 	var OpType = {

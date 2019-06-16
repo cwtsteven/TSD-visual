@@ -7,6 +7,7 @@ define(function(require) {
 	var Const = require('nodes/const');
 	var Link = require('link');
 	var Weak = require('nodes/weak');
+	var Pair = require('token').Pair();
 
 	class Dep extends Node {
 		
@@ -24,7 +25,7 @@ define(function(require) {
 				if (token.dataStack[token.dataStack.length-2] == CompData.PROMPT) {
 					var data = token.dataStack.pop();
 					token.dataStack.pop();
-					token.dataStack.push([data[0],CompData.EMPTY]);
+					token.dataStack.push(new Pair(data.a,CompData.EMPTY));
 					token.rewriteFlag = RewriteFlag.F_DEP;
 					return this.findLinksInto(null)[0]; 
 				}
@@ -36,19 +37,21 @@ define(function(require) {
 				token.rewriteFlag = RewriteFlag.EMPTY;
 				var data = token.dataStack.last();
 
-				if ((isNumber(data[0]) || typeof(data[0]) === "boolean")) {
+				//if ((isNumber(data.a) || typeof(data.a) === "boolean") || typeof(data.a) === "array") {
 					var outLink = this.findLinksOutOf(null)[0]; 
 					var weak = new Weak(outLink.text).addToGroup(this.group);
 					outLink.changeFrom(weak.key, "n");
 
 					var wrapper = BoxWrapper.create().addToGroup(this.group);
-					var newConst = new Const(data[0]).addToGroup(wrapper.box);
+					var newConst = new Const(data.a.toString()).addToGroup(wrapper.box);
+					console.log("here");
+					console.log(newConst);
 					new Link(wrapper.prin.key, newConst.key, "n", "s").addToGroup(wrapper);
 					nextLink.changeTo(wrapper.prin.key, "s");
 					
 					this.delete();
 					token.rewrite = true;
-				}
+				//}
 
 				return nextLink;
 			}

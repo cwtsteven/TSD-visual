@@ -12,7 +12,7 @@ requirejs.config({
         			 , 'ast/constant', 'ast/operation', 'ast/unary-op'
         			 , 'ast/binary-op', 'ast/if-then-else', 'ast/recursion', 'ast/tuple'
         			 , 'ast/provisional-constant', 'ast/change', 'ast/assign', 'ast/propagation'
-        			 , 'ast/deprecation', 'ast/deref', 'ast/graphabstraction'],
+        			 , 'ast/deprecation', 'ast/deref', 'ast/fusion', 'ast/pc', 'ast/fold'],
         'group': ['group', 'box'],
         'term': ['term', 'box-wrapper'],
         'nodes/der': ['nodes/der', 'nodes/var'],

@@ -3,48 +3,41 @@ define(function(require) {
 	var Node = require('node');
 	var CompData = require('token').CompData();
 	var RewriteFlag = require('token').RewriteFlag();
-	var Delta = require('nodes/delta');
-	var Weak = require('nodes/weak');
 	var Contract = require('nodes/contract');
+	var Pair = require('token').Pair();
 
 	class Mod extends Node {
 		
-		constructor() {
-			super(null, "M", "indianred1");
+		constructor(n) {
+			super(null, "", "indianred1");
+			this.data = n;
+			this.update(n);
+			this.dep_key = null;
 			this.graph.machine.cells.push(this.key);
+			this.width = "1";
+			this.height = "1";
 		}
 
 		transition(token, link) {
 			if (link.to == this.key) {
-				return this.findLinksOutOf("w")[0];
-			}
-			else if (link.from == this.key && link.fromPort == "w") {
-				var data = token.dataStack.pop();
-				token.dataStack.push([data[0],this.key])
-				return this.findLinksInto(null)[0]; 
-			}
-			else if (link.from == this.key && link.fromPort == "e") {
-				token.machine.newValues.set(this.key, token.dataStack.last()[0]);
-				token.delete();
-				return null;
+				token.dataStack.pop();
+				token.dataStack.push(new Pair(this.data,this.key));
+				token.forward = false;
+				return link;
 			}
 		}
 
 		update(data) {
-			var leftLink = this.findLinksOutOf("w")[0]; 
-
 			if ((isNumber(data) || typeof(data) === "boolean")) {
-				var value = this.graph.findNodeByKey(leftLink.to);
-				var oldData = value.name;
-				value.text = data;
-				value.name = data;
+				var oldData = this.data;
+				this.data = data;
+				this.text = "M\n(" + this.key + "," + data + ")";
 				return oldData;
 			}
 		}
 
 		copy() {
-			var mod = new Mod();
-			return mod;
+			// there shouldnt be any copying
 		}
 	}
 

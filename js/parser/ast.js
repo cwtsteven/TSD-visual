@@ -178,11 +178,30 @@ define('ast/deref', function() {
   return Dereference;
 });
 
-define('ast/graphabstraction', function() {
-  class GraphAbstraction {
+define('ast/fusion', function() {
+  class Fusion {
     constructor(term) {
       this.term = term;
     }
   }
-  return GraphAbstraction;
+  return Fusion;
+});
+
+define('ast/pc', function() {
+  class Pc {
+    constructor(data) {
+      this.data = data;
+    }
+  }
+  return Pc;
+});
+
+define('ast/fold', function() {
+  class Folding {
+    constructor(v1,v2) {
+      this.v1 = v1;
+      this.v2 = v2;
+    }
+  }
+  return Folding;
 });

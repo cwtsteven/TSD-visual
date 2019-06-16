@@ -12,6 +12,7 @@ define(function() {
 		PR: 'R',
 		PE: 'P',
 		DEP : 'g',
+		PROJ: 'π',
 	}
 
 	var RewriteFlag = {
@@ -22,12 +23,25 @@ define(function() {
 		F_C: '<C>',
 		F_PROMO: '<!>',
 		F_RECUR: '<μ>',
-		F_MOD: '<M>',
+		F_MOD: '<m>',
 		F_DEP: '<p>',
-		F_DELTA: '<Δ>',
+		F_DELTA: '<L>',
 		F_ASSIGN: '<A>',
 		F_PROP: '<s>',
 		F_PAIR: '<,>',
+		F_FUSE: '<f>',
+		F_FOLD: '<F>',
+	}
+
+	class Pair {
+		constructor(a,b) {
+			this.a = a;
+			this.b = b;
+		}
+
+		toString() {
+			return "(" + this.a + "," + this.b + ")";
+		}
 	}
 
 	class MachineToken {
@@ -35,6 +49,8 @@ define(function() {
 		static CompData() { return CompData; }
 
 		static RewriteFlag() { return RewriteFlag; }
+
+		static Pair() { return Pair; }
 
 		constructor(machine) {
 			this.machine = machine;

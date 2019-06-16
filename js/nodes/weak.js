@@ -5,7 +5,7 @@ define(function(require) {
 	class Weak extends Expo {
 
 		constructor() {
-			super(null, 'C0');
+			super(null, 'C');
 		}
 
 		copy() {

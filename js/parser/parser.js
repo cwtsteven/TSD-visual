@@ -18,7 +18,9 @@ define(function(require) {
   var Propagation = require('ast/propagation');
   var Deprecation = require('ast/deprecation');
   var Dereference = require('ast/deref');
-  var GraphAbstraction = require('ast/graphabstraction');
+  var Fusion = require('ast/fusion');
+  var Pc = require('ast/pc');
+  var Folding = require('ast/fold');
 
   var BinOpType = require('op').BinOpType;
   var UnOpType = require('op').UnOpType;
@@ -96,6 +98,8 @@ define(function(require) {
           || token.type == Token.PLUS || token.type == Token.SUB  
           || token.type == Token.MULT || token.type == Token.DIV 
           || token.type == Token.LTE || token.type == Token.COMMA
+          || token.type == Token.VECPLUS || token.type == Token.VECMULT
+          || token.type == Token.VECDOT
     }
 
     parseBinop(ctx, lhs, pred) {
@@ -133,6 +137,15 @@ define(function(require) {
         }
         else if (op.type == Token.COMMA) {
           lhs = new Tuple(lhs, rhs);
+        }
+        else if (op.type == Token.VECPLUS) {
+          lhs = new BinaryOp(BinOpType.VecPlus, "⊞", lhs, rhs);
+        }
+        else if (op.type == Token.VECMULT) {
+          lhs = new BinaryOp(BinOpType.VecMult, "⊠", lhs, rhs);
+        }
+        else if (op.type == Token.VECDOT) {
+          lhs = new BinaryOp(BinOpType.VecDot, "⊡", lhs, rhs);
         }
       }
       return lhs;
@@ -218,9 +231,18 @@ define(function(require) {
         const term = this.term(ctx);
         return new Assign(id, term); 
       }
-      else if (this.lexer.skip(Token.ABS)) {
+      else if (this.lexer.skip(Token.FUSE)) {
         const term = this.term(ctx);
-        return new GraphAbstraction(term); 
+        return new Fusion(term); 
+      }
+      else if (this.lexer.skip(Token.PC)) {
+        const n = this.lexer.token(Token.INT);
+        return new Pc(n); 
+      }
+      else if (this.lexer.skip(Token.FOLD)) {
+        const v1 = this.atom(ctx);
+        const v2 = this.atom(ctx)
+        return new Folding(v1,v2); 
       }
       else {
         return undefined;

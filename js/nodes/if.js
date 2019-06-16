@@ -6,6 +6,7 @@ define(function(require) {
 	var Promo = require('nodes/promo');
 	var Weak = require('nodes/weak');
 	var Link = require('link');
+	var Pair = require('token').Pair();
 
 	class If extends Node {
 
@@ -22,15 +23,15 @@ define(function(require) {
 			else if (link.from == this.key && link.fromPort == "w") {
 				//var left = this.graph.findNodeByKey(this.findLinksOutOf("w")[0].to);
 				var data = token.dataStack.last(); 
-				if (data[1] == CompData.EMPTY) { //left instanceof Promo) {
-					if (data[0] == true) {
+				if (data.b == CompData.EMPTY) { //left instanceof Promo) {
+					if (data.a == true) {
 						var nextLink = this.findLinksOutOf("n")[0];
 						token.dataStack.pop();
 						token.rewriteFlag = RewriteFlag.F_IF;
 						token.forward = true;
 						return nextLink; 
 					}
-					else if (data[0] == false) {
+					else if (data.a == false) {
 						var nextLink = this.findLinksOutOf("e")[0];
 						token.dataStack.pop();
 						token.rewriteFlag = RewriteFlag.F_IF;
@@ -41,7 +42,7 @@ define(function(require) {
 				else {
 					var nextLink = this.findLinksOutOf("n")[0];
 					var data = token.dataStack.pop();
-					token.dataStack.push(data[0]);
+					token.dataStack.push(data.a);
 					token.dataStack.push(CompData.PROMPT);
 					token.forward = true;
 					return nextLink; 
@@ -65,8 +66,8 @@ define(function(require) {
 					else
 						result = y;
 					token.dataStack.pop();
-					var type = (result[1] == CompData.DEP || result[1] == CompData.EMPTY) ? CompData.DEP : result[1];
-					token.dataStack.push([result[0], type]);
+					var type = (result.b == CompData.DEP || result.b == CompData.EMPTY) ? CompData.DEP : result.b;
+					token.dataStack.push(new Pair(result.a, type));
 					token.forward = false;
 					return nextLink; 
 				}

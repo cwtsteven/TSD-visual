@@ -7,11 +7,12 @@ define(function(require) {
 	var Const = require('nodes/const');
 	var Link = require('link');
 	var Weak = require('nodes/weak');
+	var Pair = require('token').Pair();
 
 	class Delta extends Node {
 
 		constructor() {
-			super(null, "Δ", "indianred1");
+			super(null, "l", "indianred1");
 		}
 		
 		transition(token, link) {
@@ -32,9 +33,9 @@ define(function(require) {
 					if (token.dataStack[token.dataStack.length-2] == CompData.PROMPT) {
 						var data = token.dataStack.pop();
 						token.dataStack.pop();
-						token.dataStack.push([CompData.UNIT,CompData.EMPTY]);
+						token.dataStack.push(new Pair(CompData.UNIT,CompData.EMPTY));
 
-						token.rewriteFlag = RewriteFlag.F_DELTA + data[1];
+						token.rewriteFlag = RewriteFlag.F_DELTA + data.b;
 						return this.findLinksInto(null)[0];
 					}
 				}
@@ -51,12 +52,14 @@ define(function(require) {
 				this.findLinksOutOf("w")[0].changeFrom(weak1.key, "n");
 
 				var mod = this.graph.findNodeByKey(key);
+				var dep = this.graph.findNodeByKey(mod.dep_key);
+
 				var weak2 = new Weak().addToGroup(this.group);
-				mod.findLinksOutOf('e')[0].changeFrom(weak2.key, 'n');
-				this.findLinksOutOf("e")[0].changeFrom(mod.key, "e");
+				dep.findLinksOutOf(null)[0].changeFrom(weak2.key, 'n');
+				this.findLinksOutOf("e")[0].changeFrom(dep.key, "n");
 
 				var wrapper = BoxWrapper.create().addToGroup(this.group);
-				var con = new Const(data[0]).addToGroup(wrapper.box);
+				var con = new Const(data.a).addToGroup(wrapper.box);
 				new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper);
 				this.findLinksInto(null)[0].changeTo(wrapper.prin.key, "s");
 				this.delete();

@@ -9,6 +9,7 @@ define(function(require) {
 	var Const = require('nodes/const');
 	var BinOpType = require('op').BinOpType;
 	var Weak = require('nodes/weak');
+	var Pair = require('token').Pair();
 
 	class BinOp extends Node {
 
@@ -34,9 +35,9 @@ define(function(require) {
 					var l = token.dataStack.pop();
 					var r = token.dataStack.pop();
 				 			token.dataStack.pop();
-				 	var result = this.binOpApply(this.subType, l[0], r[0]);
-				 	var type = (l[1] == CompData.EMPTY && r[1] == CompData.EMPTY) ? CompData.EMPTY : CompData.DEP;
-					token.dataStack.push([result,type]);
+				 	var result = this.binOpApply(this.subType, l.a, r.a);
+				 	var type = (l.b == CompData.EMPTY && r.b == CompData.EMPTY) ? CompData.EMPTY : CompData.DEP;
+					token.dataStack.push(new Pair(result,type));
 					token.rewriteFlag = RewriteFlag.F_OP;	
 					return this.findLinksInto(null)[0];;
 				}	
@@ -50,9 +51,9 @@ define(function(require) {
 				var left = this.graph.findNodeByKey(this.findLinksOutOf("w")[0].to);
 				var right = this.graph.findNodeByKey(this.findLinksOutOf("e")[0].to);
 				var data = token.dataStack.last();
-				if (data[1] == CompData.EMPTY) { //left instanceof Promo && right instanceof Promo) {
+				if (data.b == CompData.EMPTY) { //left instanceof Promo && right instanceof Promo) {
 					var wrapper = BoxWrapper.create().addToGroup(this.group);
-					var newConst = new Const(token.dataStack.last()[0]).addToGroup(wrapper.box);
+					var newConst = new Const(token.dataStack.last().a).addToGroup(wrapper.box);
 					new Link(wrapper.prin.key, newConst.key, "n", "s").addToGroup(wrapper);
 					nextLink.changeTo(wrapper.prin.key, "s");
 					
@@ -84,6 +85,28 @@ define(function(require) {
 				case BinOpType.Mult: return parseFloat(v1) * parseFloat(v2);
 				case BinOpType.Div: return parseFloat(v1) / parseFloat(v2);
 				case BinOpType.Lte: return parseFloat(v1) <= parseFloat(v2);
+				case BinOpType.VecPlus: 
+					if (v1.length != v2.length)
+						return null;
+					var result = [];
+					for (var i=0; i<v1.length; i++) {
+						result[i] = (v1[i] + v2[i]);
+					}
+					return result;
+				case BinOpType.VecMult:
+					var result = [];
+					for (var i=0; i<v2.length; i++) {
+						result[i] = (v1 * v2[i]);
+					}
+					return result;
+				case BinOpType.VecDot:
+					if (v1.length != v2.length)
+						return null;
+					var result = 0;
+					for (var i=0; i<v1.length; i++) {
+						result += v1[i] * v2[i];
+					}
+					return result;
 			}
 		}
 
@@ -97,6 +120,24 @@ define(function(require) {
 			var node = new BinOp("*");
 			node.subType = BinOpType.Mult;
 			return node;
+		}
+
+		static createPlus() {
+			var op = new VecBinOp('⊞');
+			op.subType = BinOpType.VecPlus;
+			return op;
+		}
+
+		static createMult() {
+			var op = new VecBinOp('⊠');
+			op.subType = BinOpType.VecMult;
+			return op;
+		}
+
+		static createDot() {
+			var op = new VecBinOp('⊡');
+			op.subType = BinOpType.VecDot;
+			return op;
 		}
 
 		copy() {

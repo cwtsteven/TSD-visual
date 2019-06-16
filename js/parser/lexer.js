@@ -123,6 +123,18 @@ define(function(require) {
           this._token = new Token(Token.DEFINE);
           break;
 
+        case '⊞':
+          this._token = new Token(Token.VECPLUS, null, 12);
+          break;
+
+        case '⊠':
+          this._token = new Token(Token.VECMULT, null, 13);
+          break;
+
+        case '⊡':
+          this._token = new Token(Token.VECDOT, null, 13);
+          break;
+
         default:
           // text for string
           if (/[a-z]|_|'/.test(c)) {
@@ -164,8 +176,12 @@ define(function(require) {
               this._token = new Token(Token.DEP);
             else if (str == "deref")
               this._token = new Token(Token.DEREF);
-            else if (str == "abs")
-              this._token = new Token(Token.ABS);
+            else if (str == "fusion")
+              this._token = new Token(Token.FUSE);
+            else if (str == "pc")
+              this._token = new Token(Token.PC);
+            else if (str == "fold")
+              this._token = new Token(Token.FOLD);
             else
               this._token = new Token(Token.LCID, str);
           } 

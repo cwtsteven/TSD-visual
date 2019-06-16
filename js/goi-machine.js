@@ -34,7 +34,9 @@ define('goi-machine', function(require) {
 	var Propagation = require('ast/propagation');
 	var Deprecation = require('ast/deprecation');
 	var Dereference = require('ast/deref');
-	var GraphAbstraction = require('ast/graphabstraction');
+	var Fusion = require('ast/fusion');
+	var Pc = require('ast/pc');
+	var Folding = require('ast/fold');
 
 	var Lexer = require('parser/lexer');
 	var Parser = require('parser/parser');
@@ -71,7 +73,9 @@ define('goi-machine', function(require) {
 	var Prov = require('nodes/prov');
 	var PatTuple = require('nodes/pattuple');
 	var Pair = require('nodes/pair');
-	var GAbs = require('nodes/gabs');
+	var Fuse = require('nodes/fusion');
+	var ProvCon = require('nodes/pc');
+	var Fold = require('nodes/fold');
 
 	var GC = require('gc');
 
@@ -361,13 +365,32 @@ define('goi-machine', function(require) {
 				return new Term(prop, []);
 			}
 
-			else if (ast instanceof GraphAbstraction) {
-				var abs = new GAbs().addToGroup(group);
+			else if (ast instanceof Pc) {
+				var data = ast.data;
+				var pc = new ProvCon(data).addToGroup(group);
+
+				return new Term(pc, []);
+			}
+
+			else if (ast instanceof Fusion) {
+				var abs = new Fuse().addToGroup(group);
 				var box = this.toGraph(ast.term, group);
 
 				new Link(abs.key, box.prin.key, "n", "s").addToGroup(group);
 
 				return new Term(abs, box.auxs);
+			}
+
+			else if (ast instanceof Folding) {
+				var fold = new Fold().addToGroup(group);
+
+				var left = this.toGraph(ast.v1, group);
+				var right = this.toGraph(ast.v2, group);
+
+				new Link(fold.key, left.prin.key, "w", "s").addToGroup(group);
+				new Link(fold.key, right.prin.key, "e", "s").addToGroup(group);
+
+				return new Term(fold, Term.joinAuxs(left.auxs, right.auxs, group));
 			}
 		}
 
@@ -385,9 +408,10 @@ define('goi-machine', function(require) {
 			this.hasUpdate = false;
 			for (let key of this.cells) {
 				var cell = this.graph.findNodeByKey(key);
+				var dep = this.graph.findNodeByKey(cell.dep_key);
 				var evalToken = new MachineToken(this);
 				evalToken.isMain = false;
-				evalToken.setLink(cell.findLinksOutOf('e')[0]);
+				evalToken.setLink(dep.findLinksOutOf(null)[0]);
 				this.evalTokens.push(evalToken);
 			} 
 		}

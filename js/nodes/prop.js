@@ -6,6 +6,7 @@ define(function(require) {
 	var BoxWrapper = require('box-wrapper');
 	var Const = require('nodes/const');
 	var Link = require('link');
+	var Pair = require('token').Pair();
 
 	class Prop extends Node {
 		
@@ -31,7 +32,7 @@ define(function(require) {
 				token.rewriteFlag = RewriteFlag.EMPTY;
 				var data = token.machine.hasUpdate; 
 				token.dataStack.pop();
-				token.dataStack.push([data,CompData.EMPTY]);
+				token.dataStack.push(new Pair(data,CompData.EMPTY));
 				var wrapper = BoxWrapper.create().addToGroup(this.group);
 				var con = new Const(data).addToGroup(wrapper.box);
 				new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper);

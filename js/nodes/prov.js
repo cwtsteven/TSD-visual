@@ -4,15 +4,17 @@ define(function(require) {
 	var CompData = require('token').CompData();
 	var RewriteFlag = require('token').RewriteFlag();
 	var Mod = require('nodes/mod');
+	var Dependency = require('nodes/depend');
 	var Const = require('nodes/const');
 	var Link = require('link');
+	var Pair = require('token').Pair();
 
 	class Prov extends Node {
 		
 		constructor() {
-			super('diamond', '', "indianred1");
-			this.width = ".3";
-			this.height = ".3";
+			super('circle', 'm', "indianred1");
+			//this.width = ".3";
+			//this.height = ".3";
 		}
 
 		transition(token, link) {
@@ -36,16 +38,16 @@ define(function(require) {
 				var data = token.dataStack.pop();
 
 				//if ((isNumber(data[0]) || typeof(data[0]) === "boolean")) {
-					var mod = new Mod().addToGroup(this.group);
-					var con = new Const(data[0]).addToGroup(this.group);
-					new Link(mod.key, con.key, "w", "s").addToGroup(this.group); 
+					var mod = new Mod(data.a).addToGroup(this.group);
+					var dep = new Dependency(mod.key).addToGroup(this.group);
+					mod.dep_key = dep.key;
 					var outLink = this.findLinksOutOf(null)[0];
-					outLink.changeFrom(mod.key, "e");
+					outLink.changeFrom(dep.key, "n");
 					var inLink = this.findLinksInto(null)[0];
 					inLink.changeTo(mod.key, "s");
 					this.delete();
 					token.rewrite = true;  
-					token.dataStack.push([data[0],mod.key]); 
+					token.dataStack.push(new Pair(data.a,mod.key)); 
 				//}
 				
 				return nextLink;

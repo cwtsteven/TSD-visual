@@ -9,6 +9,7 @@ define(function(require) {
 	var Const = require('nodes/const');
 	var UnOpType = require('op').UnOpType;
 	var Weak = require('nodes/weak');
+	var Pair = require('token').Pair();
 
 	class UnOp extends Node {
 
@@ -27,8 +28,8 @@ define(function(require) {
 				if (token.dataStack[token.dataStack.length-2] == CompData.PROMPT) {
 					var v1 = token.dataStack.pop();
 							 token.dataStack.pop();
-					var type = (v1[1] == CompData.EMPTY) ? CompData.EMPTY : CompData.DEP;
-					token.dataStack.push([this.unOpApply(this.subType, v1[0]),CompData.EMPTY]);
+					var type = (v1.b == CompData.EMPTY) ? CompData.EMPTY : CompData.DEP;
+					token.dataStack.push(new Pair(this.unOpApply(this.subType, v1.a),CompData.EMPTY));
 					token.rewriteFlag = RewriteFlag.F_OP;
 					return this.findLinksInto(null)[0];
 				}
@@ -41,7 +42,7 @@ define(function(require) {
 				
 				var prev = this.graph.findNodeByKey(this.findLinksOutOf(null)[0].to); 
 				var data = token.dataStack.last();
-				if (data[1] == CompData.EMPTY) { //if (prev instanceof Promo) {
+				if (data.b == CompData.EMPTY) { //if (prev instanceof Promo) {
 					var wrapper = BoxWrapper.create().addToGroup(this.group);
 					var newConst = new Const(token.dataStack.last()[0]).addToGroup(wrapper.box);
 					new Link(wrapper.prin.key, newConst.key, "n", "s").addToGroup(wrapper);

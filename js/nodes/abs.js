@@ -5,6 +5,7 @@ define(function(require) {
 	var App = require('nodes/app');
 	var Expo = require('nodes/expo');	
 	var PatTuple = require('nodes/pattuple');
+	var Pair = require('token').Pair();
 
 	class Abs extends Node {
 
@@ -18,7 +19,7 @@ define(function(require) {
 				var data = token.dataStack.last();
 				if (data == CompData.PROMPT && !(prev instanceof App)) {
 					token.dataStack.pop();
-					token.dataStack.push([CompData.LAMBDA,CompData.EMPTY]);
+					token.dataStack.push(new Pair(CompData.LAMBDA,CompData.EMPTY));
 					token.forward = false;
 					return link;
 				}
