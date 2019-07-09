@@ -166,7 +166,7 @@ define(function(require) {
               this._token = new Token(Token.ELSE);
             else if (str == "link")
               this._token = new Token(Token.CHANGE);
-            else if (str == "set")
+            else if (str == "assign")
               this._token = new Token(Token.SET);
             else if (str == "to")
               this._token = new Token(Token.TO);
