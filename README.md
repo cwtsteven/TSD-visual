@@ -14,9 +14,10 @@
          | rec <var>. <expr>
          | let <var> = <expr> in <expr>
          | { <expr> }
-         | link <var> to <expr>
-         | set <var> to <expr>
+         | link <expr> <expr>
+         | assign <expr> <expr>
          | peek <expr>
          | deref <expr>
+         | root <expr>
          | step
 ```
