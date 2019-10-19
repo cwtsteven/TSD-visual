@@ -44,7 +44,7 @@ define(function(require) {
           break;
 
         case ',':
-          this._token = new Token(Token.COMMA, null, 1);
+          this._token = new Token(Token.COMMA, ',', 1);
           break;
 
         case ';':
@@ -72,12 +72,12 @@ define(function(require) {
           break;
 
         case '~':
-          this._token = new Token(Token.NOT);
+          this._token = new Token(Token.NOT, '~');
           break;
 
         case '&':
           if (this._nextChar() == '&')
-            this._token = new Token(Token.AND, null, 5);
+            this._token = new Token(Token.AND, '&&', 5);
           else {
             this._index--;
             this.fail();
@@ -87,7 +87,7 @@ define(function(require) {
         case '|':
           var c2 = this._nextChar();
           if (c2 == '|')
-            this._token = new Token(Token.OR, null, 4);
+            this._token = new Token(Token.OR, '||', 4);
           else {
             this._index--;
             this.fail();
@@ -95,24 +95,31 @@ define(function(require) {
           break;
 
         case '+':
-          this._token = new Token(Token.PLUS, null, 12);
+          this._token = new Token(Token.PLUS, '+', 12);
           break;
 
         case '-':
-          this._token = new Token(Token.SUB, null, 12);
+          this._token = new Token(Token.SUB, '-', 12);
           break;
 
         case '*':
-          this._token = new Token(Token.MULT, null, 13);
+          this._token = new Token(Token.MULT, '*', 13);
           break;
 
         case '/':
-          this._token = new Token(Token.DIV, null, 13);
+          this._token = new Token(Token.DIV, '/', 13);
+          break;
+
+        case '%':
+          this._token = new Token(Token.MOD, '%', 13); 
           break;
 
         case '<':
-          if (this._nextChar() == '=')
-            this._token = new Token(Token.LTE, null, 10);
+          var nexttoken = this._nextChar(); 
+          if (nexttoken == '=')
+            this._token = new Token(Token.LTE, '<=', 10);
+          else if (nexttoken == '>')
+            this._token = new Token(Token.NEQ, '<>', 10);
           else {
             this._index--;
             this.fail();
@@ -121,6 +128,34 @@ define(function(require) {
 
         case '=':
           this._token = new Token(Token.DEFINE);
+          break;
+
+        case '⊞':
+          this._token = new Token(Token.VECPLUS, '⊞', 12);
+          break;
+
+        case '⊠':
+          this._token = new Token(Token.VECMULT, '⊠', 13);
+          break;
+
+        case '⊡':
+          this._token = new Token(Token.VECDOT, '⊡', 13);
+          break;
+
+        case 'F':
+          this._token = new Token(Token.FUSE);
+          break;
+
+        case 'Λ':
+          this._token = new Token(Token.BIGLAMBDA);
+          break;
+
+        case '[':
+          this._token = new Token(Token.LSQPARAM);
+          break;
+
+        case ']':
+          this._token = new Token(Token.RSQPARAM);
           break;
 
         default:
@@ -153,19 +188,27 @@ define(function(require) {
             else if (str == "else")
               this._token = new Token(Token.ELSE);
             else if (str == "link")
-              this._token = new Token(Token.CHANGE);
-            else if (str == "set")
-              this._token = new Token(Token.SET);
-            else if (str == "to")
-              this._token = new Token(Token.TO);
+              this._token = new Token(Token.LINK);
+            else if (str == "assign")
+              this._token = new Token(Token.ASSIGN);
+            //else if (str == "to")
+            //  this._token = new Token(Token.TO);
             else if (str == "step")
-              this._token = new Token(Token.PROP);
+              this._token = new Token(Token.STEP);
             else if (str == "peek")
-              this._token = new Token(Token.DEP);
+              this._token = new Token(Token.PEEK);
             else if (str == "deref")
               this._token = new Token(Token.DEREF);
-            else if (str == "abs")
-              this._token = new Token(Token.ABS);
+            else if (str == "root")
+              this._token = new Token(Token.ROOT);
+            else if (str == "fuse")
+              this._token = new Token(Token.FUSION);
+            else if (str == "from")
+              this._token = new Token(Token.FROM);
+            else if (str == "pc")
+              this._token = new Token(Token.PC);
+            else if (str == "fold")
+              this._token = new Token(Token.FOLD);
             else
               this._token = new Token(Token.LCID, str);
           } 

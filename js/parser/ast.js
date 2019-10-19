@@ -68,30 +68,6 @@ define('ast/operation', function() {
   return Operation;
 });
 
-define('ast/unary-op', function(require) {
-  var Operation = require('ast/operation');
-  
-  class UnaryOp extends Operation {
-    constructor(type, name, v1) {
-      super(type, name);
-      this.v1 = v1;
-    }
-  }
-  return UnaryOp;
-});
-
-define('ast/binary-op', function(require) {
-  var UnaryOp = require('ast/unary-op');
-
-  class BinaryOp extends UnaryOp {
-    constructor(type, name, v1, v2) {
-      super(type, name, v1);
-      this.v2 = v2;
-    }
-  }
-  return BinaryOp;
-});
-
 define('ast/if-then-else', function() {
   class IfThenElse {
     constructor(cond, t1, t2) {
@@ -123,66 +99,51 @@ define('ast/tuple', function() {
   return Tuple;
 });
 
-define('ast/provisional-constant', function() {
-  class ProvisionalConstant {
+define('ast/cell-creation', function() {
+  class CellCreation {
     constructor(term) {
       this.term = term;
     }
   }
-  return ProvisionalConstant;
+  return CellCreation;
 });
 
-define('ast/change', function() {
-  class Change {
-    constructor(param, body) {
-      this.param = param;
+define('ast/fusion', function() {
+  class Fusion {
+    constructor(name, id, body) {
+      this.name = name;
+      this.id = id;
       this.body = body;
     }
   }
-  return Change;
+  return Fusion;
 });
 
-define('ast/assign', function() {
-  class Assign {
-    constructor(param, body) {
-      this.param = param;
+define('ast/pc', function() {
+  class Pc {
+    constructor(data) {
+      this.data = data;
+    }
+  }
+  return Pc; 
+});
+
+define('ast/name-abstraction', function() {
+  class NameAbstraction {
+    constructor(name, body) {
+      this.name = name;
       this.body = body;
     }
   }
-  return Assign;
+  return NameAbstraction; 
 });
 
-define('ast/propagation', function() {
-  class Propagation {
-    constructor() {
+define('ast/name-instantiation', function() {
+  class NameInstantiation {
+    constructor(name, body) {
+      this.name = name;
+      this.body = body;
     }
   }
-  return Propagation;
-});
-
-define('ast/deprecation', function() {
-  class Deprecation {
-    constructor(term) {
-      this.term = term;
-    }
-  }
-  return Deprecation;
-});
-
-define('ast/deref', function() {
-  class Dereference {
-    constructor(term) {
-      this.term = term;
-    }
-  }
-  return Dereference;
-});
-
-define('ast/graphabstraction', function() {
-  class GraphAbstraction {
-    constructor(term) {
-      this.term = term;
-    }
-  }
-  return GraphAbstraction;
+  return NameInstantiation; 
 });

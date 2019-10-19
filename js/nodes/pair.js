@@ -4,23 +4,18 @@ define(function(require) {
 	var CompData = require('token').CompData();
 	var RewriteFlag = require('token').RewriteFlag();
 	var Link = require('link');
-	var BoxWrapper = require('box-wrapper');
-	var Promo = require('nodes/promo');
-	var Const = require('nodes/const');
 	var PatternType = require('ast/pattern');
 	var Contract = require('nodes/contract');
 	var PatTuple = require('nodes/pattuple');
-	var Term = require('term');
-	var Weak = require('nodes/weak');
+	var Pair = require('token').Pair();
 
-	class Pair extends Node {
+	class PairNode extends Node {
 
 		constructor() {
 			super(null, ",", "mediumpurple1");
 		}
 		
 		transition(token, link) {
-			console.log("pair-trans");
 			if (link.to == this.key) {
 				var nextLink;
 				if (token.dataStack.last() == CompData.PR) {
@@ -32,6 +27,7 @@ define(function(require) {
 					nextLink = this.findLinksOutOf('w')[0];
 				}
 				else {
+					token.dataStack.pop();
 					token.dataStack.push(CompData.PE);
 					token.dataStack.push(CompData.PROMPT); 
 					nextLink = this.findLinksOutOf("e")[0]; ;
@@ -55,13 +51,14 @@ define(function(require) {
 			}
 			else if (link.from == this.key && link.fromPort == "w") {
 				if (token.dataStack[token.dataStack.length-3] == CompData.PE) {
+					console.log("here");
 					var l = token.dataStack.pop();
 					var r = token.dataStack.pop();
 				 			token.dataStack.pop();
-				 			token.dataStack.pop();
-				 	var result = "(" + l[0] + "," + r[0] + ")";
-				 	var type = (l[1] == CompData.EMPTY && r[1] == CompData.EMPTY) ? CompData.EMPTY : CompData.DEP;
-					token.dataStack.push([result,type]);
+				 	//		token.dataStack.pop();
+				 	var result = new Pair(l.a,r.a);
+				 	var type = (l.b == CompData.EMPTY && r.b == CompData.EMPTY) ? CompData.EMPTY : CompData.DEP;
+					token.dataStack.push(new Pair(result,type));
 				}	
 				else {
 					token.dataStack.push(CompData.PL); 
@@ -82,13 +79,15 @@ define(function(require) {
 						var inLinks = prev.findLinksInto(null);
 						if (inLinks.length == 1) { 
 							// this will not happen as the C-node should have taken care of it
+							link.changeTo(this.key, "s");
+							prev.delete();
 						}
 						else {
 							var leftArm = this.findLinksOutOf('w')[0];
 							var left = this.graph.findNodeByKey(leftArm.to);
 							var rightArm = this.findLinksOutOf('e')[0];
 							var right = this.graph.findNodeByKey(rightArm.to);
-							var newPair = new Pair().addToGroup(this.group);
+							var newPair = new PairNode().addToGroup(this.group);
 							var conL = new Contract(left.name).addToGroup(this.group);
 							var conR = new Contract(right.name).addToGroup(this.group);
 							leftArm.changeTo(conL.key, "s");
@@ -127,9 +126,9 @@ define(function(require) {
 		}
 
 		copy() {
-			return new Pair();
+			return new PairNode();
 		}
 	}
 
-	return Pair;
+	return PairNode;
 });

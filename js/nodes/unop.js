@@ -5,33 +5,34 @@ define(function(require) {
 	var RewriteFlag = require('token').RewriteFlag();
 	var Link = require('link');
 	var BoxWrapper = require('box-wrapper');
-	var Promo = require('nodes/promo');
 	var Const = require('nodes/const');
-	var UnOpType = require('op').UnOpType;
-	var Weak = require('nodes/weak');
+	var Token = require('parser/token');
+	var Contract = require('nodes/contract');
+	var Pair = require('token').Pair();
 
 	class UnOp extends Node {
 
-		constructor(text) {
-			super(null, text, "mediumpurple1");
-			this.subType = null;
+		constructor(op, subType, hasPname, pname) {
+			super(null, op, "mediumpurple1");
+			this.subType = subType;
+			this.op = op;
+			this.hasPname = hasPname;
+			this.updatePName(pname);
 		}
 
 		transition(token, link) {
 			if (link.to == this.key) {
 				var nextLink = this.findLinksOutOf(null)[0];
-				token.dataStack.push(CompData.PROMPT);
+				//token.dataStack.push(CompData.PROMPT);
 				return nextLink;
 			}
 			else if (link.from == this.key) {
-				if (token.dataStack[token.dataStack.length-2] == CompData.PROMPT) {
-					var v1 = token.dataStack.pop();
-							 token.dataStack.pop();
-					var type = (v1[1] == CompData.EMPTY) ? CompData.EMPTY : CompData.DEP;
-					token.dataStack.push([this.unOpApply(this.subType, v1[0]),CompData.EMPTY]);
-					token.rewriteFlag = RewriteFlag.F_OP;
-					return this.findLinksInto(null)[0];
-				}
+				var v1 = token.dataStack.pop();
+				//		 token.dataStack.pop();
+				var type = (v1.b == CompData.EMPTY) ? CompData.EMPTY : CompData.DEP;
+				token.dataStack.push(new Pair(this.unOpApply(this.subType, v1.a),CompData.EMPTY));
+				token.rewriteFlag = RewriteFlag.F_OP;
+				return this.findLinksInto(null)[0];
 			}
 		}
 
@@ -41,13 +42,13 @@ define(function(require) {
 				
 				var prev = this.graph.findNodeByKey(this.findLinksOutOf(null)[0].to); 
 				var data = token.dataStack.last();
-				if (data[1] == CompData.EMPTY) { //if (prev instanceof Promo) {
+				if (data.b == CompData.EMPTY) { //if (prev instanceof Promo) {
 					var wrapper = BoxWrapper.create().addToGroup(this.group);
 					var newConst = new Const(token.dataStack.last()[0]).addToGroup(wrapper.box);
 					new Link(wrapper.prin.key, newConst.key, "n", "s").addToGroup(wrapper);
 					nextLink.changeTo(wrapper.prin.key, "s");
 					//prev.group.delete(); 
-					var weak = new Weak().addToGroup(this.group);
+					var weak = new Contract().addToGroup(this.group);
 					new Link(weak.key, prev.key, "n", "s").addToGroup(this.group);
 					this.delete(); 
 				}
@@ -64,13 +65,19 @@ define(function(require) {
 
 		unOpApply(type, v1) {
 			switch(type) {
-				case UnOpType.Not: return !v1;
+				case Token.NOT: return !v1;
+			}
+		}
+
+		updatePName(pname) {
+			if (this.hasPname) {
+				this.pname = pname; 
+				this.text = this.op+"("+pname+")";
 			}
 		}
 
 		copy() {
-			var newNode = new UnOp(this.text);
-			newNode.subType = this.subType;
+			var newNode = new UnOp(this.op, this.subType, this.hasPname. this.pname);
 			return newNode;
 		}
 

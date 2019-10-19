@@ -2,7 +2,6 @@ define(function(require) {
 
 	var CompData = require('token').CompData();
 	var RewriteFlag = require('token').RewriteFlag();
-
 	var Expo = require('nodes/expo');
 
 	class Contract extends Expo {
@@ -12,7 +11,6 @@ define(function(require) {
 		}
 
 		transition(token, link) {
-			console.log("con-trans");
 			if (link.to == this.key) {
 				var nextLink = this.findLinksOutOf(null)[0];
 				token.boxStack.push(link);

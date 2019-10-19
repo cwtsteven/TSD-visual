@@ -5,13 +5,16 @@ define(function() {
 		EMPTY: '-',
 		PROMPT: '*',
 		LAMBDA: 'λ',
-		UNIT: '•',
+		UNIT: '()',
 		IF0: 'if0',
 		IF1: 'if1',
+		DEP : 'g',
+		BIGLAMBDA: 'Λ',
+		
 		PL: 'L',
 		PR: 'R',
 		PE: 'P',
-		DEP : 'g',
+		//PROJ: 'π',
 	}
 
 	var RewriteFlag = {
@@ -22,12 +25,29 @@ define(function() {
 		F_C: '<C>',
 		F_PROMO: '<!>',
 		F_RECUR: '<μ>',
-		F_MOD: '<M>',
-		F_DEP: '<p>',
-		F_DELTA: '<Δ>',
-		F_ASSIGN: '<A>',
-		F_PROP: '<s>',
+		F_CREATE: '<m>',
+		F_PEEK: '<p>',
+		F_ROOT: '<r>',
+		F_LINK: '<l>',
+		F_ASSIGN: '<a>',
+		F_FUSE: '<F>',
+		F_FOLD: '<f>',
+		F_STEP: '<s>',
+		F_SP: '<sp>',
+		F_BIGLAMBDA: '<Λ>',
+
 		F_PAIR: '<,>',
+	}
+
+	class Pair {
+		constructor(a,b) {
+			this.a = a;
+			this.b = b;
+		}
+
+		toString() {
+			return "(" + this.a + "," + this.b + ")";
+		}
 	}
 
 	class MachineToken {
@@ -35,6 +55,8 @@ define(function() {
 		static CompData() { return CompData; }
 
 		static RewriteFlag() { return RewriteFlag; }
+
+		static Pair() { return Pair; }
 
 		constructor(machine) {
 			this.machine = machine;
@@ -64,6 +86,7 @@ define(function() {
 			this.link = null;
 			
 			this.rewriteFlag = RewriteFlag.EMPTY;
+			this.payload = null;
 			this.dataStack = [CompData.PROMPT];
 			this.boxStack = [];
 		}

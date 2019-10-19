@@ -3,9 +3,9 @@ define(function(require) {
 	var Node = require('node');
 	var CompData = require('token').CompData();
 	var RewriteFlag = require('token').RewriteFlag();
-	var Promo = require('nodes/promo');
-	var Weak = require('nodes/weak');
 	var Link = require('link');
+	var Contract = require('nodes/contract');
+	var Pair = require('token').Pair();
 
 	class If extends Node {
 
@@ -16,23 +16,25 @@ define(function(require) {
 		transition(token, link) {
 			if (link.to == this.key) {
 				var nextLink = this.findLinksOutOf("w")[0];
-				token.dataStack.push(CompData.PROMPT);
+				//token.dataStack.push(CompData.PROMPT);
 				return nextLink;
 			}
 			else if (link.from == this.key && link.fromPort == "w") {
 				//var left = this.graph.findNodeByKey(this.findLinksOutOf("w")[0].to);
 				var data = token.dataStack.last(); 
-				if (data[1] == CompData.EMPTY) { //left instanceof Promo) {
-					if (data[0] == true) {
+				if (data.b == CompData.EMPTY) { //left instanceof Promo) {
+					if (data.a == true) {
 						var nextLink = this.findLinksOutOf("n")[0];
 						token.dataStack.pop();
+						token.dataStack.push(CompData.PROMPT)
 						token.rewriteFlag = RewriteFlag.F_IF;
 						token.forward = true;
 						return nextLink; 
 					}
-					else if (data[0] == false) {
+					else if (data.a == false) {
 						var nextLink = this.findLinksOutOf("e")[0];
 						token.dataStack.pop();
+						token.dataStack.push(CompData.PROMPT)
 						token.rewriteFlag = RewriteFlag.F_IF;
 						token.forward = true;
 						return nextLink; 
@@ -41,7 +43,7 @@ define(function(require) {
 				else {
 					var nextLink = this.findLinksOutOf("n")[0];
 					var data = token.dataStack.pop();
-					token.dataStack.push(data[0]);
+					token.dataStack.push(data.a);
 					token.dataStack.push(CompData.PROMPT);
 					token.forward = true;
 					return nextLink; 
@@ -64,9 +66,9 @@ define(function(require) {
 						result = x;
 					else
 						result = y;
-					token.dataStack.pop();
-					var type = (result[1] == CompData.DEP || result[1] == CompData.EMPTY) ? CompData.DEP : result[1];
-					token.dataStack.push([result[0], type]);
+					//token.dataStack.pop();
+					var type = (result.b == CompData.DEP || result.b == CompData.EMPTY) ? CompData.DEP : result.b;
+					token.dataStack.push(new Pair(result.a, type));
 					token.forward = false;
 					return nextLink; 
 				}
@@ -82,9 +84,9 @@ define(function(require) {
 					var downLink = this.findLinksInto(null)[0];
 					var otherLink = this.findLinksOutOf(nextLink.fromPort == "n"?"e":"n")[0];
 					nextLink.changeFrom(downLink.from, downLink.fromPort);
-					var weak = new Weak(this.graph.findNodeByKey(otherLink.to).name).addToGroup(this.group);
+					var weak = new Contract(this.graph.findNodeByKey(otherLink.to).name).addToGroup(this.group);
 					otherLink.changeFrom(weak.key, "n");
-					var weak = new Weak().addToGroup(this.group);
+					var weak = new Contract().addToGroup(this.group);
 					new Link(weak.key, left.key, "n", "s").addToGroup(this.group);
 					this.delete();
 					//left.group.delete();

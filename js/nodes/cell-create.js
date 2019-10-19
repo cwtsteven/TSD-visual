@@ -3,49 +3,49 @@ define(function(require) {
 	var Node = require('node');
 	var CompData = require('token').CompData();
 	var RewriteFlag = require('token').RewriteFlag();
-	var Mod = require('nodes/mod');
+	var Cell = require('nodes/cell');
 	var Const = require('nodes/const');
 	var Link = require('link');
+	var Pair = require('token').Pair();
 
-	class Prov extends Node {
+	class CellCreate extends Node {
 		
 		constructor() {
-			super('diamond', '', "indianred1");
-			this.width = ".3";
-			this.height = ".3";
+			super('circle', 'm', "indianred1");
+			//this.width = ".3";
+			//this.height = ".3";
 		}
 
 		transition(token, link) {
 			if (link.to == this.key) {
 				var nextLink = this.findLinksOutOf(null)[0];
-				token.dataStack.push(CompData.PROMPT);
+				//token.dataStack.push(CompData.PROMPT);
 				return nextLink;
 			}
 			else if (link.from == this.key) {
 				var data = token.dataStack.pop();
-				token.dataStack.pop();
-				token.dataStack.push(data);
-				token.rewriteFlag = RewriteFlag.F_MOD;
+				//token.dataStack.pop();
+				token.dataStack.push(new Pair(data.a,CompData.EMPTY));
+				token.rewriteFlag = RewriteFlag.F_CREATE;
 				return this.findLinksInto(null)[0];
 			}
 		}
 
 		rewrite(token, nextLink) {
-			if (nextLink.to == this.key && token.rewriteFlag == RewriteFlag.F_MOD) {
+			if (nextLink.to == this.key && token.rewriteFlag == RewriteFlag.F_CREATE) {
 				token.rewriteFlag = RewriteFlag.EMPTY;
 				var data = token.dataStack.pop();
 
 				//if ((isNumber(data[0]) || typeof(data[0]) === "boolean")) {
-					var mod = new Mod().addToGroup(this.group);
-					var con = new Const(data[0]).addToGroup(this.group);
-					new Link(mod.key, con.key, "w", "s").addToGroup(this.group); 
+					var mod = new Cell(data.a).addToGroup(this.group);
+
 					var outLink = this.findLinksOutOf(null)[0];
-					outLink.changeFrom(mod.key, "e");
+					outLink.changeFrom(mod.key, "n");
 					var inLink = this.findLinksInto(null)[0];
 					inLink.changeTo(mod.key, "s");
 					this.delete();
 					token.rewrite = true;  
-					token.dataStack.push([data[0],mod.key]); 
+					token.dataStack.push(new Pair(data.a,mod.key)); 
 				//}
 				
 				return nextLink;
@@ -67,9 +67,9 @@ define(function(require) {
 		}
 
 		copy() {
-			return new Prov();
+			return new CellCreate();
 		}
 	}
 
-	return Prov;
+	return CellCreate;
 });

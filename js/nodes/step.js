@@ -6,8 +6,9 @@ define(function(require) {
 	var BoxWrapper = require('box-wrapper');
 	var Const = require('nodes/const');
 	var Link = require('link');
+	var Pair = require('token').Pair();
 
-	class Prop extends Node {
+	class Step extends Node {
 		
 		constructor() {
 			super(null, "s", "indianred1");
@@ -16,10 +17,7 @@ define(function(require) {
 		transition(token, link) {
 			if (link.to == this.key) {
 				if (token.dataStack.last() == CompData.PROMPT) {
-					token.dataStack.pop();
-					token.dataStack.push([false, CompData.EMPTY]);
-					token.rewriteFlag = RewriteFlag.F_PROP;
-					token.forward = false;
+					token.rewriteFlag = RewriteFlag.F_SP;
 					token.machine.startPropagation();
 					return link; 
 				}
@@ -27,11 +25,11 @@ define(function(require) {
 		}
 
 		rewrite(token, nextLink) {
-			if (token.rewriteFlag == RewriteFlag.F_PROP && nextLink.to == this.key) {
+			if (token.rewriteFlag == RewriteFlag.F_STEP && nextLink.to == this.key) {
 				token.rewriteFlag = RewriteFlag.EMPTY;
 				var data = token.machine.hasUpdate; 
 				token.dataStack.pop();
-				token.dataStack.push([data,CompData.EMPTY]);
+				token.dataStack.push(new Pair(data,CompData.EMPTY));
 				var wrapper = BoxWrapper.create().addToGroup(this.group);
 				var con = new Const(data).addToGroup(wrapper.box);
 				new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper);
@@ -39,6 +37,7 @@ define(function(require) {
 				this.delete();
 
 				token.rewrite = true;
+				token.forward = false;
 				return nextLink;
 			}
 
@@ -49,9 +48,9 @@ define(function(require) {
 		}
 
 		copy() {
-			return new Prop();
+			return new Step();
 		}
 	}
 
-	return Prop;
+	return Step;
 });

@@ -12,7 +12,6 @@ define(function(require) {
 		transition(token, link) {
 			if (link.to == this.key) {
 				var nextLink = this.findLinksOutOf("e")[0];
-				token.dataStack.push(CompData.PROMPT);
 				return nextLink;
 			}
 			else if (link.from == this.key && link.fromPort == "e") {

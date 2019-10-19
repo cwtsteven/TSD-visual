@@ -6,18 +6,19 @@ define(function(require) {
 	var BoxWrapper = require('box-wrapper');
 	var Const = require('nodes/const');
 	var Link = require('link');
-	var Weak = require('nodes/weak');
+	var Contract = require('nodes/contract');
+	var Pair = require('token').Pair();
 
-	class Set extends Node {
+	class Linking extends Node {
 
 		constructor() {
-			super(null, "<:=", "indianred1");
+			super(null, "l", "indianred1");
 		}
 		
 		transition(token, link) {
 			if (link.to == this.key) {
 				var nextLink = this.findLinksOutOf("e")[0];
-				token.dataStack.push(CompData.PROMPT);
+				//token.dataStack.push(CompData.PROMPT);
 				return nextLink;
 			}
 			else if (link.from == this.key) {
@@ -29,41 +30,35 @@ define(function(require) {
 					return nextLink;
 				}
 				else if (link.fromPort == "w") {
-					if (token.dataStack[token.dataStack.length-3] == CompData.PROMPT) {
-						var data = token.dataStack.pop();
-						var new_v = token.dataStack.pop();
-						token.dataStack.pop();
-						token.dataStack.push([CompData.UNIT,CompData.EMPTY]);
-
-						token.rewriteFlag = RewriteFlag.F_ASSIGN + data[1] +';'+ new_v[0];
-						return this.findLinksInto(null)[0];
-					}
+					var data = token.dataStack.pop();
+					token.dataStack.pop();
+					token.payload = data; 
+					token.dataStack.push(new Pair(CompData.UNIT,CompData.EMPTY));
+					token.rewriteFlag = RewriteFlag.F_DELTA;
+					return this.findLinksInto(null)[0];
 				}
 			}
 		}
 
 		rewrite(token, nextLink) { 
-			if (token.rewriteFlag.substring(0,3) == RewriteFlag.F_ASSIGN && nextLink.to == this.key) {
-				var string = token.rewriteFlag.substring(3,token.rewriteFlag.length);
-				var s = string.split(";");
-				var key = s[0];
-				var data = s[1];
+			if (token.rewriteFlag == RewriteFlag.F_DELTA && nextLink.to == this.key) {
 				token.rewriteFlag = RewriteFlag.EMPTY;
 
-				
-				var weak1 = new Weak().addToGroup(this.group);
+				var key = token.payload.b;
+				token.payload = null;
+
+				var data = token.dataStack.last();
+				var weak1 = new Contract().addToGroup(this.group);
 				this.findLinksOutOf("w")[0].changeFrom(weak1.key, "n");
 
 				var mod = this.graph.findNodeByKey(key);
-				var weak2 = new Weak().addToGroup(this.group);
-				//mod.findLinksOutOf('e')[0].changeFrom(weak2.key, 'n');
-				this.findLinksOutOf("e")[0].changeFrom(weak2.key, "n");
-				this.graph.findNodeByKey(mod.findLinksOutOf('w')[0].to).name = data;
-				this.graph.findNodeByKey(mod.findLinksOutOf('w')[0].to).text = data;
 
-				var data = token.dataStack.last();
+				var weak2 = new Contract().addToGroup(this.group);
+				mod.findLinksOutOf(null)[0].changeFrom(weak2.key, 'n');
+				this.findLinksOutOf("e")[0].changeFrom(mod.key, "n");
+
 				var wrapper = BoxWrapper.create().addToGroup(this.group);
-				var con = new Const(data[0]).addToGroup(wrapper.box);
+				var con = new Const(data.a).addToGroup(wrapper.box);
 				new Link(wrapper.prin.key, con.key, "n", "s").addToGroup(wrapper);
 				this.findLinksInto(null)[0].changeTo(wrapper.prin.key, "s");
 				this.delete();
@@ -79,9 +74,9 @@ define(function(require) {
 		}
 
 		copy() {
-			return new Set();
+			return new Linking();
 		}
 	}
 
-	return Set;
+	return Linking;
 });

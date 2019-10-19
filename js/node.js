@@ -9,7 +9,7 @@ define(function(require) {
 			this.shape = shape;
 			this.text = text;
 			this.colour = colour;
-			this.name = name; // identifier name or constant name if any
+			this.name = name; // identifier name or constant name if any 
 			this.graph = null;
 			this.group = null;
 			this.width = null;
@@ -64,6 +64,10 @@ define(function(require) {
 			newNode.width = this.width;
 			newNode.height = this.height;
 		}	
+
+		updatePName(pname) {
+
+		}
 
 		// also delete any connected links
 		delete() {

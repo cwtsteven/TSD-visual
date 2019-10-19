@@ -1,5 +1,6 @@
 var graph = null;
 
+
 function union_arrays (x, y) {
   var obj = {};
   for (var i = x.length-1; i >= 0; -- i)
@@ -14,6 +15,14 @@ function union_arrays (x, y) {
   return res;
 }
 
+var names = 0;
+
+function newName() {
+	var name = "α" + names;
+	names++; 
+	return name;
+} 
+
 
 define('goi-machine', function(require) {
 	var PatternType = require('parser/pattern');
@@ -23,23 +32,21 @@ define('goi-machine', function(require) {
 	var Identifier = require('ast/identifier');
 	var Constant = require('ast/constant');
 	var Operation = require('ast/operation');
-	var UnaryOp = require('ast/unary-op');
-	var BinaryOp = require('ast/binary-op');
-	var IfThenElse = require('ast/if-then-else');
+	var IfThenElse = require('ast/if-then-else'); 
 	var Recursion = require('ast/recursion');
 	var Tuple = require('ast/tuple');
-	var ProvisionalConstant = require('ast/provisional-constant');
-	var Change = require('ast/change');
-	var Assign = require('ast/assign');
-	var Propagation = require('ast/propagation');
-	var Deprecation = require('ast/deprecation');
-	var Dereference = require('ast/deref');
-	var GraphAbstraction = require('ast/graphabstraction');
+	var CellCreation = require('ast/cell-creation');
+	var Fusion = require('ast/fusion');
+	var Pc = require('ast/pc');
+  	var NameAbstraction = require('ast/name-abstraction');
+  	var NameInstantiation = require('ast/name-instantiation');
 
+	var Token = require('parser/token');
 	var Lexer = require('parser/lexer');
 	var Parser = require('parser/parser');
 
 	var MachineToken = require('token');
+	var RewriteFlag = require('token').RewriteFlag();
 	var Link = require('link');		
 
 	var Graph = require('graph');
@@ -61,17 +68,23 @@ define('goi-machine', function(require) {
 	var Recur = require('nodes/recur');
 	var Start = require('nodes/start');
 	var UnOp = require('nodes/unop');
-	var Weak = require('nodes/weak');
-	var Delta = require('nodes/delta');
-	var Set = require('nodes/set');
-	var Dep = require('nodes/dep');
 	var Deref = require('nodes/deref');
-	var Mod = require('nodes/mod');
-	var Prop = require('nodes/prop');
-	var Prov = require('nodes/prov');
 	var PatTuple = require('nodes/pattuple');
 	var Pair = require('nodes/pair');
-	var GAbs = require('nodes/gabs');
+	var Fuse = require('nodes/fusion');
+	var Fold = require('nodes/fold');
+
+	var Assign = require('nodes/assign');
+	var Linking = require('nodes/linking');
+	var CellCreate = require('nodes/cell-create');
+	var Cell = require('nodes/cell');
+	var Step = require('nodes/step');
+	var ProvCon = require('nodes/pc');
+	var Peek = require('nodes/peek');
+	var Root = require('nodes/root');
+
+	var BigLambda = require('nodes/biglambda');
+	var NameInstance = require('nodes/name-instance');
 
 	var GC = require('gc');
 
@@ -79,7 +92,7 @@ define('goi-machine', function(require) {
 		
 		constructor() {
 			this.graph = new Graph(this);
-			graph = this.graph; // cheating!
+			graph = this.graph; // cheating! 
 			this.token = new MachineToken(this); 
 			this.gc = new GC(this.graph);
 			this.count = 0;
@@ -100,6 +113,7 @@ define('goi-machine', function(require) {
 			this.graph.clear();
 			this.token.reset();
 			this.count = 0;
+			names = 0;
 
 			this.evalTokens = [];
 			this.cells = [];
@@ -109,6 +123,7 @@ define('goi-machine', function(require) {
 			this.hasUpdate = false;
 			// create graph
 			var start = new Start().addToGroup(this.graph.child);
+			console.log(ast);
 			var term = this.toGraph(ast, this.graph.child);
 			new Link(start.key, term.prin.key, "n", "s").addToGroup(this.graph.child);
 			this.deleteVarNode(this.graph.child);
@@ -159,7 +174,7 @@ define('goi-machine', function(require) {
 					if (paramUsed[i]) {
 						auxs.splice(auxs.indexOf(auxNodes[i]), 1);
 					} else {
-						auxNodes[i] = new Weak(params[i]).addToGroup(abs.group);
+						auxNodes[i] = new Contract(params[i]).addToGroup(abs.group);
 					}	
 				}
 				if (ast.pattern.type == PatternType.Id)
@@ -196,29 +211,6 @@ define('goi-machine', function(require) {
 				var constant = new Const(ast.value).addToGroup(wrapper.box);
 				new Link(wrapper.prin.key, constant.key, "n", "s").addToGroup(wrapper);
 				return new Term(wrapper.prin, wrapper.auxs);
-			}
-
-			else if (ast instanceof BinaryOp) {
-				var binop = new BinOp(ast.name).addToGroup(group);
-
-				binop.subType = ast.type;
-				var left = this.toGraph(ast.v1, group);
-				var right = this.toGraph(ast.v2, group);
-
-				new Link(binop.key, left.prin.key, "w", "s").addToGroup(group);
-				new Link(binop.key, right.prin.key, "e", "s").addToGroup(group);
-
-				return new Term(binop, Term.joinAuxs(left.auxs, right.auxs, group));
-			}
-
-			else if (ast instanceof UnaryOp) {
-				var unop = new UnOp(ast.name).addToGroup(group);
-				unop.subType = ast.type;
-				var box = this.toGraph(ast.v1, group);
-
-				new Link(unop.key, box.prin.key, "n", "s").addToGroup(group);
-
-				return new Term(unop, box.auxs);
 			}
 
 			else if (ast instanceof IfThenElse) {
@@ -260,7 +252,7 @@ define('goi-machine', function(require) {
 				if (p1Used) {
 					// wrapper.auxs.splice(wrapper.auxs.indexOf(auxNode1), 1);
 				} else {
-					auxNode1 = new Weak(p1).addToGroup(wrapper.box);
+					auxNode1 = new Contract(p1).addToGroup(wrapper.box);
 				}
 				new Link(auxNode1.key, recur.key, "nw", "w", true).addToGroup(wrapper);
 				return new Term(wrapper.prin, wrapper.auxs);
@@ -277,98 +269,212 @@ define('goi-machine', function(require) {
 				return new Term(pair, Term.joinAuxs(left.auxs, right.auxs, group));
 			}
 
-			else if (ast instanceof ProvisionalConstant) {
-				var term = this.toGraph(ast.term, group);
-				var prov = new Prov().addToGroup(group);
-				new Link(prov.key, term.prin.key, "n", "s").addToGroup(group);
-				return new Term(prov, term.auxs);
+			else if (ast instanceof Pc) {
+				var data = ast.data;
+				var pc = new ProvCon(data).addToGroup(group);
+
+				return new Term(pc, []);
 			}
 
-			else if (ast instanceof Deprecation) {
-				var term = this.toGraph(ast.term, group);
-				var dep = new Dep().addToGroup(group);
-				new Link(dep.key, term.prin.key, "n", "s").addToGroup(group);
-				return new Term(dep, term.auxs);
-			}
+			else if (ast instanceof Fusion) {
+				var params;
+				var paramUsed;
+				var auxNodes;
+				params = [ast.id]; 
+				var orig_name = ast.name; 
+				var name = newName();
+				paramUsed = [false];
+				auxNodes = [null];
 
-			else if (ast instanceof Dereference) {
-				var term = this.toGraph(ast.term, group);
-				var deref = new Deref().addToGroup(group);
-				new Link(deref.key, term.prin.key, "n", "s").addToGroup(group);
-				return new Term(deref, term.auxs); 
-			}
+				var wrapper = BoxWrapper.create().addToGroup(group);
+				var abs = new Fuse(name).addToGroup(wrapper.box);
+				var term = this.toGraph(ast.body, wrapper.box); 
+				
+				new Link(wrapper.prin.key, abs.key, "n", "s").addToGroup(wrapper);
 
-			else if (ast instanceof Change) {
-				var param = ast.param;
-				var delta = new Delta().addToGroup(group);
-				var term = this.toGraph(ast.body, group);
-				var v = new Var(param).addToGroup(group);
-				new Link(delta.key, v.key, "w", "s").addToGroup(group);
-				new Link(delta.key, term.prin.key, "e", "s").addToGroup(group);
+				new Link(abs.key, term.prin.key, "e", "s").addToGroup(abs.group);
 
-				var auxs = Array.from(term.auxs);
-				var p1Used = false;
-				var auxNode1;
-				for (var i=0; i<term.auxs.length; i++) {
-					var aux = auxs[i];
-					if (aux.name == param) {
-						p1Used = true;
-						auxs.splice(i, 1);
-						var con = new Contract(aux.name).addToGroup(group);
-						new Link(aux.key, con.key, "n", "s").addToGroup(group);
-						new Link(v.key, con.key, "n", "s").addToGroup(group);
-						auxs.push(con);
-						break;
+				var auxs = Array.from(term.auxs); 
+				
+				for (var i=0;i<params.length;i++) {
+					for (let aux of term.auxs) {
+						if (aux.name == params[i]) {
+							paramUsed[i] = true;
+							auxNodes[i] = aux;
+							break;
+						}
 					}
 				}
-				if (!p1Used)
-					auxs.push(v);
-
-				return new Term(delta, auxs);
-			}
-
-			else if (ast instanceof Assign) {
-				var param = ast.param;
-				var setn = new Set().addToGroup(group);
-				var term = this.toGraph(ast.body, group);
-				var v = new Var(param).addToGroup(group);
-				new Link(setn.key, v.key, "w", "s").addToGroup(group);
-				new Link(setn.key, term.prin.key, "e", "s").addToGroup(group);
-
-				var auxs = Array.from(term.auxs);
-				var p1Used = false;
-				var auxNode1;
-				for (var i=0; i<term.auxs.length; i++) {
-					var aux = auxs[i];
-					if (aux.name == param) {
-						p1Used = true;
-						auxs.splice(i, 1);
-						var con = new Contract(aux.name).addToGroup(group);
-						new Link(aux.key, con.key, "n", "s").addToGroup(group);
-						new Link(v.key, con.key, "n", "s").addToGroup(group);
-						auxs.push(con);
-						break;
-					}
+				for (var i=0;i<params.length;i++) {
+					if (paramUsed[i]) {
+						auxs.splice(auxs.indexOf(auxNodes[i]), 1);
+					} else {
+						auxNodes[i] = new Contract(params[i]).addToGroup(abs.group);
+					}	
 				}
-				if (!p1Used)
-					auxs.push(v);
 
-				return new Term(setn, auxs);
+				new Link(auxNodes[0].key, abs.key, "nw", "w", true).addToGroup(abs.group);
+
+
+				wrapper.auxs = wrapper.createPaxsOnTopOf(auxs);
+				wrapper.updateNames(orig_name, name);
+
+				return new Term(wrapper.prin, wrapper.auxs);
 			}
 
-			else if (ast instanceof Propagation) {
-				var prop = new Prop().addToGroup(group);
-				return new Term(prop, []);
+			else if (ast instanceof Operation) {
+				var node; 
+				var machine = this;
+				switch (ast.type) {
+					case Token.AND: 
+					case Token.OR:
+					case Token.PLUS:
+					case Token.SUB:
+					case Token.MULT:
+					case Token.DIV:
+					case Token.MOD:
+					case Token.LTE:
+					case Token.NEQ:
+						var node = new BinOp(ast.name, ast.type, false); return this.createBinOp(node, group); 
+					case Token.COMMA:
+						var node = new Pair(); return this.createBinOp(node, group); 
+					case Token.VECPLUS:
+					case Token.VECMULT:
+					case Token.VECDOT: 
+						var name = newName();
+						var node = new BinOp(ast.name, ast.type, true, name); 
+						return this.createNameAbstraction(node, this.createBinOp, name, group);
+					case Token.LINK:
+						var node = new Linking(); return this.createBinOp(node, group); 
+					case Token.ASSIGN:
+						if (ast.hasPname) {
+							var name = newName();
+							var node = new Assign(true, name);
+							return this.createNameAbstraction(node, this.createBinOp, name, group);
+						}
+						else {
+							var node = new Assign(false); 
+							return this.createBinOp(node, group); 
+						}
+					case Token.FOLD: 
+						var name = newName();
+						var node = new Fold(name); 
+						return this.createNameAbstraction(node, this.createBinOp, name, group);
+					case Token.NOT:
+						var node = new UnOp(ast.name, ast.type, false); return this.createUnOp(node, group); 
+					case Token.CELLCREATE:
+						var node = new CellCreate(); return this.createUnOp(node, group);
+					case Token.PEEK:
+						var node = new Peek(); return this.createUnOp(node, group); 
+					case Token.ROOT:
+						var node = new Root(); return this.createUnOp(node, group);						
+					case Token.DEREF:
+						if (ast.hasPname) {
+							var name = newName(); 
+							var node = new Deref(true, name);
+							return this.createNameAbstraction(node, this.createUnOp, name, group);
+						}
+						else {
+							var node = new Deref(false); 
+							return this.createUnOp(node, group); 
+						}
+					case Token.STEP:
+						var node = new Step().addToGroup(group); 
+						return new Term(node, []);
+				}
 			}
 
-			else if (ast instanceof GraphAbstraction) {
-				var abs = new GAbs().addToGroup(group);
-				var box = this.toGraph(ast.term, group);
+			else if (ast instanceof NameAbstraction) {
+				// term
+				var orig_name = ast.name; 
+				var name = newName();
 
-				new Link(abs.key, box.prin.key, "n", "s").addToGroup(group);
+				var outter = BoxWrapper.create().addToGroup(group);
 
-				return new Term(abs, box.auxs);
+				var wrapper = BoxWrapper.create().addToGroup(outter.box);
+				wrapper.prin.delete();
+				var biglambda = new BigLambda(name).addToGroup(wrapper); 
+				wrapper.prin = biglambda;
+				var box = this.toGraph(ast.body, wrapper.box);
+				wrapper.auxs = wrapper.createPaxsOnTopOf(box.auxs);
+				wrapper.updateNames(orig_name, name); 
+
+				new Link(biglambda.key, box.prin.key, "n", "s").addToGroup(wrapper);
+				outter.auxs = outter.createPaxsOnTopOf(wrapper.auxs);
+				new Link(outter.prin.key, wrapper.prin.key, "n", "s").addToGroup(outter);
+				return new Term(outter.prin, outter.auxs);
 			}
+
+			else if (ast instanceof NameInstantiation) {
+				var term = this.toGraph(ast.body, group);
+				var der = new Der(term.prin.name).addToGroup(group);
+				var ins = new NameInstance(ast.name).addToGroup(group); 
+				new Link(der.key, term.prin.key, "n", "s").addToGroup(group);
+				new Link(ins.key, der.key, "n", "s").addToGroup(group);
+
+				return new Term(ins, term.auxs);
+			}
+
+		}
+
+		createNameAbstraction(node, f, name, group) { 
+			var outter = BoxWrapper.create().addToGroup(group);
+
+			var wrapper = BoxWrapper.create().addToGroup(outter.box);
+			wrapper.prin.delete();
+			var biglambda = new BigLambda(name).addToGroup(wrapper); 
+			wrapper.prin = biglambda;
+			var box = f(node, wrapper.box); 
+			wrapper.auxs = wrapper.createPaxsOnTopOf(box.auxs);
+			//wrapper.updateNames(orig_name, name); 
+
+			new Link(biglambda.key, box.prin.key, "n", "s").addToGroup(wrapper);
+			outter.auxs = outter.createPaxsOnTopOf(wrapper.auxs);
+			new Link(outter.prin.key, wrapper.prin.key, "n", "s").addToGroup(outter);
+			return new Term(outter.prin, outter.auxs);
+		}
+
+		createBinOp(node, group) {
+			var wrapper1 = BoxWrapper.create().addToGroup(group);
+			var abs1 = new Abs().addToGroup(wrapper1.box); 
+			new Link(wrapper1.prin.key, abs1.key, "n", "s").addToGroup(wrapper1);
+
+			var wrapper2 = BoxWrapper.create().addToGroup(wrapper1.box);
+			var abs2 = new Abs().addToGroup(wrapper2.box);
+			new Link(wrapper2.prin.key, abs2.key, "n", "s").addToGroup(wrapper2);
+
+			node.addToGroup(wrapper2.box); 
+			var vl = new Var('x').addToGroup(wrapper2.box);
+			var vr = new Var('y').addToGroup(wrapper2.box);
+			new Link(node.key, vl.key, "w", "s").addToGroup(wrapper2.box);
+			new Link(node.key, vr.key, "e", "s").addToGroup(wrapper2.box);
+
+			new Link(abs2.key, node.key, "e", "s").addToGroup(abs2.group);
+			new Link(vr.key, abs2.key, "nw", "w", true).addToGroup(abs2.group);
+
+			wrapper2.auxs = wrapper2.createPaxsOnTopOf([vl]);
+
+			new Link(abs1.key, wrapper2.prin.key, "e", "s").addToGroup(abs1.group);
+			new Link(wrapper2.auxs[0].key, abs1.key, "nw", "w", true).addToGroup(abs1.group);
+
+			wrapper1.auxs = [];
+
+			return new Term(wrapper1.prin, wrapper1.auxs); 
+		}
+
+		createUnOp(node, group) {
+			var wrapper2 = BoxWrapper.create().addToGroup(group);
+			var abs2 = new Abs().addToGroup(wrapper2.box);
+			new Link(wrapper2.prin.key, abs2.key, "n", "s").addToGroup(wrapper2);
+
+			node.addToGroup(wrapper2.box); 
+
+			new Link(abs2.key, node.key, "e", "s").addToGroup(abs2.group);
+			new Link(node.key, abs2.key, "nw", "w", true).addToGroup(abs2.group);
+
+			wrapper2.auxs = [] 
+
+			return new Term(wrapper2.prin, wrapper2.auxs);
 		}
 
 		deleteVarNode(group) {
@@ -387,7 +493,7 @@ define('goi-machine', function(require) {
 				var cell = this.graph.findNodeByKey(key);
 				var evalToken = new MachineToken(this);
 				evalToken.isMain = false;
-				evalToken.setLink(cell.findLinksOutOf('e')[0]);
+				evalToken.setLink(cell.findLinksOutOf(null)[0]);
 				this.evalTokens.push(evalToken);
 			} 
 		}
@@ -444,6 +550,8 @@ define('goi-machine', function(require) {
 								machine.hasUpdate = true;
 						})
 						this.newValues.clear();
+						this.token.rewriteFlag = RewriteFlag.F_STEP;
+						this.token.foward = false;
 						return;
 					}
 				}
@@ -467,7 +575,7 @@ define('goi-machine', function(require) {
 
 				token.rewrite = false;
 				nextLink = node.transition(token, token.link);
-				console.log(nextLink);
+				//console.log(nextLink);
 
 
 				if (nextLink != null) {
@@ -493,9 +601,13 @@ define('goi-machine', function(require) {
 
 			else {
 				var target = token.forward ? token.link.from : token.link.to;
+				if (token.rewriteFlag == RewriteFlag.F_LAMBDA 
+					|| token.rewriteFlag == RewriteFlag.F_RECUR
+					|| token.rewriteFlag == RewriteFlag.F_STEP)
+					target = token.link.to; 
 				node = this.graph.findNodeByKey(target);
 				var nextLink = node.rewrite(token, token.link);
-				console.log(nextLink);
+				//console.log(nextLink);
 				if (!token.rewrite) {
 					token.transited = false;
 					this.tokenPass(token, flag, dataStack, boxStack); 

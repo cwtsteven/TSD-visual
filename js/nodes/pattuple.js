@@ -25,7 +25,7 @@ define(function(require) {
 					nextLink = this.findLinksInto("e")[0];
 				else if (direction == CompData.PL)
 					nextLink = this.findLinksInto("w")[0];
-				return nextLink;
+				return nextLink; 
 			}
 		}
 
