@@ -41,7 +41,7 @@ var fir_ex =
 + '  let aux = rec g. λx. λsum. λfs.\n' 
 + '    if fs <= nil\n' 
 + '    then \n' 
-+ '      0\n' 
++ '      sum\n' 
 + '    else \n' 
 + '      let (f, fs) = fs in \n' 
 + '      g (deref {x}) (f x + sum) fs\n' 
