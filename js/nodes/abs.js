@@ -1,6 +1,7 @@
 define(function(require) {
 	var Node = require('node');
 	var CompData = require('token').CompData();
+	var Pair = require('token').Pair();
 	
 	class Abs extends Node {
 

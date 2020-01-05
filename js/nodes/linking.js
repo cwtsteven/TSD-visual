@@ -34,14 +34,14 @@ define(function(require) {
 					token.dataStack.pop();
 					token.payload = data; 
 					token.dataStack.push(new Pair(CompData.UNIT,CompData.EMPTY));
-					token.rewriteFlag = RewriteFlag.F_DELTA;
+					token.rewriteFlag = RewriteFlag.F_LINK;
 					return this.findLinksInto(null)[0];
 				}
 			}
 		}
 
 		rewrite(token, nextLink) { 
-			if (token.rewriteFlag == RewriteFlag.F_DELTA && nextLink.to == this.key) {
+			if (token.rewriteFlag == RewriteFlag.F_LINK && nextLink.to == this.key) {
 				token.rewriteFlag = RewriteFlag.EMPTY;
 
 				var key = token.payload.b;

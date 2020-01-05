@@ -73,9 +73,11 @@ define(function() {
 
 		delete() {
 			var fromNode = this.graph.findNodeByKey(this.from);
-			fromNode.links.splice(fromNode.links.indexOf(this), 1);
+			if (fromNode)
+				fromNode.links.splice(fromNode.links.indexOf(this), 1);
 			var toNode = this.graph.findNodeByKey(this.to);
-			toNode.links.splice(toNode.links.indexOf(this), 1);
+			if (toNode)
+				toNode.links.splice(toNode.links.indexOf(this), 1);
 			this.group.removeLink(this);
 			this.graph.removeLink(this);
 		}

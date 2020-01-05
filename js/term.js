@@ -53,7 +53,7 @@ define('term', function(require) {
 						new Link(rightAux.key, con.key, "n", "s").addToGroup(group);
 						new Link(leftAux.key, con.key, "n", "s").addToGroup(group);
 						newAuxs.splice(newAuxs.indexOf(leftAux), 1);
-						newAuxs.splice(newAuxs.indexOf(rightAux), 1);
+						newAuxs.splice(newAuxs.indexOf(rightAux), 1); 
 						newAuxs.push(con);
 
 						continue outter;
@@ -72,9 +72,6 @@ define('box-wrapper', function(require) {
 	var Term = require('term');
 	var Box = require('box');
 	var Promo = require('nodes/promo');
-	var NameInstance = require('nodes/name-instance'); 
-	var BigLambda = require('nodes/biglambda'); 
-	var Fuse = require('nodes/fusion'); 
 
 	// !-box 
 	class BoxWrapper extends Term {
@@ -162,20 +159,7 @@ define('box-wrapper', function(require) {
 		copy() {
 			var map = new Map();
 			var newWrapper = this.copyBox(map);
-			newWrapper.renames();
 			return newWrapper; 
-		}
-
-		renames() {
-			if (this.prin instanceof BigLambda || this.prin instanceof Fuse) {
-				var name = newName(); 
-				this.updateNames(this.prin.pname, name);
-				this.prin.updatePName(name);
-			}
-			this.box.nodes.forEach(function(node) {
-				if (node instanceof BoxWrapper)
-					node.renames();
-			});
 		}
 
 		delete() {
@@ -194,21 +178,6 @@ define('box-wrapper', function(require) {
 			}
 			this.prin.deleteAndPreserveInLink(); //preserve inLink
 			super.delete();
-		}
-
-		updateNames(orig, fresh) {
-			//if (wrapper.prin instanceof BigLambda && wrapper.prin.name == orig) {
-			//	wrapper.prin.update(fresh);
-			//}
-			this.box.nodes.forEach(function(node) {
-				//if (node instanceof BigLambda && node.name == orig) {
-					//node.update(fresh);
-				//}					
-				if (node instanceof BoxWrapper) 
-					node.updateNames(orig, fresh);
-				else if (node.pname != null && node.pname == orig) 
-					node.updatePName(fresh);
-			})
 		}
 
 		draw(level) {

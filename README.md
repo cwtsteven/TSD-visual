@@ -13,7 +13,7 @@
          | <expr> && <expr> | <expr> || <expr> 
          | rec <var>. <expr>
          | let <var> = <expr> in <expr>
-         | { <expr> }
+         | ref <expr>
          | link <expr> <expr>
          | assign <expr> <expr>
          | peek <expr>

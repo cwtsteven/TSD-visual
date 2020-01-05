@@ -65,10 +65,6 @@ define(function(require) {
 			newNode.height = this.height;
 		}	
 
-		updatePName(pname) {
-
-		}
-
 		// also delete any connected links
 		delete() {
 			this.group.removeNode(this);

@@ -19,7 +19,7 @@ define(function() {
 
 	var RewriteFlag = {
 		EMPTY: '□',
-		F_APP: '<λ>',
+		F_APP: '<@>',
 		F_OP: '<$>',
 		F_IF: '<if>',
 		F_C: '<C>',

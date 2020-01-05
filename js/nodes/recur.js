@@ -4,12 +4,11 @@ define(function(require) {
 	var CompData = require('token').CompData();
 	var RewriteFlag = require('token').RewriteFlag();
 	var Term = require('term');
-	var Expo = require('nodes/expo');
 
-	class Recur extends Expo {
+	class Recur extends Node {
 
 		constructor() {
-			super(null, "μ", "mediumpurple1");
+			super(null, "μ", "yellow");
 		}
 
 		transition(token, link) {
@@ -24,28 +23,27 @@ define(function(require) {
 			if (token.rewriteFlag == RewriteFlag.F_RECUR && nextLink.to == this.key) {
 				token.rewriteFlag = RewriteFlag.EMPTY;
 
-				var nextLink = this.findLinksOutOf("e")[0];
+				var promo = this.graph.findNodeByKey(this.findLinksInto()[0].from);
+				var wrapper = promo.group.copy().addToGroup(promo.group.group);
+				Term.joinAuxs(promo.group.auxs, wrapper.auxs, wrapper.group);	
 
-				var wrapper = this.group.copy().addToGroup(this.group);
-				Term.joinAuxs(this.group.auxs, wrapper.auxs, wrapper.group);	
-
-				var oldGroup = this.group;
-				var oldBox = this.group.box;
+				var oldGroup = promo.group; 
 				
-				this.group.moveOut();
+				oldGroup.moveOut();
+				oldGroup.deleteAndPreserveLink(); 
 
 				var leftLink = this.findLinksInto("w")[0];
 				leftLink.changeTo(wrapper.prin.key, "s");
 				leftLink.fromPort = "n";
-				leftLink.reverse = false;
+				leftLink.reverse = false; 
 				var inLink = this.findLinksInto("s")[0];
 				var outLink = this.findLinksOutOf("e")[0];
 				outLink.changeFrom(inLink.from, inLink.fromPort);
 				
-				oldGroup.deleteAndPreserveLink();
+				this.delete(); 
 
 				token.rewrite = true;
-				return nextLink;
+				return outLink;
 			}
 
 			else if (token.rewriteFlag == RewriteFlag.EMPTY) {

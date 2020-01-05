@@ -8,17 +8,13 @@ define(function(require) {
 	var Link = require('link');
 	var Const = require('nodes/const');
 	var Cell =require('nodes/cell');
-	var Param = require('nodes/param');
-	var ProvCon = require('nodes/pc');
 	var Contract = require('nodes/contract');
 	var Pair = require('token').Pair();
 
 	class Assign extends Node {
 
-		constructor(hasPname, pname) {
+		constructor() {
 			super(null, "a", "indianred1");
-			this.hasPname = hasPname;
-			this.updatePName(pname);
 		}
 		
 		transition(token, link) {
@@ -54,16 +50,10 @@ define(function(require) {
 				var pair = token.payload;
 				var data = pair.a; 
 				var key = pair.b;
-				token.payload = null;
 				
 				var node = this.graph.findNodeByKey(key);
 
-				if (node instanceof Param) {
-					for (var i=0; i<data.length; i++) {
-						this.update(this.graph.findNodeByKey(node.findLinksOutOf(null)[i].to),data[i]);
-					}
-				}
-				else if (node instanceof Cell) {
+				if (node instanceof Cell) {
 					node.update(data);
 				}
 				var weak1 = new Contract().addToGroup(this.group);
@@ -88,27 +78,8 @@ define(function(require) {
 			}
 		}
 
-		update(node, n) {
-			while (true) {
-				if (node instanceof ProvCon) {
-					node.update(n);
-					break;
-				}
-				else if (node instanceof Contract) {
-					node = this.graph.findNodeByKey(node.findLinksOutOf(null)[0].to);
-				}
-			}
-		}
-
-		updatePName(pname) {
-			if (this.hasPname) { 
-				this.pname = pname; 
-				this.text = "a("+pname+")";
-			}
-		}
-
 		copy() {
-			return new Assign(this.hasPname, this.pname);
+			return new Assign();
 		}
 	}
 

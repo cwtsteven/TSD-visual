@@ -214,34 +214,41 @@ define('goi-machine', function(require) {
 			}
 
 			else if (ast instanceof Recursion) {
-				var p1 = ast.param;
-				// recur term
+				var params;
+				var paramUsed;
+				var auxNodes;
+				params = [ast.param]; 
+				paramUsed = [false];
+				auxNodes = [null];
 				var wrapper = BoxWrapper.create().addToGroup(group);
-				wrapper.prin.delete();
-				var recur = new Recur().addToGroup(wrapper);
-				wrapper.prin = recur;
-				var box = this.toGraph(ast.body, wrapper.box);
-				wrapper.auxs = wrapper.createPaxsOnTopOf(box.auxs);
+				var abs = new Recur().addToGroup(wrapper.box);
+				var term = this.toGraph(ast.body, wrapper.box);
+				new Link(wrapper.prin.key, abs.key, "n", "s").addToGroup(wrapper);
 
-				new Link(recur.key, box.prin.key, "e", "s").addToGroup(wrapper);
+				new Link(abs.key, term.prin.key, "e", "s").addToGroup(abs.group);
 
-				var p1Used = false;
-				var auxNode1;
-				for (var i=0; i<wrapper.auxs.length; i++) {
-					var aux = wrapper.auxs[i];
-					if (aux.name == p1) {
-						p1Used = true;
-						auxNode1 = this.graph.findNodeByKey(aux.findLinksInto(null)[0].from);
-						aux.delete();
-						break;
+				var auxs = Array.from(term.auxs);
+				
+				for (var i=0;i<params.length;i++) {
+					for (let aux of term.auxs) {
+						if (aux.name == params[i]) {
+							paramUsed[i] = true;
+							auxNodes[i] = aux;
+							break;
+						}
 					}
 				}
-				if (p1Used) {
-					// wrapper.auxs.splice(wrapper.auxs.indexOf(auxNode1), 1);
-				} else {
-					auxNode1 = new Contract(p1).addToGroup(wrapper.box);
+				for (var i=0;i<params.length;i++) {
+					if (paramUsed[i]) {
+						auxs.splice(auxs.indexOf(auxNodes[i]), 1);
+					} else {
+						auxNodes[i] = new Contract(params[i]).addToGroup(abs.group);
+					}	
 				}
-				new Link(auxNode1.key, recur.key, "nw", "w", true).addToGroup(wrapper);
+				new Link(auxNodes[0].key, abs.key, "nw", "w", true).addToGroup(abs.group);
+
+				wrapper.auxs = wrapper.createPaxsOnTopOf(auxs);
+
 				return new Term(wrapper.prin, wrapper.auxs);
 			}
 

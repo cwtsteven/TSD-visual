@@ -55,7 +55,7 @@ var fir_ex =
 + '   fir x fs\n' 
 + 'in\n' 
 + '\n' 
-+ 'let inp = {0} in \n' 
++ 'let inp = ref 0 in \n' 
 + 'link inp ((deref inp) + 1); \n' 
 + 'let y = avg3 (deref inp) in\n' 
 + 'step; \n' 

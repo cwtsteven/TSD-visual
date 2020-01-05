@@ -29,6 +29,7 @@ define(function(require) {
 			else if (link.from == this.key && link.fromPort == "w") {
 				var nextLink = this.findLinksInto()[0];
 				token.dataStack.pop();
+				token.dataStack.push(CompData.PROMPT);
 				token.rewriteFlag = RewriteFlag.F_APP;
 				return nextLink; 
 			}
@@ -68,6 +69,7 @@ define(function(require) {
 			
 					
 				token.rewrite = true;
+				token.forward = true;
 				return lamdaout;
 			}
 			
