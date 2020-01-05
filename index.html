@@ -26,9 +26,8 @@
   						case "dataflow": prog = dfg_ex; break;
   						case "link": prog = link_ex; break;
   						case "max": prog = max_ex; break;
-  						case "alt": prog = alt_ex; break;
+  						case "alt": prog = alt_sum_ex; break;
   						case "fir": prog = fir_ex; break;
-  						case "rsum": prog = rsum_ex; break;
   					}
   					$("#ta-program").val(prog);
   					$("#btn-make-graph").click(); 
@@ -46,7 +45,7 @@
 			<option value="dataflow">Dataflow graph</option>
 			<option value="link">Link</option>
 			<option value="max">Maximum of two int</option>
-			<option value="alt">Alternating signal</option>
+			<option value="alt">Alternating sum</option>
 			<option value="fir">Finite impulse response filter</option>
 			<option value="rsum">Running sum</option>
 			<!--<option value="iir">Infinite impulse response filter</option>
@@ -96,7 +95,7 @@
 			case "dataflow": prog = dfg_ex; break;
 			case "link": prog = link_ex; break;
 			case "max": prog = max_ex; break;
-			case "alt": prog = alt_ex; break;
+			case "alt": prog = alt_sum_ex; break;
 			case "fir": prog = fir_ex; break;
 			case "rsum": prog = rsum_ex; break;
 			default: prog = max_ex;$("#sm-example").val("max")
