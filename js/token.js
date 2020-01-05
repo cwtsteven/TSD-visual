@@ -19,7 +19,7 @@ define(function() {
 
 	var RewriteFlag = {
 		EMPTY: '□',
-		F_LAMBDA: '<λ>',
+		F_APP: '<λ>',
 		F_OP: '<$>',
 		F_IF: '<if>',
 		F_C: '<C>',
@@ -30,11 +30,8 @@ define(function() {
 		F_ROOT: '<r>',
 		F_LINK: '<l>',
 		F_ASSIGN: '<a>',
-		F_FUSE: '<F>',
-		F_FOLD: '<f>',
 		F_STEP: '<s>',
 		F_SP: '<sp>',
-		F_BIGLAMBDA: '<Λ>',
 
 		F_PAIR: '<,>',
 	}

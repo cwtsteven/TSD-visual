@@ -56,6 +56,7 @@ define(function() {
     'THEN',
     'ELSE',
 
+    'REF',
     'ASSIGN',
     'LINK',
     //'TO',
@@ -63,11 +64,6 @@ define(function() {
     'PEEK',
     'DEREF', 
     'ROOT',
-    'FUSE',
-    'FUSION',
-    'FROM',
-    'PC',
-    'FOLD', 
     'CELLCREATE',
 
     'BIGLAMBDA',

@@ -10,7 +10,7 @@ requirejs.config({
 	bundles: {
         'parser/ast': ['ast/pattern', 'ast/abstraction', 'ast/application', 'ast/identifier'
         			 , 'ast/constant', 'ast/operation', 'ast/if-then-else', 'ast/recursion', 'ast/tuple'
-        			 , 'ast/cell-creation', 'ast/fusion', 'ast/pc', 'ast/name-abstraction', 'ast/name-instantiation'],
+        			 , 'ast/cell-creation'],
         'group': ['group', 'box'],
         'term': ['term', 'box-wrapper'],
         'nodes/der': ['nodes/der', 'nodes/var'],

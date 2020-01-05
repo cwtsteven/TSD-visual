@@ -187,6 +187,8 @@ define(function(require) {
               this._token = new Token(Token.THEN);
             else if (str == "else")
               this._token = new Token(Token.ELSE);
+            else if (str == "ref")
+              this._token = new Token(Token.REF);
             else if (str == "link")
               this._token = new Token(Token.LINK);
             else if (str == "assign")
@@ -201,14 +203,6 @@ define(function(require) {
               this._token = new Token(Token.DEREF);
             else if (str == "root")
               this._token = new Token(Token.ROOT);
-            else if (str == "fuse")
-              this._token = new Token(Token.FUSION);
-            else if (str == "from")
-              this._token = new Token(Token.FROM);
-            else if (str == "pc")
-              this._token = new Token(Token.PC);
-            else if (str == "fold")
-              this._token = new Token(Token.FOLD);
             else
               this._token = new Token(Token.LCID, str);
           } 
