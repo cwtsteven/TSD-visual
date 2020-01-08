@@ -61,3 +61,8 @@ var alt_sum_ex =
 + 'step; \n'
 + 'step; \n'
 + 'peek alt_sum';
+
+var if_ex = 
+  'let f = λx.x in\n'
++ 'let x = ref 1 in\n'
++ 'ref (if x <= 1 then f 3 else f 4)'; 
