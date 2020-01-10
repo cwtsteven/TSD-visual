@@ -46,6 +46,7 @@ define(function() {
     'MULT',
     'DIV',
     'MOD',
+    'EQ',
     'LTE',
     'NEQ',
     'VECPLUS',

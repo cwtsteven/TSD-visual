@@ -275,6 +275,7 @@ define('goi-machine', function(require) {
 					case Token.DIV:
 					case Token.MOD:
 					case Token.LTE:
+					case Token.EQ:
 					case Token.NEQ:
 						var node = new BinOp(ast.name, ast.type, false); return this.createBinOp(node, group); 
 					case Token.COMMA:

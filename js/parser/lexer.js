@@ -71,10 +71,6 @@ define(function(require) {
           this._token = new Token(Token.EOF);
           break;
 
-        case '~':
-          this._token = new Token(Token.NOT, '~');
-          break;
-
         case '&':
           if (this._nextChar() == '&')
             this._token = new Token(Token.AND, '&&', 5);
@@ -127,7 +123,13 @@ define(function(require) {
           break;
 
         case '=':
-          this._token = new Token(Token.DEFINE);
+          var nexttoken = this._nextChar(); 
+          if (nexttoken == '=')
+            this._token = new Token(Token.EQ, '==', 10);
+          else {
+            this._index--;
+            this._token = new Token(Token.DEFINE);
+          }
           break;
 
         case '⊞':
@@ -203,6 +205,9 @@ define(function(require) {
               this._token = new Token(Token.DEREF);
             else if (str == "root")
               this._token = new Token(Token.ROOT);
+
+            else if (str == "not")
+              this._token = new Token(Token.NOT);
             else
               this._token = new Token(Token.LCID, str);
           } 

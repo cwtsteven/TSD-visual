@@ -85,7 +85,7 @@ define(function(require) {
       return token.type == Token.AND || token.type == Token.OR 
           || token.type == Token.PLUS || token.type == Token.SUB  
           || token.type == Token.MULT || token.type == Token.DIV 
-          || token.type == Token.MOD || token.type == Token.NEQ
+          || token.type == Token.MOD || token.type == Token.EQ || token.type == Token.NEQ
           || token.type == Token.LTE || token.type == Token.COMMA
     }
 
@@ -186,7 +186,7 @@ define(function(require) {
                || this.lexer.next(Token.ASSIGN) || this.lexer.next(Token.STEP) || this.lexer.next(Token.FOLD)
                || this.lexer.next(Token.AND) || this.lexer.next(Token.OR) || this.lexer.next(Token.PLUS)
                || this.lexer.next(Token.SUB) || this.lexer.next(Token.MULT) || this.lexer.next(Token.DIV)
-               || this.lexer.next(Token.MOD) || this.lexer.next(Token.NEQ) 
+               || this.lexer.next(Token.MOD) || this.lexer.next(Token.EQ) || this.lexer.next(Token.NEQ) 
                || this.lexer.next(Token.LTE) || this.lexer.next(Token.COMMA)
               ) {
         var op = this.lexer.lookahead();
